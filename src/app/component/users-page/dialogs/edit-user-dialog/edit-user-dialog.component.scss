@@ -1,0 +1,92 @@
+:host {
+  display: block;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+h2[mat-dialog-title] {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #333;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+
+  .mat-mdc-form-field-flex {
+    border-radius: 8px;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+  }
+}
+
+$primary-color: #675992;
+
+.massive-btn {
+  border: 1px solid $primary-color;
+  color: $primary-color;
+  text-transform: none;
+  height: 36px;
+  border-radius: 18px;
+}
+
+.create-btn {
+  background-color: $primary-color;
+  color: white;
+  text-transform: none;
+  height: 36px;
+  border-radius: 18px;
+}
+
+mat-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 16px;
+  margin-top: 24px;
+
+  button + button {
+    margin-left: 8px;
+  }
+}
+
+.checkbox-field {
+  margin-bottom: 16px;
+}
+
+.mat-checkbox .mat-checkbox-frame {
+  border-color: $primary-color;
+}
+
+.mat-checkbox-checked .mat-checkbox-background,
+.mat-checkbox-checked .mat-checkbox-checkmark-path {
+  background-color: $primary-color;
+  stroke: white;
+}
+
+.mat-checkbox .mat-checkbox-ripple .mat-ripple-element {
+  background-color: rgba(103, 89, 146, 0.2);
+}
+
+::ng-deep .mat-datepicker-content {
+  background: #fff !important;
+  border-radius: 12px;
+}
+
+::ng-deep .mat-calendar {
+  color: #333;
+}
+
+::ng-deep .mat-calendar-body-selected,
+::ng-deep .mat-calendar-body-today {
+  background-color: $primary-color !important;
+  color: white !important;
+}

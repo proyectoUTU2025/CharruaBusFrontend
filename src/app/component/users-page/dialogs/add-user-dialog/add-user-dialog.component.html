@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Crear Nuevo Usuario</h2>
+<form [formGroup]="form" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Nombre</mat-label>
+    <input matInput formControlName="nombre" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Correo</mat-label>
+    <input matInput formControlName="correo" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Documento</mat-label>
+    <input matInput formControlName="documento" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha de Nacimiento</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Rol</mat-label>
+    <mat-select formControlName="rol">
+      <mat-option value="Administrador">Administrador</mat-option>
+      <mat-option value="Vendedor">Vendedor</mat-option>
+      <mat-option value="Cliente">Cliente</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Género</mat-label>
+    <mat-select formControlName="genero">
+      <mat-option value="Masculino">Masculino</mat-option>
+      <mat-option value="Femenino">Femenino</mat-option>
+      <mat-option value="Otro">Otro</mat-option>
+    </mat-select>
+  </mat-form-field>
+    
+  <div class="checkbox-field">
+    <mat-checkbox formControlName="activo">Usuario activo</mat-checkbox>
+  </div>
+</form>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-stroked-button
+    class="massive-btn"
+    (click)="cancel()">
+    Cancelar
+  </button>
+  <button
+    mat-flat-button
+    class="create-btn"
+    (click)="save()">
+    Guardar
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,30 @@
+<mat-toolbar color="primary" class="navbar">
+  <div class="navbar-left">
+    <img src="assets/charruabusIcon.png" alt="Logo" class="logo clickable" (click)="onLogoClick()">
+    <span class="brand clickable" (click)="onLogoClick()">CharruaBus</span>
+    <span class="role">Vendedor</span>
+  </div>
+
+  <span class="spacer"></span>
+  
+    <button mat-stroked-button 
+          class="usuarios-button" 
+          routerLink="/usuarios">
+      <mat-icon>people</mat-icon>
+        Usuarios
+    </button> 
+    
+    <button mat-stroked-button
+          color="primary"
+          class="usuarios-button"
+          routerLink="/omnibus">
+      <mat-icon>directions_bus</mat-icon>
+      Ómnibus
+    </button>
+
+    <button mat-stroked-button 
+          class="logout-button">
+      <mat-icon>logout</mat-icon>
+      Cerrar Sesión
+    </button>
+</mat-toolbar>

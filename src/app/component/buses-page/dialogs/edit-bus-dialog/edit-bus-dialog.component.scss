@@ -1,0 +1,60 @@
+$primary-color: #675992;
+
+:host {
+  display: block;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+h2[mat-dialog-title] {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #333;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+
+  .mat-mdc-form-field-flex {
+    background: #f7f7f7;
+    border-radius: 8px;
+  }
+}
+
+.checkbox-field {
+  margin: 16px 0;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 16px;
+  margin-top: 24px;
+
+  button + button {
+    margin-left: 8px;
+  }
+}
+
+.cancel-btn {
+  border: 1px solid rgba(0, 0, 0, 0.54);
+  color: rgba(0, 0, 0, 0.54);
+  background: transparent;
+  border-radius: 18px;
+  height: 36px;
+  text-transform: none;
+}
+
+.save-btn {
+  background-color: $primary-color;
+  color: #fff;
+  border-radius: 18px;
+  height: 36px;
+  text-transform: none;
+}

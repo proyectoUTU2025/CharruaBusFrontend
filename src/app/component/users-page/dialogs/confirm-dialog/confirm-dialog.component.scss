@@ -1,0 +1,48 @@
+$primary-color: #675992;
+
+:host {
+  display: block;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+h2[mat-dialog-title] {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #333;
+}
+
+mat-dialog-content {
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+mat-dialog-actions {
+  justify-content: flex-end;
+  background: #fff;
+  margin-top: 16px;
+  padding-top: 8px;
+
+  button + button {
+    margin-left: 8px;
+  }
+}
+
+.massive-btn {
+  border: 1px solid $primary-color;
+  color: $primary-color;
+  text-transform: none;
+  height: 36px;
+  border-radius: 18px;
+}
+
+.delete-btn {
+  background-color:#675992;
+  color: white;
+  text-transform: none;
+  height: 36px;
+  border-radius: 18px;
+}

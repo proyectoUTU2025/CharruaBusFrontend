@@ -1,0 +1,49 @@
+<div class="login-card">
+  <div class="header-bar"></div>
+  <div class="logo-container">
+    <img src="assets/charruabusIcon.png" alt="Charrua Bus" class="logo">
+  </div>
+  <h1 class="title">Bienvenido de nuevo</h1>
+  <p class="subtitle">Introduce tus credenciales para iniciar sesión en tu cuenta</p>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="mail@ejemplo.com"
+        matInput>
+      <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        Ingresa un email válido
+      </mat-error>
+    </div>
+    <div class="form-field">
+      <label for="password">Contraseña</label>
+      <div class="password-field">
+        <input
+          id="password"
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          matInput>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="hidePassword = !hidePassword"
+          class="visibility-toggle">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+      <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        Password is required
+      </mat-error>
+    </div>
+    <button type="submit" mat-flat-button class="sign-in-button">
+      <mat-icon>login</mat-icon>
+      Sign in
+    </button>
+    <div class="forgot-password">
+      <a (click)="forgotPassword()">Olvidaste tu password? Recuperalo</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,59 @@
+$primary-color: #675992;
+
+:host {
+  display: block;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+h2[mat-dialog-title] {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+mat-dialog-content {
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 16px;
+
+    .mat-mdc-form-field-flex {
+      background: #f7f7f7;
+      border-radius: 8px;
+    }
+  }
+
+  .note {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 12px;
+  }
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+}
+
+.cancel-btn {
+  border: 1px solid rgba(0, 0, 0, 0.54);
+  color: rgba(0, 0, 0, 0.54);
+  background: transparent;
+  border-radius: 18px;
+  height: 36px;
+  text-transform: none;
+}
+
+.save-btn {
+  background-color: $primary-color;
+  color: #fff;
+  border-radius: 18px;
+  height: 36px;
+  text-transform: none;
+}

@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Editar Localidad</h2>
+<p class="intro">Modifique los datos de la localidad seleccionada.</p>
+
+<form [formGroup]="form" mat-dialog-content>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Departamento</mat-label>
+    <mat-select formControlName="departamento">
+      <mat-option *ngFor="let dept of departamentos" [value]="dept">{{ dept }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Nombre de la Localidad</mat-label>
+    <input matInput formControlName="nombre" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Código</mat-label>
+    <input matInput formControlName="codigo" />
+  </mat-form-field>
+</form>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
+  <button mat-flat-button class="save-btn" (click)="save()">Guardar</button>
+</mat-dialog-actions>

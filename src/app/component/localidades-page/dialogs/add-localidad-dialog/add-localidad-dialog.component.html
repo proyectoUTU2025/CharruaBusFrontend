@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Alta Individual de Localidad</h2>
+<p class="intro">Complete los siguientes campos para registrar una nueva localidad en el sistema.</p>
+
+<form [formGroup]="form" mat-dialog-content>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Departamento</mat-label>
+    <mat-select formControlName="departamento">
+      <mat-option *ngFor="let dept of departamentos" [value]="dept">{{ dept }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Nombre de la Localidad</mat-label>
+    <input matInput formControlName="nombre" placeholder="Ej: Ciudad Vieja" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Código</mat-label>
+    <input matInput formControlName="codigo" placeholder="Ej: MV-001" />
+  </mat-form-field>
+
+  <p class="note">* Campos obligatorios</p>
+  <p class="note small">Nota: El ID será generado automáticamente por el sistema.</p>
+</form>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
+    <button mat-flat-button class="save-btn" (click)="save()">Guardar</button>
+</mat-dialog-actions>

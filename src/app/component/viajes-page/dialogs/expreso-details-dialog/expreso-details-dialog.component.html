@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>Alta de Viaje Expreso</h2>
+<mat-dialog-content [formGroup]="form">
+  <p class="info-msg">
+    Los viajes expresos son traslados de ómnibus sin pasajeros, generalmente para reposicionamiento, mantenimiento o logística interna.
+  </p>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha del viaje</mat-label>
+    <input matInput formControlName="fecha" [matDatepicker]="fechaPicker" />
+    <mat-datepicker-toggle matSuffix [for]="fechaPicker"></mat-datepicker-toggle>
+    <mat-datepicker #fechaPicker></mat-datepicker>
+  </mat-form-field>
+
+  <div class="time-row">
+    <mat-form-field appearance="fill">
+      <mat-label>Hora de salida</mat-label>
+      <input matInput formControlName="horaSalida" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Hora de llegada</mat-label>
+      <input matInput formControlName="horaLlegada" />
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Origen</mat-label>
+    <mat-select formControlName="origen">
+      <mat-option *ngFor="let origen of ['Montevideo', 'Colonia', 'Paysandú']" [value]="origen">{{ origen }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Destino</mat-label>
+    <mat-select formControlName="destino">
+      <mat-option *ngFor="let destino of ['Punta del Este', 'Colonia', 'Montevideo']" [value]="destino">{{ destino }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="continuar()">Continuar</button>
+</mat-dialog-actions>

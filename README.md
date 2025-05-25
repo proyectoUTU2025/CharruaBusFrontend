@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Charruabus
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
@@ -58,6 +57,3 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-=======
-# CharruaBusFrontend
->>>>>>> 2c7b9b233c780a61cc0c35178ca95dce2c5bda9a

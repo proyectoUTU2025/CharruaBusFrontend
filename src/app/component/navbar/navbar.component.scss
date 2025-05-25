@@ -102,9 +102,16 @@ $primary-color: #675992;
   align-items: center !important;
   margin-right: 8px !important;
 }
-
-mat-icon {
-margin-right: 4px !important;
+.viajes-button {
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
 }
-
+  mat-icon {
+    margin-right: 4px !important;
+  }
 }

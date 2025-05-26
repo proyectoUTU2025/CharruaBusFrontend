@@ -17,6 +17,9 @@ export class LoginService {
     ).then(response => {
       this._jwt = response.data.token;
       this._decoded = jwtDecode(this._jwt);
+    })
+    .catch(error => {
+      console.error('Error during login:', error);
     });
   }
 
@@ -26,7 +29,10 @@ export class LoginService {
         email,
         verificationCode: code
       })
-    );
+    ).catch(error => {
+      console.error('Error during email verification:', error);
+      throw error;
+    });
   }
 
   get nombre(): string | null {

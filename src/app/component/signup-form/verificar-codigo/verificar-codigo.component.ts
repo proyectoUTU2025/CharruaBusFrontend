@@ -3,47 +3,40 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { LoginService } from '../../services/login.service';
+import { LoginService } from '../../../services/login.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-verificar-codigo',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule,
     MatButtonModule
   ],
-  templateUrl: './signup-form.component.html',
-  styleUrls: ['./signup-form.component.scss']
+  templateUrl: './verificar-codigo.component.html',
+  styleUrls: ['./verificar-codigo.component.scss']
 })
-export class SignupFormComponent {
-  loginForm: FormGroup;
-  hidePassword = true;
+export class VerificarCodigoComponent {
+  form: FormGroup;
   error: string | null = null;
 
   constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router) {
-    this.loginForm = this.fb.group({
+    this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      code: ['', Validators.required]
     });
   }
 
   async onSubmit(): Promise<void> {
-    if (this.loginForm.invalid) return;
     try {
-      await this.loginService.login(this.loginForm.value);
-      this.router.navigate(['/verificar-codigo']);
+      await this.loginService.validateCode(this.form.value.email, this.form.value.code);
+      this.router.navigate(['/usuarios']);
     } catch {
-      this.error = 'Credenciales inválidas';
+      this.error = 'Código inválido';
     }
-  }
-  forgotPassword(): void {
-    console.log('Recuperar contraseña');
   }
 }

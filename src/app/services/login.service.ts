@@ -34,7 +34,14 @@ export class LoginService {
       throw error;
     });
   }
-
+  registrarCliente(data: any) {
+    return firstValueFrom(
+      this.http.post('http://localhost:8080/auth/registrar', data)
+    ).catch(error => {
+      console.error('Error durante el registro:', error);
+      throw error;
+    });
+  }
   get nombre(): string | null {
     return this._decoded.name || null;
   }

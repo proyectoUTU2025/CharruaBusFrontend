@@ -1,6 +1,6 @@
 <div class="wrapper fadeInDown">
   <div id="formContent">
-    <h2 class="active"> Verificar Email </h2>
+    <h2 class="active">Verificar Email</h2>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <input type="email" formControlName="email" class="fadeIn first" placeholder="Email" />
@@ -8,6 +8,8 @@
       <button type="submit" class="login-button fadeIn fourth">Validar</button>
     </form>
 
-    <div *ngIf="error" class="fadeIn fourth" style="color: red; margin-top: 10px;">{{ error }}</div>
+    <div *ngIf="error" class="fadeIn fourth" style="color: red; margin-top: 10px;">
+      {{ error }}
+    </div>
   </div>
 </div>

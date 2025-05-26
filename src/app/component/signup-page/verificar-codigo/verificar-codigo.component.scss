@@ -1,0 +1,60 @@
+$primary-color: #675992;
+$input-border: #ddd;
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+#formContent {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+input[type="email"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid $input-border;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus {
+  border-color: $primary-color;
+  outline: none;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: darken($primary-color, 5%);
+}

@@ -34,7 +34,7 @@ export class VerificarCodigoComponent {
   async onSubmit(): Promise<void> {
     try {
       await this.loginService.validateCode(this.form.value.email, this.form.value.code);
-      this.router.navigate(['/usuarios']);
+      this.router.navigate(['/login']);
     } catch {
       this.error = 'Código inválido';
     }

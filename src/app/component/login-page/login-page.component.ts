@@ -19,10 +19,10 @@ import { Router } from '@angular/router';
     MatIconModule,
     MatButtonModule
   ],
-  templateUrl: './signup-form.component.html',
-  styleUrls: ['./signup-form.component.scss']
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.scss']
 })
-export class SignupFormComponent {
+export class LoginPageComponent {
   loginForm: FormGroup;
   hidePassword = true;
   error: string | null = null;
@@ -38,12 +38,17 @@ export class SignupFormComponent {
     if (this.loginForm.invalid) return;
     try {
       await this.loginService.login(this.loginForm.value);
-      this.router.navigate(['/verificar-codigo']);
+      this.router.navigate(['/']);
     } catch {
       this.error = 'Credenciales inválidas';
     }
   }
+
   forgotPassword(): void {
     console.log('Recuperar contraseña');
+  }
+
+  goToSignup(): void {
+    this.router.navigate(['/registro']);
   }
 }

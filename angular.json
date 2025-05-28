@@ -27,7 +27,7 @@
               },
               "src/assets"
             ],
-            "styles": [              
+            "styles": [
               "src/styles.css"
             ],
             "scripts": []
@@ -58,6 +58,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "charuabusfrontend:build:production"
@@ -87,10 +90,9 @@
             ],
             "styles": [
               "src/styles.css"
-              
             ],
             "scripts": [
-               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           }
         }

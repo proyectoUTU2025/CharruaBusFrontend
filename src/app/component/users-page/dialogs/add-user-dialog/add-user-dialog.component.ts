@@ -10,14 +10,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TipoDocumento, TipoRol } from '../../../../models/users';
 
 @Component({
   selector: 'app-add-user-dialog',
   standalone: true,
   imports: [
     CommonModule,
-    MatDialogModule,
     ReactiveFormsModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
@@ -32,26 +33,31 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 })
 export class AddUserDialogComponent {
   form: FormGroup;
+  tiposDocumento = Object.values(TipoDocumento);
+  roles = Object.values(TipoRol);
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddUserDialogComponent>
   ) {
     this.form = this.fb.group({
-      nombre: ['', Validators.required],
-      correo: ['', [Validators.required, Validators.email]],
-      documento: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required],
-      rol: ['', Validators.required],
-      genero: ['', Validators.required],
-      activo: [true]
+      email:            ['', [Validators.required, Validators.email]],
+      password:         ['', Validators.required],
+      nombre:           ['', Validators.required],
+      apellido:         ['', Validators.required],
+      documento:        ['', Validators.required],
+      tipoDocumento:    ['', Validators.required],
+      rol:              ['', Validators.required],
+      fechaNacimiento:  ['', Validators.required],
+      activo:           [true]
     });
   }
 
   save(): void {
-    if (this.form.valid) {
-      this.dialogRef.close(this.form.value);
-    }
+    if (!this.form.valid) return;
+    const raw = this.form.value;
+    raw.fechaNacimiento = (raw.fechaNacimiento as Date).toISOString().slice(0, 10);
+    this.dialogRef.close(raw);
   }
 
   cancel(): void {

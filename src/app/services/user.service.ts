@@ -1,38 +1,62 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { User } from '../models/users';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import {
+  UsuarioDto,
+  AltaUsuarioDto,
+  FiltroBusquedaUsuarioDto,
+  Page
+} from '../models';
+import { ApiResponse } from '../models/api';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private _users = new BehaviorSubject<User[]>([
-    { id: 1, nombre: 'Carlos Rodríguez', correo: 'carlos@charruabus.com', documento: '4.123.456-7', fechaNacimiento: '1980-03-15', fechaRegistro: '2022-03-15', ultimoAcceso: 'Hoy, 09:45', rol: 'Administrador', genero: 'Masculino', activo: true },
-    { id: 2, nombre: 'María González', correo: 'maria@charruabus.com', documento: '3.987.654-1', fechaNacimiento: '1992-05-22', fechaRegistro: '2022-05-22', ultimoAcceso: 'Ayer, 17:30', rol: 'Vendedor', genero: 'Femenino', activo: true },
-    { id: 3, nombre: 'Juan Pérez', correo: 'juan@gmail.com', documento: '5.678.901-2', fechaNacimiento: '1985-01-10', fechaRegistro: '2023-01-10', ultimoAcceso: 'Hace 3 días', rol: 'Cliente', genero: 'Masculino', activo: true },
-    { id: 4, nombre: 'Ana Silva', correo: 'ana@hotmail.com', documento: '2.345.678-9', fechaNacimiento: '1990-04-05', fechaRegistro: '2023-04-05', ultimoAcceso: 'Hace 1 semana', rol: 'Cliente', genero: 'Femenino', activo: true },
-    { id: 5, nombre: 'Roberto Fernández', correo: 'roberto@outlook.com', documento: '1.234.567-8', fechaNacimiento: '1978-06-18', fechaRegistro: '2023-06-18', ultimoAcceso: 'Hace 2 semanas', rol: 'Cliente', genero: 'Masculino', activo: false },
-    { id: 6, nombre: 'Lucía Martínez', correo: 'lucia@mail.com', documento: '6.543.210-3', fechaNacimiento: '1995-09-30', fechaRegistro: '2023-09-30', ultimoAcceso: 'Hace 3 semanas', rol: 'Vendedor', genero: 'Femenino', activo: true }
-  ]);
+  private base = 'http://localhost:8080/usuarios';
 
-  getAll(): Observable<User[]> {
-    return this._users.asObservable();
+  constructor(private http: HttpClient) {}
+
+  getAll(
+    filtro: FiltroBusquedaUsuarioDto = {},
+    page = 0,
+    size = 10,
+    sort = 'nombre,asc'
+  ): Promise<Page<UsuarioDto>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+
+    Object.entries(filtro).forEach(([k, v]) => {
+      if (v != null && v !== '') {
+        Array.isArray(v)
+          ? v.forEach(val => (params = params.append(k, val)))
+          : (params = params.set(k, v.toString()));
+      }
+    });
+
+    return firstValueFrom(
+      this.http.get<Page<UsuarioDto>>(this.base, { params })
+    );
   }
 
-  create(user: User): Observable<User> {
-    const current = this._users.getValue();
-    const nextId = Math.max(...current.map(u => u.id)) + 1;
-    const created = { ...user, id: nextId };
-    this._users.next([...current, created]);
-    return of(created);
+  create(alta: AltaUsuarioDto): Promise<UsuarioDto> {
+    return firstValueFrom(
+      this.http
+        .post<ApiResponse<UsuarioDto>>(`${this.base}/admin`, alta)
+    ).then(resp => resp.data);
   }
 
-  update(user: User): Observable<User> {
-    const updatedList = this._users.getValue().map(u => u.id === user.id ? user : u);
-    this._users.next(updatedList);
-    return of(user);
+  update(u: UsuarioDto): Promise<UsuarioDto> {
+    return firstValueFrom(
+      this.http
+        .put<ApiResponse<UsuarioDto>>(`${this.base}/admin/${u.id}`, u)
+    ).then(resp => resp.data);
   }
 
-  delete(id: number): Observable<number> {
-    this._users.next(this._users.getValue().filter(u => u.id !== id));
-    return of(id);
+  delete(id: number): Promise<void> {
+    return firstValueFrom(
+      this.http
+        .delete<void>(`${this.base}/admin/${id}`)
+    );
   }
 }

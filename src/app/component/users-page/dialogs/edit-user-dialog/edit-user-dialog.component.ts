@@ -9,8 +9,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { User } from '../../../../models/users';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { UsuarioDto } from '../../../../models';
 
 @Component({
   standalone: true,
@@ -33,25 +33,27 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 })
 export class EditUserDialogComponent {
   form: FormGroup;
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditUserDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: User
+    @Inject(MAT_DIALOG_DATA) public data: UsuarioDto
   ) {
     this.form = this.fb.group({
-      id: [data.id],
-      nombre: [data.nombre, Validators.required],
-      correo: [data.correo, [Validators.required, Validators.email]],
-      documento: [data.documento, Validators.required],
-      fechaNacimiento: [data.fechaNacimiento, Validators.required],
-      rol: [data.rol, Validators.required],
-      genero: [data.genero, Validators.required],
-      activo: [data.activo]
+      id: [this.data.id],
+      nombre: [this.data.nombre, Validators.required],
+      email: [this.data.email, [Validators.required, Validators.email]],
+      documento: [this.data.documento, Validators.required],
+      fechaNacimiento: [this.data.fechaNacimiento, Validators.required],
+      rol: [this.data.rol, Validators.required],
+      activo: [this.data.activo]
     });
   }
+
   save() {
     this.dialogRef.close(this.form.value);
   }
+
   cancel() {
     this.dialogRef.close();
   }

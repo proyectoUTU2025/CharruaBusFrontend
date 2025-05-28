@@ -5,23 +5,26 @@ import {
   UsuarioDto,
   AltaUsuarioDto,
   FiltroBusquedaUsuarioDto,
-  Page,
+  Page
 } from '../models';
+import { ApiResponse } from '../models/api';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private base = 'http://localhost:8080/usuarios';
 
   constructor(private http: HttpClient) {}
- 
+
   getAll(
     filtro: FiltroBusquedaUsuarioDto = {},
     page = 0,
-    size = 10
+    size = 10,
+    sort = 'nombre,asc'
   ): Promise<Page<UsuarioDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
     Object.entries(filtro).forEach(([k, v]) => {
       if (v != null && v !== '') {
@@ -31,20 +34,29 @@ export class UserService {
       }
     });
 
-    return firstValueFrom(this.http.get<Page<UsuarioDto>>(this.base, { params }));
+    return firstValueFrom(
+      this.http.get<Page<UsuarioDto>>(this.base, { params })
+    );
   }
 
   create(alta: AltaUsuarioDto): Promise<UsuarioDto> {
-    return firstValueFrom(this.http.post<UsuarioDto>(this.base, alta));
+    return firstValueFrom(
+      this.http
+        .post<ApiResponse<UsuarioDto>>(`${this.base}/admin`, alta)
+    ).then(resp => resp.data);
   }
 
   update(u: UsuarioDto): Promise<UsuarioDto> {
     return firstValueFrom(
-      this.http.put<UsuarioDto>(`${this.base}/${u.id}`, u)
-    );
+      this.http
+        .put<ApiResponse<UsuarioDto>>(`${this.base}/admin/${u.id}`, u)
+    ).then(resp => resp.data);
   }
 
   delete(id: number): Promise<void> {
-    return firstValueFrom(this.http.delete<void>(`${this.base}/${id}`));
+    return firstValueFrom(
+      this.http
+        .delete<void>(`${this.base}/admin/${id}`)
+    );
   }
 }

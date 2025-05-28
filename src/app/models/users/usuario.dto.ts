@@ -5,16 +5,17 @@ import { TipoRol } from './tipo-rol.enum';
 export interface UsuarioDto {
   id: number;
   email: string;
+  password: string; 
   nombre: string;
   apellido: string;
-  documento: string;
+  documento: string;  
   tipoDocumento: TipoDocumento;
   rol: TipoRol;
-  fechaNacimiento: string; // ISO date string
+  fechaNacimiento: string; // formato ISO 8601 (YYYY-MM-DD)
   activo: boolean;
 }
 
-// para el alta
+// para el alta de usuario
 export interface AltaUsuarioDto {
   email: string;
   password: string;
@@ -26,7 +27,7 @@ export interface AltaUsuarioDto {
   fechaNacimiento: string;
 }
 
-// para los filtros
+// para la búsqueda y filtrado
 export interface FiltroBusquedaUsuarioDto {
   nombre?: string;
   apellido?: string;
@@ -36,11 +37,11 @@ export interface FiltroBusquedaUsuarioDto {
   activo?: boolean;
 }
 
-// genérico para paginación Spring Data
+// para paginación y ordenamiento
 export interface Page<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
   size: number;
-  number: number; // página actual (0-based)
+  number: number;   
 }

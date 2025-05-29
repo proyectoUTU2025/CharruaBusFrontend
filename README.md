@@ -1,3 +1,124 @@
+# CharruaBus Frontend
+
+Interfaz web administrativa de CharruaBus, desarrollada con Angular y Angular Material.
+
+## 📋 Prerequisitos
+
+- **Node.js** v18.x o superior  
+- **npm** v9.x o superior  
+- **Angular CLI** v19.x  
+- **Chrome**, **Edge** u otro navegador moderno para desarrollo
+- Backend corriendo en `http://localhost:8080` (o ajustar proxy)
+
+## 🔧 Instalación
+
+1. Clona el repositorio:
+
+   ```bash
+   git clone <url-del-repo>
+   cd <ruta-al-frontend>
+   ```
+
+2. Instala dependencias:
+
+   ```bash
+   npm install
+   ```
+
+## 🔌 Configuración de desarrollo
+
+- El proxy para evitar CORS está en `proxy.conf.json`:
+
+  ```json
+  {
+    "/api": {
+      "target": "http://localhost:8080",
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }
+  ```
+
+- Asegúrate de que el backend escuche en el puerto `8080`. Para otro puerto, actualiza `proxy.conf.json` y tus servicios.
+
+## 🚀 Comandos principales
+
+- **Desarrollo**  
+
+  ```bash
+  npm start
+  # o
+  ng serve --proxy-config proxy.conf.json
+  ```
+
+  Accede en `http://localhost:4200`.
+
+- **Build producción**  
+
+  ```bash
+  npm run build
+  ```
+
+  Salida en `dist/charruabus-frontend`.
+
+- **Tests unitarios**  
+
+  ```bash
+  npm test
+  ```
+
+- **Lint**  
+
+  ```bash
+  npm run lint
+  ```
+
+## 📁 Estructura de carpetas
+
+```
+src/
+├── app/
+│   ├── component/
+│   │   ├── navbar/
+│   │   ├── users-page/
+│   │   ├── buses-page/
+│   │   ├── localidades-page/
+│   │   ├── viajes-page/
+│   │   └── configuracion-del-sistema/
+│   │       ├── configuracion-del-sistema.component.ts
+│   │       ├── configuracion-del-sistema.component.html
+│   │       ├── configuracion-del-sistema.component.scss
+│   │       └── dialogs/
+│   │           └── edit-configuracion-dialog.component.*
+│   ├── services/
+│   │   ├── usuarios.service.ts
+│   │   ├── buses.service.ts
+│   │   └── configuracion-del-sistema.service.ts
+│   ├── models/
+│   │   ├── usuario.ts
+│   │   ├── bus.ts
+│   │   └── configuracion.ts
+│   └── app.routes.ts
+└── assets/
+    └── charruabusIcon.png
+```
+
+## 🛠️ Troubleshooting
+
+- **CORS / 404 en llamadas `/api`**  
+  Verifica que `ng serve` use `--proxy-config proxy.conf.json` y que el backend esté en `localhost:8080`.
+
+- **Errores TS de módulos faltantes**  
+  Ejecuta `npm install` y revisa importaciones en `tsconfig.json`.
+
+- **Estilos no aplican**  
+  Revisa `styles.css` para importar Bootstrap o Angular Material themes.
+
+---
+
+# FORMER README.md
+
 # Charruabus
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.

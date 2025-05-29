@@ -4,28 +4,47 @@
   background: #f5f5f5;
 }
 
-.page-header {
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.filter-field {
+  flex: 1 1 160px;
+}
+
+.filter-actions {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.page-header {
   margin-bottom: 24px;
+}
 
-  h1 {
-    font-size: 1.75rem;
-    margin: 0 0 4px;
-  }
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+}
 
-  p {
-    font-size: 0.95rem;
-    color: #666;
-    margin: 0 0 16px;
-  }
+.page-header p {
+  margin: 0 0 16px;
+  color: #666;
 }
 
 .buses-card {
   background: #fff;
   border-radius: 8px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 16px;
 }
 
 .table-header {
@@ -33,16 +52,16 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+}
 
-  .card-title {
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
 
-  .actions {
-    display: flex;
-    gap: 8px;
-  }
+.actions {
+  display: flex;
+  gap: 8px;
 }
 
 .massive-btn {
@@ -68,12 +87,6 @@ table.mat-table {
 
 .mat-header-row {
   background: #fafafa;
-  color: #333;
-  align-items: center;
-}
-
-.mat-row {
-  align-items: center;
 }
 
 .mat-cell,
@@ -91,11 +104,11 @@ table.mat-table {
 }
 
 .badge-active {
-  background-color: #e6f4ea;
+  background: #e6f4ea;
   color: #2e7d32;
 }
 
 .badge-inactive {
-  background-color: #fdecea;
+  background: #fdecea;
   color: #c62828;
 }

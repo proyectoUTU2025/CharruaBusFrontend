@@ -1,101 +1,133 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
+import { AltaBusDto, FiltroBusquedaBusDto, BusDto, Page } from '../../models';
+import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
+import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
 import { BusService } from '../../services/bus.service';
-import { Bus } from '../../models/bus';
 import { AddBusDialogComponent } from './dialogs/add-bus-dialog/add-bus-dialog.component';
-import { EditBusDialogComponent } from './dialogs/edit-bus-dialog/edit-bus-dialog.component';
-import { ConfirmBusDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { BulkUploadBusDialogComponent } from './dialogs/bulk-upload-bus-dialog/bulk-upload-bus-dialog.component';
-
+import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-errors-dialog.component';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-buses-page',
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatTableModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
     AddBusDialogComponent,
-    EditBusDialogComponent,
-    ConfirmBusDialogComponent,    
-    BulkUploadBusDialogComponent
+    BulkUploadBusDialogComponent,
+    BulkErrorsDialogComponent,
+    MatCardModule
   ],
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
 })
-export class BusesPageComponent implements OnInit {
-  columns = [
-    'id',
-    'matricula',
-    'localidad',
-    'cantidadAsientos',
-    'estado',
-    'acciones'
-  ];
-  dataSource = new MatTableDataSource<Bus>();
+export class BusesPageComponent implements OnInit, AfterViewInit {
+  filterForm: FormGroup;
+  buses: BusDto[] = [];
+  totalElements = 0;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  columns = ['id', 'matricula', 'ubicacionActual', 'capacidad', 'activo', 'acciones'];
 
   constructor(
+    private fb: FormBuilder,
     private busService: BusService,
     private dialog: MatDialog
-  ) {}
+  ) {
+    this.filterForm = this.fb.group({
+      matricula: [''],
+      localidadId: [null],
+      minAsientos: [null],
+      maxAsientos: [null],
+      activo: [null]
+    });
+  }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngAfterViewInit() {
+    this.paginator.page.subscribe(() => this.loadBuses());
     this.loadBuses();
   }
 
   private loadBuses() {
-    this.busService.getAll().subscribe(buses => {
-      this.dataSource.data = buses;
-    });
+    const filtro: FiltroBusquedaBusDto = this.filterForm.value;
+    const page = this.paginator?.pageIndex || 0;
+    const size = this.paginator?.pageSize || 5;
+
+    this.busService.getAll(filtro, page, size)
+      .then((resp: Page<BusDto>) => {
+        this.buses = resp.content;
+        this.totalElements = resp.totalElements;
+      })
+      .catch(console.error);
   }
+
+  onSearch() {
+    this.paginator.firstPage();
+    this.loadBuses();
+  }
+
+  onClear() {
+    this.filterForm.reset({
+      matricula: '', localidadId: null, minAsientos: null, maxAsientos: null, activo: null
+    });
+    this.onSearch();
+  }
+
   openBulkUpload() {
     this.dialog.open(BulkUploadBusDialogComponent, { width: '600px' })
       .afterClosed()
-      .subscribe(file => {
-        // aquí procesarías el CSV devuelto si quieres recargar
-        this.loadBuses();
+      .subscribe((file: File | undefined) => {
+        if (file) {
+          this.busService.bulkUpload(file)
+            .then((resp: BulkResponseDto) => {
+              const errores = resp.results.filter((r: BulkLineResult) => !r.creado);
+              if (errores.length > 0) {
+                this.dialog.open(BulkErrorsDialogComponent, {
+                  width: '600px',
+                  data: errores
+                });
+              } else {
+                this.loadBuses();
+              }
+            })
+            .catch(console.error);
+        }
       });
   }
 
   add() {
-    this.dialog.open(AddBusDialogComponent, { width: '400px', maxHeight: '95vh' })
-      .afterClosed()
-      .subscribe((bus: Bus) => {
-        if (bus) {
-          this.busService.create(bus).subscribe(() => this.loadBuses());
-        }
-      });
-  }
-
-  edit(bus: Bus) {
-    this.dialog.open(EditBusDialogComponent, { width: '400px', data: bus })
-      .afterClosed()
-      .subscribe((updated: Bus) => {
-        if (updated) {
-          this.busService.update(updated).subscribe(() => this.loadBuses());
-        }
-      });
-  }
-
-  remove(bus: Bus) {
-    this.dialog.open(ConfirmBusDialogComponent, {
-      width: '300px',
-      data: {
-        title: 'Confirmar eliminación',
-        message: `¿Eliminar ómnibus ${bus.matricula}?`
-      }
+    this.dialog.open(AddBusDialogComponent, {
+      width: '450px', maxHeight: '95vh'
     })
     .afterClosed()
-    .subscribe((ok: boolean) => {
-      if (ok && bus.id !== undefined) {
-        this.busService.delete(bus.id).subscribe(() => this.loadBuses());
+    .subscribe((alta: AltaBusDto) => {
+      if (alta) {
+        this.busService.create(alta)
+          .then(() => this.onSearch())
+          .catch(console.error);
       }
     });
   }

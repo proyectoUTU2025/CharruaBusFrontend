@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Bus } from '../../../../models/bus';
+import { AltaBusDto, BusDto } from '../../../../models/buses/bus-dto.model';
 
 
 @Component({
@@ -38,18 +38,22 @@ export class AddBusDialogComponent {
   ) {
     this.form = this.fb.group({
       matricula: ['', Validators.required],
-      localidad: [this.localidades[0], Validators.required],
-      cantidadAsientos: [0, [Validators.required, Validators.min(1)]],
-      estado: [true]
+      localidadId: [null, Validators.required],
+      cantidadAsientos: [1, [Validators.required, Validators.min(1)]],
     });
+
   }
 
-  save(): void {
-    if (this.form.valid) {
-      const bus: Bus = this.form.value;
-      this.dialogRef.close(bus);
-    }
+save(): void {
+  if (this.form.valid) {
+    const alta: AltaBusDto = {
+      matricula: this.form.value.matricula,
+      cantidadAsientos: this.form.value.cantidadAsientos,
+      localidadId: parseInt(this.form.value.localidadId, 10)
+    };
+    this.dialogRef.close(alta);
   }
+}
 
   cancel(): void {
     this.dialogRef.close();

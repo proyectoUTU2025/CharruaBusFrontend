@@ -1,4 +1,3 @@
-// src/app/models/usuario.dto.ts
 import { TipoDocumento } from './tipo-documento.enum';
 import { TipoRol } from './tipo-rol.enum';
 
@@ -11,11 +10,10 @@ export interface UsuarioDto {
   documento: string;  
   tipoDocumento: TipoDocumento;
   rol: TipoRol;
-  fechaNacimiento: string; // formato ISO 8601 (YYYY-MM-DD)
+  fechaNacimiento: string; 
   activo: boolean;
 }
 
-// para el alta de usuario
 export interface AltaUsuarioDto {
   email: string;
   password: string;
@@ -27,7 +25,6 @@ export interface AltaUsuarioDto {
   fechaNacimiento: string;
 }
 
-// para la búsqueda y filtrado
 export interface FiltroBusquedaUsuarioDto {
   nombre?: string;
   apellido?: string;
@@ -37,7 +34,6 @@ export interface FiltroBusquedaUsuarioDto {
   activo?: boolean;
 }
 
-// para paginación y ordenamiento
 export interface Page<T> {
   content: T[];
   totalElements: number;

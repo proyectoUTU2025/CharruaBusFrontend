@@ -1,39 +1,44 @@
 import { Injectable } from '@angular/core';
-import { Bus } from '../models/bus';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { AltaBusDto, FiltroBusquedaBusDto, BusDto } from '../models/buses';
+import { Page } from '../models';
+import { ApiResponse } from '../models/api';
+import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
 
 @Injectable({ providedIn: 'root' })
 export class BusService {
-  private _buses = new BehaviorSubject<Bus[]>([
-    { id: 1, matricula: 'ABC-123', localidad: 'Montevideo', cantidadAsientos: 45, estado: true },
-    { id: 2, matricula: 'XYZ-789', localidad: 'Punta del Este', cantidadAsientos: 52, estado: true },
-    { id: 3, matricula: 'DEF-456', localidad: 'Colonia', cantidadAsientos: 48, estado: true },
-    { id: 4, matricula: 'GHI-789', localidad: 'Paysandú', cantidadAsientos: 42, estado: true },
-    { id: 5, matricula: 'JKL-012', localidad: 'Salto', cantidadAsientos: 50, estado: false },
-    { id: 6, matricula: 'MNO-345', localidad: 'San José', cantidadAsientos: 55, estado: true },
-    { id: 7, matricula: 'PQR-678', localidad: 'Durazno', cantidadAsientos: 40, estado: true }
-  ]);
+  private base = `${environment.apiBaseUrl}/omnibus`;
 
-  getAll(): Observable<Bus[]> {
-    return this._buses.asObservable();
+  constructor(private http: HttpClient) {}
+
+  getAll(filtro: FiltroBusquedaBusDto = {}, page = 0, size = 10, sort = 'matricula,asc'): Promise<Page<BusDto>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+
+    Object.entries(filtro).forEach(([k, v]) => {
+      if (v != null && v !== '') {
+        params = params.set(k, v.toString());
+      }
+    });
+
+    return firstValueFrom(this.http.get<Page<BusDto>>(`${this.base}/filtrar`, { params }));
   }
 
-  create(b: Bus): Observable<Bus> {
-    const current = this._buses.value;
-    const newId = current.length ? Math.max(...current.map(x => x.id)) + 1 : 1;
-    const newBus = { ...b, id: newId };
-    this._buses.next([...current, newBus]);
-    return new Observable<Bus>(obs => { obs.next(newBus); obs.complete(); });
+  create(alta: AltaBusDto): Promise<BusDto> {
+    return firstValueFrom(
+      this.http.post<ApiResponse<BusDto>>(`${this.base}`, alta)
+    ).then(resp => resp.data);
   }
 
-  update(b: Bus): Observable<Bus> {
-    const updated = this._buses.value.map(x => x.id === b.id ? { ...x, ...b } : x);
-    this._buses.next(updated);
-    return new Observable<Bus>(obs => { obs.next(b); obs.complete(); });
-  }
-
-  delete(id: number): Observable<number> {
-    this._buses.next(this._buses.value.filter(x => x.id !== id));
-    return new Observable<number>(obs => { obs.next(id); obs.complete(); });
+  bulkUpload(file: File): Promise<BulkResponseDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return firstValueFrom(
+      this.http.post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
+    ).then(resp => resp.data);
   }
 }

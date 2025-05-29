@@ -21,6 +21,8 @@ import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { AuthInterceptor } from './app/core/auth/auth.interceptor';
 import { LoginService } from './app/services/login.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -35,7 +37,9 @@ bootstrapApplication(AppComponent, {
       MatButtonModule,
       MatDialogModule,
       MatFormFieldModule,
-      MatInputModule
+      MatInputModule,
+      MatDatepickerModule,
+      MatNativeDateModule
     ),
 
 

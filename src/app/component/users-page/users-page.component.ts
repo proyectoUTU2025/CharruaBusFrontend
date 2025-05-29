@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -41,13 +41,13 @@ import { BulkUploadDialogComponent } from './dialogs/bulk-upload-dialog/bulk-upl
   styleUrls: ['./users-page.component.scss']
 })
 export class UsersPageComponent implements OnInit, AfterViewInit {
-  filterForm: FormGroup;
-  dataSource = new MatTableDataSource<UsuarioDto>();
+  filterForm: FormGroup; 
+  usuarios: UsuarioDto[] = [];
   totalElements = 0;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   columns = [
-    'id','nombre','apellido','email','documento',
-    'tipoDocumento','rol','fechaNacimiento','activo','acciones'
+    'id', 'nombre', 'apellido', 'email', 'documento',
+    'tipoDocumento', 'rol', 'fechaNacimiento', 'activo', 'acciones'
   ];
 
   constructor(
@@ -68,31 +68,31 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
   ngOnInit() {}
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
     this.paginator.page.subscribe(() => this.loadUsers());
     this.loadUsers();
   }
 
-  private loadUsers() { 
-    const rawFiltro = this.filterForm.value;  
+  private loadUsers() {
+    const rawFiltro = this.filterForm.value;
     const filtro: FiltroBusquedaUsuarioDto = {
       nombre: rawFiltro.nombre,
       apellido: rawFiltro.apellido,
       email: rawFiltro.email,
       documento: rawFiltro.documento,
-      roles: rawFiltro.rol ? [rawFiltro.rol] : undefined, 
+      roles: rawFiltro.rol ? [rawFiltro.rol] : undefined,
       activo: rawFiltro.activo
-  };
+    };
 
-    const page = this.paginator.pageIndex;
-    const size = this.paginator.pageSize || 5;
+    const page = this.paginator?.pageIndex || 0;
+    const size = this.paginator?.pageSize || 5;
+
     this.userService.getAll(filtro, page, size)
       .then((resp: Page<UsuarioDto>) => {
-        this.dataSource.data = resp.content;
+        this.usuarios = resp.content;
         this.totalElements = resp.totalElements;
       })
       .catch(console.error);
-  } 
+  }
 
   onSearch() {
     this.paginator.firstPage();

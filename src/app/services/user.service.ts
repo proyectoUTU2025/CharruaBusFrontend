@@ -9,6 +9,7 @@ import {
 } from '../models';
 import { ApiResponse } from '../models/api';
 import { environment } from '../../environments/environment';
+import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -59,5 +60,14 @@ export class UserService {
       this.http
         .delete<void>(`${this.base}/admin/${id}`)
     );
+  }
+
+  bulkUpload(file: File): Promise<BulkResponseDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return firstValueFrom(
+      this.http
+        .post<ApiResponse<BulkResponseDto>>(`${this.base}/admin/bulk`, formData)
+    ).then(resp => resp.data);
   }
 }

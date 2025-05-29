@@ -47,6 +47,16 @@
     <mat-checkbox formControlName="activo">Activos</mat-checkbox>
   </div>
 </form>
+<div *ngIf="bulkErrors.length > 0" class="bulk-errors">
+  <mat-card>
+    <mat-card-title>Resultado del procesamiento</mat-card-title>
+    <mat-card-content>
+      <ul>
+        <li *ngFor="let msg of bulkErrors">{{ msg }}</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+</div>
 
 <div class="users-card">
   <div class="table-header">

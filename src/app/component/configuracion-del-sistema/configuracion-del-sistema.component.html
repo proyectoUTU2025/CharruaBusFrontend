@@ -3,6 +3,15 @@
     <p>Editar parámetros globales: plazos, penalizaciones, mensajes, etc.</p>
 </div>
 
+<div class="filtro-nombre">
+    <mat-form-field appearance="outline">
+        <mat-label>Buscar por nombre</mat-label>
+        <input matInput [(ngModel)]="filtroNombre" placeholder="Ej: Plazo devolución">
+    </mat-form-field>
+    <button mat-stroked-button color="primary" (click)="aplicarFiltro()">Buscar</button>
+    <button mat-button (click)="limpiarFiltro()" *ngIf="filtroNombre">Limpiar</button>
+</div>
+
 <div class="card">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
 

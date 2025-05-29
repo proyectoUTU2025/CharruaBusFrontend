@@ -25,6 +25,48 @@
     margin: 0 auto;
 }
 
+
+.filtro-nombre {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 32px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+
+    mat-form-field {
+        flex: 1 1 420px;
+        min-width: 240px;
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+
+    button {
+        min-width: 88px;
+        height: 56px !important;
+        margin: 0 !important;
+        align-self: flex-start;
+        margin-top: 0 !important;
+        font-size: 1rem;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+
+::ng-deep .filtro-nombre button .mat-button-wrapper {
+    line-height: 1.25 !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+
 table.mat-table {
     width: 100%;
 }

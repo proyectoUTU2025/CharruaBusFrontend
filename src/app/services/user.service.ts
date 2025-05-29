@@ -8,10 +8,11 @@ import {
   Page
 } from '../models';
 import { ApiResponse } from '../models/api';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private base = 'http://localhost:8080/usuarios';
+  private base = `${environment.apiBaseUrl}/usuarios`;
 
   constructor(private http: HttpClient) {}
 

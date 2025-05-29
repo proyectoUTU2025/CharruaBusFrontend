@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { JwtPayload, jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
@@ -13,7 +14,7 @@ export class LoginService {
 
   login(credentials: { email: string; password: string }) {
     return firstValueFrom(
-      this.http.post<{ data: { token: string } }>('http://localhost:8080/auth/login', credentials)
+      this.http.post<{ data: { token: string } }>(`${environment.apiBaseUrl}/auth/login`, credentials)
     ).then(response => {
       this._jwt = response.data.token;
       this._decoded = jwtDecode(this._jwt);
@@ -25,7 +26,7 @@ export class LoginService {
 
   validateCode(email: string, code: string) {
     return firstValueFrom(
-      this.http.post('http://localhost:8080/auth/verify-email', {
+      this.http.post(`${environment.apiBaseUrl}/auth/verify-email`, {
         email,
         verificationCode: code
       })
@@ -36,7 +37,7 @@ export class LoginService {
   }
   registrarCliente(data: any) {
     return firstValueFrom(
-      this.http.post('http://localhost:8080/auth/registrar', data)
+      this.http.post(`${environment.apiBaseUrl}/auth/registrar`, data)
     ).catch(error => {
       console.error('Error durante el registro:', error);
       throw error;

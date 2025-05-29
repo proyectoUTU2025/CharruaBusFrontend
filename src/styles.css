@@ -1,5 +1,25 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+    height: 100%;
+}
 
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+div.cdk-overlay-pane>div[class*="mat-select-panel"] {
+    background: #fff !important;
+    opacity: 1 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2) !important;
+    z-index: 3000 !important;
+}
+
+div.cdk-overlay-pane mat-option,
+div.cdk-overlay-pane .mat-option {
+    background: #fff !important;
+    color: #222 !important;
+    opacity: 1 !important;
+}

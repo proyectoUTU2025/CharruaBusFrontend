@@ -1,5 +1,30 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
 
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.cdk-overlay-pane,
+.mat-select-panel,
+.mat-datepicker-content,
+.mat-paginator-page-size-select {
+  background-color: white !important;
+  color: #333 !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.mat-option {
+  background-color: white !important;
+  color: #333 !important;
+}
+
+.mat-option:hover {
+  background-color: #f0f0f0 !important;
+}

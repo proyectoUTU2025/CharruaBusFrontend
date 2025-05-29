@@ -8,7 +8,7 @@ interface Paged<T> { content: T[]; totalElements: number; }
 
 @Injectable({ providedIn: 'root' })
 export class ConfiguracionDelSistemaService {
-    private baseUrl = `${environment.apiUrl}/configuraciones`;
+    private baseUrl = `${environment.apiBaseUrl}/configuraciones`;
 
     constructor(private http: HttpClient) { }
 

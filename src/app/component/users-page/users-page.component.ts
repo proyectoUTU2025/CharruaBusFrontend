@@ -74,8 +74,17 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
     this.loadUsers();
   }
 
-  private loadUsers() {
-    const filtro = this.filterForm.value as FiltroBusquedaUsuarioDto;
+  private loadUsers() { 
+    const rawFiltro = this.filterForm.value;  
+    const filtro: FiltroBusquedaUsuarioDto = {
+      nombre: rawFiltro.nombre,
+      apellido: rawFiltro.apellido,
+      email: rawFiltro.email,
+      documento: rawFiltro.documento,
+      roles: rawFiltro.rol ? [rawFiltro.rol] : undefined, 
+      activo: rawFiltro.activo
+  };
+
     const page = this.paginator.pageIndex;
     const size = this.paginator.pageSize || 5;
     this.userService.getAll(filtro, page, size)
@@ -84,7 +93,7 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
         this.totalElements = resp.totalElements;
       })
       .catch(console.error);
-  }
+  } 
 
   onSearch() {
     this.paginator.firstPage();

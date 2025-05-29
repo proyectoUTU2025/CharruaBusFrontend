@@ -1,31 +1,35 @@
-<!-- src/app/component/users-page/users-page.component.html -->
+<div class="page-header">
+  <h1>Gestión de Usuarios</h1>
+  <p>Crear y administrar usuarios del sistema.</p>
+</div>
+
 <form [formGroup]="filterForm" class="filters-container">
   <div class="filter-field">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Nombre</mat-label>
       <input matInput formControlName="nombre" />
     </mat-form-field>
   </div>
   <div class="filter-field">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Apellido</mat-label>
       <input matInput formControlName="apellido" />
     </mat-form-field>
   </div>
   <div class="filter-field">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Correo</mat-label>
       <input matInput formControlName="email" />
     </mat-form-field>
   </div>
   <div class="filter-field">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Documento</mat-label>
       <input matInput formControlName="documento" />
     </mat-form-field>
   </div>
   <div class="filter-field">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Rol</mat-label>
       <mat-select formControlName="rol">
         <mat-option value="">Todos</mat-option>
@@ -36,16 +40,13 @@
     </mat-form-field>
   </div>
   <div class="filter-actions">
+    <div class="action-buttons">
+      <button mat-flat-button class="create-btn" (click)="onSearch()">Buscar</button>
+      <button mat-stroked-button class="massive-btn" (click)="onClear()">Limpiar</button>
+    </div>
     <mat-checkbox formControlName="activo">Solo activos</mat-checkbox>
-    <button mat-flat-button class="create-btn" (click)="onSearch()">Buscar</button>
-    <button mat-stroked-button class="massive-btn" (click)="onClear()">Limpiar</button>
   </div>
 </form>
-
-<div class="page-header">
-  <h1>Gestión de Usuarios</h1>
-  <p>Crear y administrar usuarios del sistema.</p>
-</div>
 
 <div class="users-card">
   <div class="table-header">
@@ -119,7 +120,7 @@
   <mat-paginator
     [length]="totalElements"
     [pageSize]="5"
-    [pageSizeOptions]="[5,10,25]"
+    [pageSizeOptions]="[5, 10, 25]"
     showFirstLastButtons>
   </mat-paginator>
 </div>

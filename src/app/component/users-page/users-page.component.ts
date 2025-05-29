@@ -11,11 +11,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { UsuarioDto, AltaUsuarioDto, FiltroBusquedaUsuarioDto, Page } from '../../models';
+import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
+import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
 import { UserService } from '../../services/user.service';
 import { AddUserDialogComponent } from './dialogs/add-user-dialog/add-user-dialog.component';
 import { EditUserDialogComponent } from './dialogs/edit-user-dialog/edit-user-dialog.component';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { BulkUploadDialogComponent } from './dialogs/bulk-upload-dialog/bulk-upload-dialog.component';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-usuarios-page',
@@ -35,13 +38,14 @@ import { BulkUploadDialogComponent } from './dialogs/bulk-upload-dialog/bulk-upl
     AddUserDialogComponent,
     EditUserDialogComponent,
     ConfirmDialogComponent,
-    BulkUploadDialogComponent
+    BulkUploadDialogComponent,
+    MatCardModule
   ],
   templateUrl: './users-page.component.html',
   styleUrls: ['./users-page.component.scss']
 })
 export class UsersPageComponent implements OnInit, AfterViewInit {
-  filterForm: FormGroup; 
+  filterForm: FormGroup;
   usuarios: UsuarioDto[] = [];
   totalElements = 0;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -105,11 +109,26 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
     });
     this.onSearch();
   }
-
+  bulkErrors: string[] = [];
   openBulkUpload() {
-    this.dialog.open(BulkUploadDialogComponent, { width: '600px' })
-      .afterClosed().subscribe(() => this.loadUsers());
-  }
+  this.dialog.open(BulkUploadDialogComponent, { width: '600px' })
+    .afterClosed()
+    .subscribe((file: File | undefined) => {
+      if (file) {
+        this.userService.bulkUpload(file)
+          .then((resp: BulkResponseDto) => {
+            const errores = resp.results.filter((r: BulkLineResult) => !r.creado);
+            if (errores.length > 0) {
+              this.bulkErrors = errores.map((e: BulkLineResult) => `Fila ${e.fila}: ${e.mensaje}`);
+            } else {
+              this.bulkErrors = ['Archivo procesado exitosamente sin errores.'];
+            }
+            this.loadUsers();
+          })
+          .catch(console.error);
+      }
+    });
+}
 
   add() {
     this.dialog.open(AddUserDialogComponent, {

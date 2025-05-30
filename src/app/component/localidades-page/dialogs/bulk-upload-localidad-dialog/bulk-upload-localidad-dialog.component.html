@@ -1,9 +1,12 @@
 <h2 mat-dialog-title>Alta Masiva de Localidades</h2>
 
 <mat-dialog-content class="bulk-content">
-  <p class="intro">Cargue un archivo CSV con las localidades a crear.</p>
+  <p class="intro">Cargue un archivo CSV con los datos de las localidades a crear.</p>
 
-  <div class="dropzone-wrapper" (drop)="onFileDrop($event)" (dragover)="$event.preventDefault()" (click)="fileInput.click()">
+  <div class="dropzone-wrapper"
+       (drop)="onFileDrop($event)"
+       (dragover)=" $event.preventDefault() "
+       (click)="fileInput.click()">
     <div class="icon-wrapper">
       <mat-icon>upload_file</mat-icon>
     </div>

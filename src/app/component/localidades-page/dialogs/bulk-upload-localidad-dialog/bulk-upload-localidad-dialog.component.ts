@@ -1,15 +1,20 @@
 import { Component } from '@angular/core';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-bulk-upload-localidad-dialog',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule,MatDialogModule],
+  selector: 'app-bulk-upload-localidad-dialog',
   templateUrl: './bulk-upload-localidad-dialog.component.html',
-  styleUrls: ['./bulk-upload-localidad-dialog.component.scss']
+  styleUrls: ['./bulk-upload-localidad-dialog.component.scss'],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule
+  ]
 })
 export class BulkUploadLocalidadDialogComponent {
   file: File | null = null;
@@ -28,7 +33,7 @@ export class BulkUploadLocalidadDialogComponent {
   }
 
   downloadTemplate() {
-    const header = 'id,departamento,nombre,codigo\n';
+    const header = 'departamento,nombre,codigo\n';
     const blob = new Blob([header], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

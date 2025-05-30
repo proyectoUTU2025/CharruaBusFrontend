@@ -7,6 +7,13 @@ $primary-color: #675992;
   border-radius: 12px;
 }
 
+h2[mat-dialog-title] {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #333;
+}
+
 .bulk-content {
   display: flex;
   flex-direction: column;
@@ -34,8 +41,8 @@ $primary-color: #675992;
   top: 2px;
   left: 50%;
   transform: translateX(-50%);
-  border: 2px solid transparent;
   background: transparent;
+  border: none;
   border-radius: 50%;
   width: 56px;
   height: 56px;
@@ -73,7 +80,7 @@ $primary-color: #675992;
   font-size: 0.85rem;
   font-style: italic;
   color: rgba(0, 0, 0, 0.7);
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .template {
@@ -99,6 +106,8 @@ mat-dialog-actions {
   justify-content: flex-end;
   padding: 16px 24px 0;
   background: #fff;
+  position: sticky;
+  bottom: 0;
   margin-top: 24px;
 
   button + button {
@@ -110,15 +119,15 @@ mat-dialog-actions {
   border: 1px solid $primary-color;
   color: $primary-color;
   background: none;
-  border-radius: 18px;
-  height: 36px;
   text-transform: none;
+  height: 36px;
+  border-radius: 18px;
 }
 
 .process-btn {
   background-color: $primary-color;
   color: #fff;
-  border-radius: 18px;
-  height: 36px;
   text-transform: none;
+  height: 36px;
+  border-radius: 18px;
 }

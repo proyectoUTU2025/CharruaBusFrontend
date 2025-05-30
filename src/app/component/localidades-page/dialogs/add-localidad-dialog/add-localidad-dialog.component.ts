@@ -1,49 +1,51 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
+import { TipoDepartamento } from '../../../../models/localidades/tipo-departamento.enum';
+import { LocalidadDto } from '../../../../models/localidades/localidades-dto.model';
 
 @Component({
-  selector: 'app-add-localidad-dialog',
   standalone: true,
+  selector: 'app-add-localidad-dialog',
+  templateUrl: './add-localidad-dialog.component.html',
+  styleUrls: ['./add-localidad-dialog.component.scss'],
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule, 
-    MatDialogModule
-  ],
-  templateUrl: './add-localidad-dialog.component.html',
-  styleUrls: ['./add-localidad-dialog.component.scss']
+    MatButtonModule
+  ]
 })
 export class AddLocalidadDialogComponent {
   form: FormGroup;
-  departamentos = ['Montevideo', 'Canelones', 'Maldonado', 'Rocha'];
+  departamentos = Object.values(TipoDepartamento);
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddLocalidadDialogComponent>
   ) {
     this.form = this.fb.group({
-      departamento: ['', Validators.required],
       nombre: ['', Validators.required],
-      codigo: ['', Validators.required],
+      departamento: ['', Validators.required]
     });
   }
 
-  save() {
+  save(): void {
     if (this.form.valid) {
-      this.dialogRef.close(this.form.value);
+      const dto: LocalidadDto = this.form.value;
+      this.dialogRef.close(dto);
     }
   }
 
-  cancel() {
+  cancel(): void {
     this.dialogRef.close();
   }
 }

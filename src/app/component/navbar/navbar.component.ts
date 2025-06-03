@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { Router }    from '@angular/router';
-import { CommonModule }     from '@angular/common';
-import { RouterModule }     from '@angular/router';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule }  from '@angular/material/button';
-import { MatIconModule }    from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { LoginService } from '../../services/login.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,10 +18,10 @@ import { MatIconModule }    from '@angular/material/icon';
     MatIconModule
   ],
   templateUrl: './navbar.component.html',
-  styleUrls:   ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private loginService: LoginService) {}
 
   onLogoClick(): void {
     if (this.router.url === '/' || this.router.url === '') {
@@ -28,5 +29,9 @@ export class NavbarComponent {
     } else {
       this.router.navigate(['']);
     }
+  }
+
+  onLogout(): void {
+    this.loginService.logout();
   }
 }

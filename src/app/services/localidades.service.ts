@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-import { AltaLocalidadDto, FiltroBusquedaLocalidadDto, LocalidadDto, Page } from '../models/localidades/localidades-dto.model';
+import { Page } from '../models';
+import { AltaLocalidadDto, FiltroBusquedaLocalidadDto, LocalidadDto} from '../models/localidades/localidades-dto.model';
 import { ApiResponse } from '../models/api';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
 import { environment } from '../../environments/environment';

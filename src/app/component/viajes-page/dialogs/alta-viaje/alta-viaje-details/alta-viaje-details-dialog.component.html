@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Detalles del Viaje</h2>
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="fill">
+    <mat-label>Origen ID</mat-label>
+    <input matInput type="number" [(ngModel)]="origenId">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Destino ID</mat-label>
+    <input matInput type="number" [(ngModel)]="destinoId">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha salida</mat-label>
+    <input matInput [matDatepicker]="pickerSalida" [(ngModel)]="fechaSalida">
+    <mat-datepicker-toggle matSuffix [for]="pickerSalida"></mat-datepicker-toggle>
+    <mat-datepicker #pickerSalida></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha llegada</mat-label>
+    <input matInput [matDatepicker]="pickerLlegada" [(ngModel)]="fechaLlegada">
+    <mat-datepicker-toggle matSuffix [for]="pickerLlegada"></mat-datepicker-toggle>
+    <mat-datepicker #pickerLlegada></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Precio</mat-label>
+    <input matInput type="number" [(ngModel)]="precio">
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" class="create-btn" (click)="confirmar()">Continuar</button>
+</mat-dialog-actions>

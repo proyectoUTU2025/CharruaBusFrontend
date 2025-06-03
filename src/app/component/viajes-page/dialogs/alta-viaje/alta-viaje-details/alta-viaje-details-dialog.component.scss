@@ -1,0 +1,13 @@
+.dialog-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.create-btn {
+  background-color: #675992;
+  color: white;
+  text-transform: none;
+  border-radius: 18px;
+}

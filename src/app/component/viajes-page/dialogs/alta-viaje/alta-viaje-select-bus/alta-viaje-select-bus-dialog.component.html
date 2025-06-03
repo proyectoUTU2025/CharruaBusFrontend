@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Seleccionar ómnibus</h2>
+
+<mat-dialog-content>
+  <mat-selection-list>
+    <mat-list-option *ngFor="let bus of buses" (click)="seleccionar(bus)">
+      {{ bus.matricula }} - {{ bus.capacidad }} asientos ({{ bus.ubicacionActual }})
+    </mat-list-option>
+  </mat-selection-list>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+</mat-dialog-actions>

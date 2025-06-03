@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
-import { ViajeService } from '../../../../services/viaje.service';
+import { ViajeService } from '../../../../../services/viaje.service';
 
 
 @Component({
@@ -63,7 +63,7 @@ export class ExpresoAdditionalInfoDialogComponent {
         destino: this.data.destino
       };
 
-      this.viajeService.addViaje(viajeCompleto);
+      //this.viajeService.addViaje(viajeCompleto);
 
       this.snackBar.open('Viaje expreso registrado exitosamente.', 'Cerrar', {
         duration: 3000

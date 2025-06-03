@@ -25,7 +25,7 @@ export class BusService {
       }
     });
 
-    return firstValueFrom(this.http.get<Page<BusDto>>(`${this.base}/filtrar`, { params }));
+    return firstValueFrom(this.http.get<Page<BusDto>>(`${this.base}`, { params }));
   }
 
   create(alta: AltaBusDto): Promise<BusDto> {

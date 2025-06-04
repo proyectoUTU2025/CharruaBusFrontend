@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
-import { BusDto } from '../../../../../models';
+import { OmnibusDisponibleDto, FiltroDisponibilidadOmnibusDto } from '../../../../../models/buses';
 import { BusService } from '../../../../../services/bus.service';
 
 @Component({
@@ -20,21 +20,33 @@ import { BusService } from '../../../../../services/bus.service';
   styleUrls: ['./alta-viaje-select-bus-dialog.component.scss']
 })
 export class AltaViajeSelectBusDialogComponent implements OnInit {
-  buses: BusDto[] = [];
+  buses: OmnibusDisponibleDto[] = [];
 
   constructor(
     private busService: BusService,
     private dialogRef: MatDialogRef<AltaViajeSelectBusDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: {
+      origenId: number;
+      destinoId: number;
+      fechaHoraSalida: string;
+      fechaHoraLlegada: string;
+    }
   ) {}
 
   ngOnInit(): void {
-    this.busService.getAll().then(resp => {
-      this.buses = resp.content;
+    const filtro: FiltroDisponibilidadOmnibusDto = {
+      origenId: this.data.origenId,
+      destinoId: this.data.destinoId,
+      fechaHoraSalida: this.data.fechaHoraSalida,
+      fechaHoraLlegada: this.data.fechaHoraLlegada
+    };
+
+    this.busService.getDisponibles(filtro).then(buses => {
+      this.buses = buses;
     });
   }
 
-  seleccionar(bus: BusDto) {
+  seleccionar(bus: OmnibusDisponibleDto) {
     this.dialogRef.close(bus);
   }
 

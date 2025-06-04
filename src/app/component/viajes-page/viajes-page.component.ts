@@ -9,8 +9,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { FiltroBusquedaViajeDto, ViajeDisponibleDto, AltaViajeDto } from '../../models/viajes';
 import { ViajeService } from '../../services/viaje.service';
-import { FiltroBusquedaViajeDto, ViajeDisponibleDto } from '../../models/viajes';
+import { AltaViajeDetailsDialogComponent } from './dialogs/alta-viaje/alta-viaje-details/alta-viaje-details-dialog.component';
 
 @Component({
   selector: 'app-viajes-page',
@@ -25,7 +27,8 @@ import { FiltroBusquedaViajeDto, ViajeDisponibleDto } from '../../models/viajes'
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatDialogModule
   ],
   templateUrl: './viajes-page.component.html',
   styleUrls: ['./viajes-page.component.scss']
@@ -40,7 +43,7 @@ export class ViajesPageComponent implements OnInit {
     cantidadPasajes: 1
   };
 
-  constructor(private viajeService: ViajeService) {}
+  constructor(private viajeService: ViajeService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.buscar();
@@ -69,5 +72,18 @@ export class ViajesPageComponent implements OnInit {
       cantidadPasajes: 1
     };
     this.dataSource = [];
+  }
+
+  crearViaje(): void {
+    this.dialog.open(AltaViajeDetailsDialogComponent, {
+      width: '80vw',
+      maxWidth: '700px'
+    }).afterClosed().subscribe((alta: AltaViajeDto) => {
+      if (!alta) return;
+
+      this.viajeService.altaViaje(alta).then(() => {
+        this.buscar();
+      }).catch(console.error);
+    });
   }
 }

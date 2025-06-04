@@ -28,7 +28,7 @@ export class LocalidadService {
 
     return this.http.get<Page<LocalidadDto>>(`${this.base}`, { params });      
   }
-
+   
   create(localidad: AltaLocalidadDto): Observable<LocalidadDto> {
     return this.http.post<ApiResponse<LocalidadDto>>(`${this.base}`, localidad)
       .pipe(map(resp => resp.data));

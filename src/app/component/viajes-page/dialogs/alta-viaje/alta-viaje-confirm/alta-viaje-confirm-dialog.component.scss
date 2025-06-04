@@ -1,3 +1,46 @@
+$primary-color: #675992;
+
+:host {
+  display: block;
+  padding: 16px;
+}
+
 mat-dialog-content {
-  margin: 16px 0;
+  margin-top: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+mat-dialog-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    height: 36px;
+    padding: 0 20px;
+    border-radius: 18px;
+    text-transform: none;
+    font-weight: 500;
+  }
+
+  .mat-stroked-button {
+    border-color: $primary-color;
+    color: $primary-color;
+    background-color: white;
+
+    &:hover {
+      background-color: #f3f0fa;
+    }
+  }
+
+  .create-btn {
+    background-color: $primary-color;
+    color: white;
+
+    &:hover {
+      background-color: #5c4d84;
+    }
+  }
 }

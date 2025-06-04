@@ -3,23 +3,27 @@ import { HttpClient } from '@angular/common/http';
 import { JwtPayload, jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
-  private _jwt: string | null = null;
-  private _decoded: JwtPayload & { name?: string; sub?: string; role?: string } = {};
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private cookies: CookieService
+  ) {}
 
   login(credentials: { email: string; password: string }) {
     return firstValueFrom(
-      this.http.post<{ data: { token: string } }>(`${environment.apiBaseUrl}/auth/login`, credentials)
+      this.http.post<{ data: { token: string } }>(
+        `${environment.apiBaseUrl}/auth/login`,
+        credentials
+      )
     ).then(response => {
-      this._jwt = response.data.token;
-      this._decoded = jwtDecode(this._jwt);
-    })
-    .catch(error => {
+      const token = response.data.token;
+      this.cookies.set('access_token', token, { path: '/' });
+    }).catch(error => {
       console.error('Error during login:', error);
     });
   }
@@ -35,6 +39,7 @@ export class LoginService {
       throw error;
     });
   }
+
   registrarCliente(data: any) {
     return firstValueFrom(
       this.http.post(`${environment.apiBaseUrl}/auth/registrar`, data)
@@ -43,29 +48,41 @@ export class LoginService {
       throw error;
     });
   }
-  get nombre(): string | null {
-    return this._decoded.name || null;
-  }
 
-  get email(): string | null {
-    return this._decoded.sub || null;
-  }
-
-  get rol(): string | null {
-    return this._decoded.role || null;
+  private get decoded(): (JwtPayload & { name?: string; sub?: string; role?: string }) | null {
+    const token = this.token;
+    if (!token) return null;
+    try {
+      return jwtDecode(token);
+    } catch {
+      return null;
+    }
   }
 
   get token(): string | null {
-    return this._jwt;
+    return this.cookies.get('access_token') || null;
+  }
+
+  get nombre(): string | null {
+    return this.decoded?.name || null;
+  }
+
+  get email(): string | null {
+    return this.decoded?.sub || null;
+  }
+
+  get rol(): string | null {
+    return this.decoded?.role || null;
   }
 
   estaLogueado(): boolean {
-    return !!this._jwt;
+    return !!this.token;
   }
-
-  logout() {
-    this._jwt = null;
-    this._decoded = {};
-    this.router.navigate(['/login']);
+ logout() {
+    firstValueFrom(this.http.post(`${environment.apiBaseUrl}/auth/logout`, {}))
+      .finally(() => {
+        this.cookies.delete('access_token', '/');
+        this.router.navigate(['/login']);
+      });
   }
 }

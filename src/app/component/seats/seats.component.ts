@@ -1,14 +1,13 @@
-import { Component, OnInit }  from '@angular/core';
-import { HttpClient }         from '@angular/common/http';
-import { Router }             from '@angular/router';
-import { CommonModule }       from '@angular/common';
-import { MatTooltipModule }   from '@angular/material/tooltip';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { HttpClient } from '@angular/common/http';
 
 interface Seat {
   seatLabel?: string;
-  seatNo?:    string;
-  price?:     number;
-  status:     'available' | 'booked' | 'unavailable';
+  seatNo?: string;
+  price?: number;
+  status: 'available' | 'booked' | 'unavailable';
 }
 
 @Component({
@@ -19,51 +18,68 @@ interface Seat {
   styleUrls: ['./seats.component.css']
 })
 export class SeatsComponent implements OnInit {
+  @Input() cantidadAsientos!: number;
+  @Input() viajeId!: number;
+  @Input() clienteId!: number;
+  @Input() origenId!: number;
+  @Input() destinoId!: number;
+
+  @Output() bookingConfirmed = new EventEmitter<number[]>();
+
   seats: Seat[][] = [];
+  maxSeleccion = 5;
+
   cart = {
     selectedSeats: [] as string[],
-    selectedIds:   [] as number[],
-    totalamount:   0
+    selectedIds: [] as number[],
+    totalamount: 0
   };
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  ngOnInit() {
-    this.http.get<number[]>('http://localhost:8080/api/seats/booked')
-      .subscribe(bookedIds => this.buildChart(bookedIds));
+  ngOnInit(): void {
+    this.http.get<number[]>(`/api/seats/booked/${this.viajeId}`)
+      .subscribe(booked => this.buildChart(booked));
   }
 
-  private buildChart(booked: number[]) {
+  buildChart(booked: number[]) {
+    const columnasPorLado = 2;
+    const porFila = columnasPorLado * 2;
+    const filas = Math.ceil(this.cantidadAsientos / porFila);
+
     this.seats = [];
     let n = 1;
-    while (n <= 50) {
+
+    for (let r = 0; r < filas; r++) {
       const row: Seat[] = [];
-      for (let i = 0; i < 2; i++) {
-        row.push(this.makeSeat(n++, booked));
+
+      for (let i = 0; i < columnasPorLado; i++) {
+        row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
       }
+
       row.push({ status: 'unavailable' });
-      for (let i = 0; i < 2; i++) {
-        row.push(this.makeSeat(n++, booked));
+
+      for (let i = 0; i < columnasPorLado; i++) {
+        row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
       }
+
       this.seats.push(row);
     }
   }
 
   private makeSeat(n: number, booked: number[]): Seat {
-    if (n > 50) return { status: 'unavailable' };
     return {
       seatLabel: 'S' + n,
-      seatNo:    n < 10 ? '0' + n : '' + n,
-      price:     250,
-      status:    booked.includes(n) ? 'booked' : 'available'
+      seatNo: n < 10 ? '0' + n : '' + n,
+      price: 250,
+      status: booked.includes(n) ? 'booked' : 'available'
     };
   }
 
   selectSeat(seat: Seat) {
     if (seat.status !== 'available') return;
+    if (this.cart.selectedIds.length >= this.maxSeleccion) return;
+
     const id = parseInt(seat.seatNo!, 10);
     seat.status = 'booked';
     this.cart.selectedSeats.push(seat.seatLabel!);
@@ -72,10 +88,8 @@ export class SeatsComponent implements OnInit {
   }
 
   processBooking() {
-    this.http
-      .post('http://localhost:8080/api/seats/purchase', this.cart.selectedIds)
-      .subscribe(() => {
-        this.router.navigate(['/']);
-      });
+    if (this.cart.selectedIds.length > 0) {
+      this.bookingConfirmed.emit(this.cart.selectedIds);
+    }
   }
 }

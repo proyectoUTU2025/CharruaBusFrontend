@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AltaBusDto, FiltroBusquedaBusDto, BusDto } from '../models/buses';
+import { AltaBusDto, FiltroBusquedaBusDto, BusDto, FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../models/buses';
 import { Page } from '../models';
 import { ApiResponse } from '../models/api';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
@@ -25,7 +25,7 @@ export class BusService {
       }
     });
 
-    return firstValueFrom(this.http.get<Page<BusDto>>(`${this.base}/filtrar`, { params }));
+    return firstValueFrom(this.http.get<Page<BusDto>>(`${this.base}`, { params }));
   }
 
   create(alta: AltaBusDto): Promise<BusDto> {
@@ -41,4 +41,20 @@ export class BusService {
       this.http.post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
     ).then(resp => resp.data);
   }
+  
+
+  getDisponibles(filtro: FiltroDisponibilidadOmnibusDto): Promise<OmnibusDisponibleDto[]> {
+    let params = new HttpParams();
+
+    Object.entries(filtro).forEach(([k, v]) => {
+      if (v != null && v !== '') {
+        params = params.set(k, v.toString());
+      }
+    });
+
+    return firstValueFrom(
+      this.http.get<Page<OmnibusDisponibleDto>>(`${this.base}/disponibles`, { params })
+    ).then(resp => resp.content);
+  }
+
 }

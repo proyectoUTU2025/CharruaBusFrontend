@@ -11,12 +11,15 @@ import { AuthInterceptor } from './core/auth/auth.interceptor';
 import { LoginService } from './services/login.service';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { SpanishPaginatorIntl } from './shared/spanish-paginator-intl';
+import { CookieService } from 'ngx-cookie-service';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
     provideHttpClient(withInterceptorsFromDi()),
+    CookieService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

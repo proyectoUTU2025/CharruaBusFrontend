@@ -1,0 +1,14 @@
+<mat-card class="compra-card">
+  <h2>Selección de Asientos</h2>
+  <p *ngIf="paso === 1">Seleccione hasta 5 asientos para el viaje de ida</p>
+  <p *ngIf="paso === 2">Seleccione hasta 5 asientos para el viaje de vuelta</p>
+
+  <app-seats
+    [cantidadAsientos]="capacidad"
+    [viajeId]="paso === 1 ? viajeIdaId : viajeVueltaId!"
+    [clienteId]="clienteId"
+    [origenId]="paso === 1 ? localidadOrigenId : paradaOrigenVueltaId!"
+    [destinoId]="paso === 1 ? localidadDestinoId : paradaDestinoVueltaId!"
+    (bookingConfirmed)="onAsientosSeleccionados($event)">
+  </app-seats>
+</mat-card>

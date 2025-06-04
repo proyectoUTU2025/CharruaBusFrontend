@@ -9,7 +9,8 @@ import { AddLocalidadDialogComponent } from './dialogs/add-localidad-dialog/add-
 import { BulkUploadLocalidadDialogComponent } from './dialogs/bulk-upload-localidad-dialog/bulk-upload-localidad-dialog.component';
 import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-errors-dialog.component';
 import { LocalidadService } from '../../services/localidades.service';
-import { LocalidadDto, FiltroBusquedaLocalidadDto, Page } from '../../models/localidades/localidades-dto.model';
+import { LocalidadDto, FiltroBusquedaLocalidadDto} from '../../models/localidades/localidades-dto.model';
+import { Page } from '../../models';
 import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
 import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
 

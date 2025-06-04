@@ -1,0 +1,114 @@
+$primary-color: #675992;
+
+:host {
+  display: block;
+}
+
+/* Ajustes generales del contenido del diálogo */
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 16px; /* para scroll */
+}
+
+/* Encabezado de cada paso */
+.step {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+
+  h3 {
+    grid-column: 1 / -1;
+    margin-bottom: 8px;
+    color: $primary-color;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+/* Lista de selección de ómnibus */
+mat-selection-list {
+  grid-column: 1 / -1;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+mat-list-option {
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  padding: 8px 12px;
+
+  &:hover {
+    background-color: #f3f0fa;
+    cursor: pointer;
+  }
+
+  &.mat-selected {
+    background-color: $primary-color;
+    color: white;
+  }
+}
+
+/* Mensaje si no hay buses */
+.sin-buses {
+  grid-column: 1 / -1;
+  font-style: italic;
+  color: #777;
+}
+
+/* Ajustes del stepper en la parte superior */
+.stepper {
+  margin-bottom: 16px;
+}
+
+/* Botones de acción */
+mat-dialog-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    height: 36px;
+    padding: 0 20px;
+    border-radius: 18px;
+    text-transform: none;
+    font-weight: 500;
+  }
+
+  .mat-stroked-button {
+    border-color: $primary-color;
+    color: $primary-color;
+    background-color: white;
+
+    &:hover {
+      background-color: #f3f0fa;
+    }
+  }
+
+  .create-btn {
+    background-color: $primary-color;
+    color: white;
+
+    &:hover {
+      background-color: darken($primary-color, 8%);
+    }
+  }
+}
+
+/* Asegurar que el diálogo no sobresalga de la pantalla */
+:host ::ng-deep .mat-dialog-container {
+  width: 80vw !important;
+  max-width: 700px !important;
+  height: auto !important;
+  max-height: 80vh !important;
+  padding: 0;
+}

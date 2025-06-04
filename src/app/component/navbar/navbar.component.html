@@ -38,8 +38,9 @@
     </button>
 
     <button mat-stroked-button 
-          class="logout-button">
-      <mat-icon>logout</mat-icon>
-      Cerrar Sesión
+        class="logout-button"
+        (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        Cerrar Sesión
     </button>
 </mat-toolbar>

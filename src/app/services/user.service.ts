@@ -44,21 +44,21 @@ export class UserService {
   create(alta: AltaUsuarioDto): Promise<UsuarioDto> {
     return firstValueFrom(
       this.http
-        .post<ApiResponse<UsuarioDto>>(`${this.base}/admin`, alta)
+        .post<ApiResponse<UsuarioDto>>(`${this.base}`, alta)
     ).then(resp => resp.data);
   }
 
   update(u: UsuarioDto): Promise<UsuarioDto> {
     return firstValueFrom(
       this.http
-        .put<ApiResponse<UsuarioDto>>(`${this.base}/admin/${u.id}`, u)
+        .put<ApiResponse<UsuarioDto>>(`${this.base}/${u.id}`, u)
     ).then(resp => resp.data);
   }
 
   delete(id: number): Promise<void> {
     return firstValueFrom(
       this.http
-        .delete<void>(`${this.base}/admin/${id}`)
+        .delete<void>(`${this.base}/${id}`)
     );
   }
 
@@ -67,7 +67,7 @@ export class UserService {
     formData.append('file', file);
     return firstValueFrom(
       this.http
-        .post<ApiResponse<BulkResponseDto>>(`${this.base}/admin/bulk`, formData)
+        .post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
     ).then(resp => resp.data);
   }
 }

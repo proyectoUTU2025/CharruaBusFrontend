@@ -11,6 +11,7 @@ export interface ViajeDisponibleDto {
 export interface AltaParadaDto {
   localidadId: number;
   orden: number;
+  fechaHoraLlegada: string; 
 }
 
 export interface AltaViajeDto {

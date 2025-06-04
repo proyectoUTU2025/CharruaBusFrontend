@@ -15,6 +15,7 @@ import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
 import { LocalidadDto } from '../../../../../models/localidades/localidades-dto.model';
 import { FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../../../../../models/buses';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-alta-viaje-details-dialog',
@@ -30,7 +31,8 @@ import { FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../../../.
     MatSelectModule,
     MatButtonModule,
     MatListModule,
-    MatStepperModule
+    MatStepperModule,
+    MatIconModule
   ],
   templateUrl: './alta-viaje-details-dialog.component.html',
   styleUrls: ['./alta-viaje-details-dialog.component.scss']
@@ -39,11 +41,16 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   step = 0;
   localidades: LocalidadDto[] = [];
   buses: OmnibusDisponibleDto[] = [];
+
   origenId: number = 0;
   destinoId: number = 0;
   fechaSalida: Date | null = null;
   fechaLlegada: Date | null = null;
   precio: number = 0;
+
+  paradaIntermediaId: number | null = null;
+  paradasIntermedias: number[] = [];
+
   busSeleccionado: OmnibusDisponibleDto | null = null;
 
   constructor(
@@ -58,10 +65,10 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   siguiente(): void {
-    if (this.step === 0) {
+    this.step++;
+    if (this.step === 2) {
       this.cargarBuses();
     }
-    this.step++;
   }
 
   anterior(): void {
@@ -72,8 +79,25 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  agregarParadaIntermedia(): void {
+    if (this.paradaIntermediaId && !this.paradasIntermedias.includes(this.paradaIntermediaId) && this.paradaIntermediaId !== this.origenId && this.paradaIntermediaId !== this.destinoId) {
+      this.paradasIntermedias.push(this.paradaIntermediaId);
+    }
+    this.paradaIntermediaId = null;
+  }
+
+  eliminarParada(index: number): void {
+    this.paradasIntermedias.splice(index, 1);
+  }
+
   confirmar(): void {
     if (!this.busSeleccionado) return;
+
+    const paradas = [
+      { localidadId: this.origenId, orden: 1 },
+      ...this.paradasIntermedias.map((id, idx) => ({ localidadId: id, orden: idx + 2 })),
+      { localidadId: this.destinoId, orden: this.paradasIntermedias.length + 2 }
+    ];
 
     const alta = {
       origenId: this.origenId,
@@ -82,20 +106,15 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       fechaHoraLlegada: this.formatFecha(this.fechaLlegada),
       precio: this.precio,
       omnibusId: this.busSeleccionado.id,
-      paradas: [
-        { localidadId: this.origenId, orden: 0 },
-        { localidadId: this.destinoId, orden: 1 }
-      ],
+      paradas,
       confirm: true
     };
 
     this.dialogRef.close(alta);
   }
 
-  private cargarBuses(): void {
-    if (!this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0) {
-      return;
-    }
+  cargarBuses(): void {
+    if (!this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0) return;
 
     const filtro: FiltroDisponibilidadOmnibusDto = {
       origenId: this.origenId,
@@ -111,6 +130,16 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     });
   }
 
+  localidadNombre(id: number): string {
+    return this.localidades.find(l => l.id === id)?.nombre ?? 'Desconocido';
+  }
+
+  deberiaDeshabilitarSiguiente(): boolean {
+    if (this.step === 0) return !this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0;
+    if (this.step === 2) return !this.busSeleccionado;
+    return false;
+  }
+
   private formatFecha(fecha: Date | null): string {
     if (!fecha) return '';
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -123,8 +152,10 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     return `${y}-${m}-${d}T${h}:${min}:${s}`;
   }
 
-  onBusSeleccionado(event: any): void {
-  this.busSeleccionado = event?.options?.[0]?.value || null;
-}
+  busSeleccionadoArray: OmnibusDisponibleDto[] = [];
+
+  onBusSeleccionadoChange(): void {
+    this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
+  }
 
 }

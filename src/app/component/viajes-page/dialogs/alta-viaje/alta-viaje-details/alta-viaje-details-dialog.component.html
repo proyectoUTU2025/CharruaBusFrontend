@@ -2,14 +2,14 @@
 
 <mat-horizontal-stepper [selectedIndex]="step" linear class="stepper">
   <mat-step label="Datos del viaje" [completed]="step > 0"></mat-step>
-  <mat-step label="Seleccionar ómnibus" [completed]="step > 1"></mat-step>
+  <mat-step label="Paradas" [completed]="step > 1"></mat-step>
+  <mat-step label="Seleccionar ómnibus" [completed]="step > 2"></mat-step>
   <mat-step label="Confirmación"></mat-step>
 </mat-horizontal-stepper>
 
 <mat-dialog-content class="dialog-content">
   <div *ngIf="step === 0" class="step">
     <h3>1. Datos del viaje</h3>
-
     <mat-form-field appearance="fill">
       <mat-label>Origen</mat-label>
       <mat-select [(ngModel)]="origenId">
@@ -45,22 +45,54 @@
   </div>
 
   <div *ngIf="step === 1" class="step">
-    <h3>2. Seleccionar ómnibus disponible</h3>
-    <ng-container *ngIf="buses.length > 0; else sinBuses">
-      <mat-selection-list [multiple]="false" (selectionChange)="onBusSeleccionado($event)">
-  <mat-list-option *ngFor="let bus of buses" [value]="bus">
-    {{ bus.matricula }} - {{ bus.capacidad }} asientos ({{ bus.ubicacionActual }})
-  </mat-list-option>
-</mat-selection-list>
-    
-    </ng-container>
-    <ng-template #sinBuses>
-      <p class="sin-buses">No hay ómnibus disponibles con esos criterios.</p>
-    </ng-template>
+    <h3>2. Paradas intermedias</h3>
+    <mat-form-field appearance="fill">
+      <mat-label>Agregar parada</mat-label>
+      <mat-select [(ngModel)]="paradaIntermediaId">
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id" [disabled]="loc.id === origenId || loc.id === destinoId || paradasIntermedias.includes(loc.id)">
+          {{ loc.nombre }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" (click)="agregarParadaIntermedia()" [disabled]="!paradaIntermediaId">Agregar parada</button>
+
+    <div *ngIf="paradasIntermedias.length > 0">
+      <h4>Listado de paradas</h4>
+      <ul>
+        <li *ngFor="let pid of paradasIntermedias; index as i">
+          Orden {{ i + 1 }} - {{ localidadNombre(pid) }}
+          <button mat-icon-button (click)="eliminarParada(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <h4>Resumen final</h4>
+    <ol>
+      <li>{{ localidadNombre(origenId) }} (Origen)</li>
+      <li *ngFor="let pid of paradasIntermedias">{{ localidadNombre(pid) }}</li>
+      <li>{{ localidadNombre(destinoId) }} (Destino)</li>
+    </ol>
   </div>
 
   <div *ngIf="step === 2" class="step">
-    <h3>3. Confirmación</h3>
+    <h3>3. Seleccionar ómnibus disponible</h3>
+    <ng-container *ngIf="buses.length > 0; else sinBuses">
+      <mat-selection-list [(ngModel)]="busSeleccionadoArray" (selectionChange)="onBusSeleccionadoChange()">
+        <mat-list-option *ngFor="let bus of buses" [value]="bus">
+          {{ bus.matricula }} - {{ bus.capacidad }} asientos ({{ bus.ubicacionActual }})
+        </mat-list-option>
+      </mat-selection-list>
+    </ng-container>
+    <ng-template #sinBuses>
+      <p>No hay ómnibus disponibles con esos criterios.</p>
+    </ng-template>
+  </div>
+
+  <div *ngIf="step === 3" class="step">
+    <h3>4. Confirmación</h3>
     <p><strong>Salida:</strong> {{ fechaSalida | date:'short' }}</p>
     <p><strong>Llegada:</strong> {{ fechaLlegada | date:'short' }}</p>
     <p><strong>Precio:</strong> {{ precio | currency }}</p>
@@ -71,17 +103,6 @@
 <mat-dialog-actions align="end">
   <button mat-stroked-button color="primary" (click)="cancelar()">Cancelar</button>
   <button mat-stroked-button color="primary" *ngIf="step > 0" (click)="anterior()">Anterior</button>
-  <button
-    mat-flat-button
-    class="create-btn"
-    *ngIf="step < 2"
-    (click)="siguiente()"
-    [disabled]="
-      (step === 0 && (!origenId || !destinoId || !fechaSalida || !fechaLlegada || precio <= 0)) ||
-      (step === 1 && !busSeleccionado)
-    "
-  >
-    Siguiente
-  </button>
-  <button mat-flat-button class="create-btn" *ngIf="step === 2" (click)="confirmar()">Confirmar</button>
+  <button mat-flat-button class="create-btn" *ngIf="step < 3" (click)="siguiente()" [disabled]="deberiaDeshabilitarSiguiente()">Siguiente</button>
+  <button mat-flat-button class="create-btn" *ngIf="step === 3" (click)="confirmar()">Confirmar</button>
 </mat-dialog-actions>

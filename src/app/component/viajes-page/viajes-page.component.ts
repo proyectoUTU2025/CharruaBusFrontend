@@ -41,16 +41,16 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
   totalElements = 0;
 
   filtro: {
-    localidadOrigenId: number;
-    localidadDestinoId: number;
-    fechaDesde: string | Date;
-    fechaHasta: string | Date;
-  } = {
-    localidadOrigenId: 1,
-    localidadDestinoId: 2,
-    fechaDesde: '',
-    fechaHasta: ''
-  };
+  localidadOrigenId: number | null;
+  localidadDestinoId: number | null;
+  fechaDesde: string | Date;
+  fechaHasta: string | Date;
+} = {
+  localidadOrigenId: null,
+  localidadDestinoId: null,
+  fechaDesde: '',
+  fechaHasta: ''
+};
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -73,8 +73,8 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
       : this.filtro.fechaHasta;
 
     const filtroTransformado: FiltroBusquedaViajeDto = {
-      localidadOrigenId: this.filtro.localidadOrigenId,
-      localidadDestinoId: this.filtro.localidadDestinoId,
+      localidadOrigenId: this.filtro.localidadOrigenId ?? undefined,
+      localidadDestinoId: this.filtro.localidadDestinoId ?? undefined,
       fechaDesde,
       fechaHasta
     };
@@ -91,15 +91,14 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
         console.error('Error al buscar viajes', error);
       });
   }
-
   limpiarFiltros(): void {
     this.filtro = {
-      localidadOrigenId: 0,
-      localidadDestinoId: 0,
+      localidadOrigenId: null,
+      localidadDestinoId: null,
       fechaDesde: '',
       fechaHasta: ''
     };
-    this.dataSource.data = [];
+    this.buscar();
   }
 
   crearViaje(): void {

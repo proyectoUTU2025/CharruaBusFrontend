@@ -1,27 +1,31 @@
 .page-header {
   margin-bottom: 16px;
+  padding: 0 24px;
 }
 
-.filtros-card {
-  padding: 16px;
-  background-color: #f4f4f4;
-  margin-bottom: 16px;
-  border-radius: 8px;
+.content-card {
+  background-color: white;
+  padding: 24px;
+  margin: 0 24px 24px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
 
-  .filtros-form {
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+
+  mat-form-field {
+    flex: 1 1 220px;
+  }
+
+  .filters-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-
-    mat-form-field {
-      flex: 1 1 220px;
-    }
-
-    .filtros-acciones {
-      display: flex;
-      align-items: end;
-      gap: 12px;
-    }
+    align-items: end;
+    gap: 12px;
+    margin-left: auto;
   }
 }
 
@@ -55,5 +59,32 @@
 
   table {
     width: 100%;
+  }
+}
+
+.create-btn {
+  background-color: #675992 !important;
+  color: white !important;
+  border-radius: 18px;
+  text-transform: none;
+  border: none;
+
+  mat-icon {
+    margin-right: 4px;
+  }
+
+  &:hover {
+    background-color: #5c4d84 !important;
+  }
+}
+
+.outline-btn {
+  border: 1px solid #675992;
+  color: #675992;
+  border-radius: 18px;
+  text-transform: none;
+
+  &:hover {
+    background-color: rgba(103, 89, 146, 0.1);
   }
 }

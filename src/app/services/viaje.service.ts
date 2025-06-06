@@ -11,19 +11,29 @@ export class ViajeService {
   constructor(private http: HttpClient) {}
 
   buscar(filtro: FiltroBusquedaViajeDto, page = 0, size = 5): Promise<Page<ViajeDisponibleDto>> {
-    let params = new HttpParams()
-      .set('localidadOrigenId', filtro.localidadOrigenId.toString())
-      .set('localidadDestinoId', filtro.localidadDestinoId.toString())
-      .set('fechaDesde', filtro.fechaDesde)
-      .set('fechaHasta', filtro.fechaHasta)
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('sort', 'fechaHoraSalida,asc');
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString())
+    .set('sort', 'fechaHoraSalida,asc');
 
-    return firstValueFrom(
-      this.http.get<Page<ViajeDisponibleDto>>(`${this.baseUrl}`, { params })
-    );
+  if (filtro.localidadOrigenId != null) {
+    params = params.set('localidadOrigenId', filtro.localidadOrigenId.toString());
   }
+  if (filtro.localidadDestinoId != null) {
+    params = params.set('localidadDestinoId', filtro.localidadDestinoId.toString());
+  }
+  if (filtro.fechaDesde) {
+    params = params.set('fechaDesde', filtro.fechaDesde);
+  }
+  if (filtro.fechaHasta) {
+    params = params.set('fechaHasta', filtro.fechaHasta);
+  }
+
+  return firstValueFrom(
+    this.http.get<Page<ViajeDisponibleDto>>(`${this.baseUrl}`, { params })
+  );
+}
+
 
   altaViaje(dto: AltaViajeDto): Promise<void> {
     return firstValueFrom(this.http.post(`${this.baseUrl}`, dto))

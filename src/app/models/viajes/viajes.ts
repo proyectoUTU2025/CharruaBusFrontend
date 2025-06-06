@@ -26,8 +26,8 @@ export interface AltaViajeDto {
 }
 
 export interface FiltroBusquedaViajeDto {
-  localidadOrigenId: number;
-  localidadDestinoId: number;
+  localidadOrigenId?: number | null;
+  localidadDestinoId?: number | null;
   fechaDesde: string;
   fechaHasta: string;
 }

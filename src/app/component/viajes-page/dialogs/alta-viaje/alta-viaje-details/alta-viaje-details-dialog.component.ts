@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -10,16 +10,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
+import { ViajeService } from '../../../../../services/viaje.service';
 import { LocalidadDto } from '../../../../../models/localidades/localidades-dto.model';
 import { FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../../../../../models/buses';
-import { MatIconModule } from '@angular/material/icon';
+import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warning-dialog.component';
 
 @Component({
   selector: 'app-alta-viaje-details-dialog',
   standalone: true,
+  templateUrl: './alta-viaje-details-dialog.component.html',
+  styleUrls: ['./alta-viaje-details-dialog.component.scss'],
   imports: [
     CommonModule,
     FormsModule,
@@ -32,31 +36,33 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonModule,
     MatListModule,
     MatStepperModule,
-    MatIconModule
-  ],
-  templateUrl: './alta-viaje-details-dialog.component.html',
-  styleUrls: ['./alta-viaje-details-dialog.component.scss']
+    MatIconModule,
+    WarningDialogComponent
+  ]
 })
 export class AltaViajeDetailsDialogComponent implements OnInit {
   step = 0;
   localidades: LocalidadDto[] = [];
   buses: OmnibusDisponibleDto[] = [];
 
-  origenId: number = 0;
-  destinoId: number = 0;
+  origenId = 0;
+  destinoId = 0;
   fechaSalida: Date | null = null;
   fechaLlegada: Date | null = null;
-  precio: number = 0;
+  precio = 0;
 
   paradaIntermediaId: number | null = null;
   paradasIntermedias: number[] = [];
 
   busSeleccionado: OmnibusDisponibleDto | null = null;
+  busSeleccionadoArray: OmnibusDisponibleDto[] = [];
 
   constructor(
     private dialogRef: MatDialogRef<AltaViajeDetailsDialogComponent>,
     private busService: BusService,
-    private localidadesService: LocalidadService
+    private localidadesService: LocalidadService,
+    private viajeService: ViajeService,
+    private dialog: MatDialog
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -66,9 +72,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   siguiente(): void {
     this.step++;
-    if (this.step === 2) {
-      this.cargarBuses();
-    }
+    if (this.step === 2) this.cargarBuses();
   }
 
   anterior(): void {
@@ -80,7 +84,12 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   agregarParadaIntermedia(): void {
-    if (this.paradaIntermediaId && !this.paradasIntermedias.includes(this.paradaIntermediaId) && this.paradaIntermediaId !== this.origenId && this.paradaIntermediaId !== this.destinoId) {
+    if (
+      this.paradaIntermediaId &&
+      !this.paradasIntermedias.includes(this.paradaIntermediaId) &&
+      this.paradaIntermediaId !== this.origenId &&
+      this.paradaIntermediaId !== this.destinoId
+    ) {
       this.paradasIntermedias.push(this.paradaIntermediaId);
     }
     this.paradaIntermediaId = null;
@@ -91,13 +100,19 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   confirmar(): void {
-    if (!this.busSeleccionado) return;
+    if (!this.busSeleccionado || !this.fechaSalida || !this.fechaLlegada) return;
 
-    const paradas = [
-      { localidadId: this.origenId, orden: 1 },
-      ...this.paradasIntermedias.map((id, idx) => ({ localidadId: id, orden: idx + 2 })),
-      { localidadId: this.destinoId, orden: this.paradasIntermedias.length + 2 }
-    ];
+    const total = 2 + this.paradasIntermedias.length;
+    const salida = new Date(this.fechaSalida);
+    const llegada = new Date(this.fechaLlegada);
+    const intervalo = (llegada.getTime() - salida.getTime()) / (total - 1);
+
+    const localidades = [this.origenId, ...this.paradasIntermedias, this.destinoId];
+    const paradas = localidades.map((id, idx) => ({
+      localidadId: id,
+      orden: idx + 1,
+      fechaHoraLlegada: new Date(salida.getTime() + idx * intervalo).toISOString()
+    }));
 
     const alta = {
       origenId: this.origenId,
@@ -107,10 +122,27 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       precio: this.precio,
       omnibusId: this.busSeleccionado.id,
       paradas,
-      confirm: true
+      confirm: false
     };
 
-    this.dialogRef.close(alta);
+    this.viajeService.altaViaje(alta).then(() => {
+      this.dialogRef.close(alta);
+    }).catch(mensaje => {
+      this.dialog.open(WarningDialogComponent, {
+        data: { message: mensaje }
+      }).afterClosed().subscribe((confirmado: boolean) => {
+        if (confirmado) {
+          this.viajeService.altaViaje({ ...alta, confirm: true }).then(() => {
+            this.dialogRef.close(alta);
+          }).catch(err => {
+            const fallback = typeof err === 'string' ? err : (err?.message || 'Error al confirmar el viaje');
+            this.dialog.open(WarningDialogComponent, {
+              data: { message: fallback }
+            });
+          });
+        }
+      });
+    });
   }
 
   cargarBuses(): void {
@@ -152,10 +184,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     return `${y}-${m}-${d}T${h}:${min}:${s}`;
   }
 
-  busSeleccionadoArray: OmnibusDisponibleDto[] = [];
-
   onBusSeleccionadoChange(): void {
     this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
   }
-
 }

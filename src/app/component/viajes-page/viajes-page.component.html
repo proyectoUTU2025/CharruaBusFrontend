@@ -3,41 +3,42 @@
   <p>Administre los viajes disponibles en el sistema</p>
 </div>
 
-<div class="filtros-card">
-  <h3>Filtros de búsqueda</h3>
-  <div class="filtros-form">
+<div class="content-card">
+  <div class="filters-container">
     <mat-form-field appearance="fill">
       <mat-label>Origen (ID)</mat-label>
-      <input matInput type="number" [(ngModel)]="filtro.idLocalidadOrigen" />
+      <input matInput type="number" [(ngModel)]="filtro.localidadOrigenId" />
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Destino (ID)</mat-label>
-      <input matInput type="number" [(ngModel)]="filtro.idLocalidadDestino" />
+      <input matInput type="number" [(ngModel)]="filtro.localidadDestinoId" />
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-      <mat-label>Fecha del viaje</mat-label>
-      <input matInput [matDatepicker]="pickerFecha" [(ngModel)]="filtro.fechaViaje" />
-      <mat-datepicker-toggle matSuffix [for]="pickerFecha"></mat-datepicker-toggle>
-      <mat-datepicker #pickerFecha></mat-datepicker>
+      <mat-label>Fecha desde</mat-label>
+      <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="filtro.fechaDesde" />
+      <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+      <mat-datepicker #pickerDesde></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-      <mat-label>Cant. pasajes</mat-label>
-      <input matInput type="number" [(ngModel)]="filtro.cantidadPasajes" />
+      <mat-label>Fecha hasta</mat-label>
+      <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="filtro.fechaHasta" />
+      <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+      <mat-datepicker #pickerHasta></mat-datepicker>
     </mat-form-field>
 
-    <div class="filtros-acciones">
-      <button mat-stroked-button (click)="limpiarFiltros()">Limpiar filtros</button>
-      <button mat-flat-button color="primary" (click)="buscar()">Buscar</button>
+    <div class="filters-actions">
+      <button mat-flat-button class="create-btn" (click)="buscar()">Buscar</button>
+      <button mat-flat-button class="outline-btn" (click)="limpiarFiltros()">Limpiar</button>
     </div>
   </div>
 </div>
 
-<div class="viajes-card">
+<div class="content-card viajes-card">
   <div class="table-header">
-    <span class="card-title">Resultados ({{ dataSource.length }})</span>
+    <span class="card-title">Resultados ({{ dataSource.data.length }})</span>
     <div class="actions">
       <button mat-flat-button class="create-btn" (click)="crearViaje()">
         <mat-icon>add</mat-icon> Crear Viaje
@@ -84,4 +85,11 @@
     <tr mat-header-row *matHeaderRowDef="columns"></tr>
     <tr mat-row *matRowDef="let row; columns: columns;"></tr>
   </table>
+
+  <mat-paginator
+    [length]="totalElements"
+    [pageSize]="5"
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons>
+  </mat-paginator>
 </div>

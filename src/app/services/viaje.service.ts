@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../models/api';
 import { AltaViajeDto, ViajeDisponibleDto, FiltroBusquedaViajeDto } from '../models/viajes';
 
 @Injectable({ providedIn: 'root' })
@@ -28,7 +27,12 @@ export class ViajeService {
 
   altaViaje(dto: AltaViajeDto): Promise<void> {
     return firstValueFrom(
-      this.http.post<ApiResponse<any>>(`${this.baseUrl}`, dto)
-    ).then(() => {});
+      this.http.post(`${this.baseUrl}`, dto)
+    ).then(() => {})
+     .catch(err => {
+        console.error('Error al registrar el viaje:', err);
+       const message = err?.error?.message || 'Error desconocido al registrar el viaje';
+       throw message;
+     });
   }
 }

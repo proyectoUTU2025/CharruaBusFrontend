@@ -1,0 +1,53 @@
+
+$primary-color: #675992;
+
+:host {
+  display: block;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+h2[mat-dialog-title] {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #333;
+}
+
+mat-dialog-content {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+  margin-top: 24px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    text-transform: none;
+    border-radius: 18px;
+    height: 36px;
+    padding: 0 20px;
+  }
+
+  .cancel-btn {
+    border: 1px solid $primary-color;
+    color: $primary-color;
+    background-color: transparent;
+  }
+
+  .confirm-btn {
+    background-color: $primary-color;
+    color: white;
+
+    &:hover {
+      background-color: darken($primary-color, 5%);
+    }
+  }
+}

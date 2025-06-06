@@ -80,10 +80,7 @@ export class ViajesPageComponent implements OnInit {
       maxWidth: '700px'
     }).afterClosed().subscribe((alta: AltaViajeDto) => {
       if (!alta) return;
-
-      this.viajeService.altaViaje(alta).then(() => {
-        this.buscar();
-      }).catch(console.error);
+      this.buscar();     
     });
   }
 }

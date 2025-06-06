@@ -3,36 +3,34 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { AltaViajeDto, ViajeDisponibleDto, FiltroBusquedaViajeDto } from '../models/viajes';
-
+import { Page } from '../models';
 @Injectable({ providedIn: 'root' })
 export class ViajeService {
   private baseUrl = `${environment.apiBaseUrl}/viajes`;
 
   constructor(private http: HttpClient) {}
 
-  buscar(filtro: FiltroBusquedaViajeDto): Promise<ViajeDisponibleDto[]> {
-    const fechaStr =
-      filtro.fechaViaje instanceof Date
-        ? filtro.fechaViaje.toISOString().split('T')[0]
-        : filtro.fechaViaje;
+  buscar(filtro: FiltroBusquedaViajeDto, page = 0, size = 5): Promise<Page<ViajeDisponibleDto>> {
+    let params = new HttpParams()
+      .set('localidadOrigenId', filtro.localidadOrigenId.toString())
+      .set('localidadDestinoId', filtro.localidadDestinoId.toString())
+      .set('fechaDesde', filtro.fechaDesde)
+      .set('fechaHasta', filtro.fechaHasta)
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', 'fechaHoraSalida,asc');
 
-    const params = new HttpParams()
-      .set('idLocalidadOrigen', filtro.idLocalidadOrigen)
-      .set('idLocalidadDestino', filtro.idLocalidadDestino)
-      .set('fechaViaje', fechaStr)
-      .set('cantidadPasajes', filtro.cantidadPasajes);
-
-    return firstValueFrom(this.http.get<ViajeDisponibleDto[]>(`${this.baseUrl}/buscar`, { params }));
+    return firstValueFrom(
+      this.http.get<Page<ViajeDisponibleDto>>(`${this.baseUrl}`, { params })
+    );
   }
 
   altaViaje(dto: AltaViajeDto): Promise<void> {
-    return firstValueFrom(
-      this.http.post(`${this.baseUrl}`, dto)
-    ).then(() => {})
-     .catch(err => {
-        console.error('Error al registrar el viaje:', err);
-       const message = err?.error?.message || 'Error desconocido al registrar el viaje';
-       throw message;
-     });
+    return firstValueFrom(this.http.post(`${this.baseUrl}`, dto))
+      .then(() => {})
+      .catch(err => {
+        const message = err?.error?.message || 'Error desconocido al registrar el viaje';
+        throw message;
+      });
   }
 }

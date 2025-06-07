@@ -42,18 +42,16 @@ import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warn
 })
 export class AltaViajeDetailsDialogComponent implements OnInit {
   step = 0;
+  completedSteps: boolean[] = [false, false, false];
   localidades: LocalidadDto[] = [];
   buses: OmnibusDisponibleDto[] = [];
-
   origenId = 0;
   destinoId = 0;
   fechaSalida: Date | null = null;
   fechaLlegada: Date | null = null;
   precio = 0;
-
   paradaIntermediaId: number | null = null;
   paradasIntermedias: number[] = [];
-
   busSeleccionado: OmnibusDisponibleDto | null = null;
   busSeleccionadoArray: OmnibusDisponibleDto[] = [];
 
@@ -71,6 +69,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   siguiente(): void {
+    this.completedSteps[this.step] = true;
     this.step++;
     if (this.step === 2) this.cargarBuses();
   }
@@ -172,6 +171,10 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     return false;
   }
 
+  onBusSeleccionadoChange(): void {
+    this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
+  }
+
   private formatFecha(fecha: Date | null): string {
     if (!fecha) return '';
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -182,9 +185,25 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const min = pad(fecha.getMinutes());
     const s = pad(fecha.getSeconds());
     return `${y}-${m}-${d}T${h}:${min}:${s}`;
+  } 
+
+  ngAfterViewChecked(): void {
+    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
+    headers.forEach((header, index) => {
+      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
+      const label = header.querySelector('.mat-step-label') as HTMLElement;
+      if (index < this.step) {
+        icon.style.backgroundColor = '#3e5f3c';
+        label.style.color = '#3e5f3c';
+      } else if (index === this.step) {
+        icon.style.backgroundColor = '#675992';
+        label.style.color = '#675992';
+      } else {
+        icon.style.backgroundColor = '#ccc';
+        label.style.color = '#444';
+      }
+    });
   }
 
-  onBusSeleccionadoChange(): void {
-    this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
-  }
+
 }

@@ -1,20 +1,20 @@
 $primary-color: #675992;
+$completed-color: #3e5f3c;
+$default-color: #ccc;
 
 :host {
   display: block;
 }
 
-/* Ajustes generales del contenido del diálogo */
 .dialog-content {
   display: flex;
   flex-direction: column;
   gap: 24px;
   max-height: 60vh;
   overflow-y: auto;
-  padding-right: 16px; /* para scroll */
+  padding-right: 16px;
 }
 
-/* Encabezado de cada paso */
 .step {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -29,11 +29,49 @@ $primary-color: #675992;
   }
 }
 
+.paradas-step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .parada-select {
+    max-width: 300px;
+  }
+
+  .paradas-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    margin-top: 16px;
+
+    .paradas-listado,
+    .paradas-resumen {
+      flex: 1;
+      min-width: 0;
+
+      h4 {
+        margin-bottom: 8px;
+        color: $primary-color;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      ul, ol {
+        padding-left: 16px;
+        margin-top: 0;
+
+        li {
+          margin-bottom: 6px;
+        }
+      }
+    }
+  }
+}
+
 mat-form-field {
   width: 100%;
 }
 
-/* Lista de selección de ómnibus */
 mat-selection-list {
   grid-column: 1 / -1;
   max-height: 200px;
@@ -57,19 +95,58 @@ mat-list-option {
   }
 }
 
-/* Mensaje si no hay buses */
 .sin-buses {
   grid-column: 1 / -1;
   font-style: italic;
   color: #777;
 }
 
-/* Ajustes del stepper en la parte superior */
 .stepper {
   margin-bottom: 16px;
 }
 
-/* Botones de acción */
+::ng-deep .mat-horizontal-stepper-header {
+  .mat-step-icon {
+    background-color: $default-color;
+    color: white;
+  }
+
+  &[aria-selected='true'] .mat-step-icon {
+    background-color: $primary-color;
+  }
+
+  &[aria-disabled='false']:not([aria-selected='true']) .mat-step-icon {
+    background-color: $completed-color;
+  }
+
+  .mat-step-label {
+    color: #444;
+    font-weight: 500;
+  }
+
+  &[aria-selected='true'] .mat-step-label {
+    color: $primary-color;
+  }
+
+  &[aria-disabled='false']:not([aria-selected='true']) .mat-step-label {
+    color: $completed-color;
+  }
+}
+
+::ng-deep .mat-horizontal-stepper-line {
+  border-top-width: 2px;
+  border-top-style: solid;
+  border-color: $default-color;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-disabled='false'] + .mat-horizontal-stepper-line {
+  border-color: $completed-color;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] + .mat-horizontal-stepper-line {
+  border-color: $primary-color;
+}
+
 mat-dialog-actions {
   margin-top: 24px;
   display: flex;
@@ -104,7 +181,20 @@ mat-dialog-actions {
   }
 }
 
-/* Asegurar que el diálogo no sobresalga de la pantalla */
+.outline-btn {
+  border: 1px solid $primary-color;
+  color: $primary-color;
+  border-radius: 18px;
+  padding: 0 20px;
+  height: 36px;
+  text-transform: none;
+  font-weight: 500;
+
+  &:hover {
+    background-color: rgba(103, 89, 146, 0.1);
+  }
+}
+
 :host ::ng-deep .mat-dialog-container {
   width: 80vw !important;
   max-width: 700px !important;

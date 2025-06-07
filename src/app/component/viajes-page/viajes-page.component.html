@@ -46,10 +46,16 @@
     </div>
   </div>
 
-  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
-    <ng-container matColumnDef="idViaje">
-      <th mat-header-cell *matHeaderCellDef> ID </th>
-      <td mat-cell *matCellDef="let v"> {{ v.idViaje }} </td>
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">  
+
+     <ng-container matColumnDef="nombreLocalidadOrigen">
+      <th mat-header-cell *matHeaderCellDef> Origen </th>
+      <td mat-cell *matCellDef="let v"> {{ v.nombreLocalidadOrigen }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="nombreLocalidadDestino">
+      <th mat-header-cell *matHeaderCellDef> Destino </th>
+      <td mat-cell *matCellDef="let v"> {{ v.nombreLocalidadDestino }} </td>
     </ng-container>
 
     <ng-container matColumnDef="fechaHoraSalida">
@@ -60,22 +66,13 @@
     <ng-container matColumnDef="fechaHoraLlegada">
       <th mat-header-cell *matHeaderCellDef> Fecha llegada </th>
       <td mat-cell *matCellDef="let v"> {{ v.fechaHoraLlegada | date: 'short' }} </td>
-    </ng-container>
+    </ng-container>   
 
-    <ng-container matColumnDef="origen">
-      <th mat-header-cell *matHeaderCellDef> Origen </th>
-      <td mat-cell *matCellDef="let v"> {{ v.origen }} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="destino">
-      <th mat-header-cell *matHeaderCellDef> Destino </th>
-      <td mat-cell *matCellDef="let v"> {{ v.destino }} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="precioEstimado">
+    <ng-container matColumnDef="precioPorTramo">
       <th mat-header-cell *matHeaderCellDef> Precio </th>
-      <td mat-cell *matCellDef="let v"> {{ v.precioEstimado | currency:'USD' }} </td>
+      <td mat-cell *matCellDef="let v"> {{ v.precioPorTramo | currency:'USD' }} </td>
     </ng-container>
+
 
     <ng-container matColumnDef="asientosDisponibles">
       <th mat-header-cell *matHeaderCellDef> Disponibles </th>

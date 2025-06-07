@@ -36,7 +36,7 @@ import { Page } from '../../models';
   styleUrls: ['./viajes-page.component.scss']
 })
 export class ViajesPageComponent implements OnInit, AfterViewInit {
-  columns = ['idViaje', 'fechaHoraSalida', 'fechaHoraLlegada', 'origen', 'destino', 'precioEstimado', 'asientosDisponibles'];
+  columns = ['nombreLocalidadOrigen', 'nombreLocalidadDestino','fechaHoraSalida', 'fechaHoraLlegada', 'precioPorTramo', 'asientosDisponibles'];
   dataSource = new MatTableDataSource<ViajeDisponibleDto>();
   totalElements = 0;
 

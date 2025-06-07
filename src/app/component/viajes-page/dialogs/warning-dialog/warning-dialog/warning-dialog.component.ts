@@ -1,14 +1,17 @@
 import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-warning-dialog',
   templateUrl: './warning-dialog.component.html',
+  styleUrls: ['./warning-dialog.component.scss'],
   standalone: true,
   imports: [
     MatDialogModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ],
 })
 export class WarningDialogComponent {

@@ -42,18 +42,18 @@ import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warn
 })
 export class AltaViajeDetailsDialogComponent implements OnInit {
   step = 0;
+  completedSteps: boolean[] = [false, false, false];
   localidades: LocalidadDto[] = [];
   buses: OmnibusDisponibleDto[] = [];
-
   origenId = 0;
   destinoId = 0;
   fechaSalida: Date | null = null;
   fechaLlegada: Date | null = null;
+  horaSalida = '';
+  horaLlegada = '';
   precio = 0;
-
   paradaIntermediaId: number | null = null;
   paradasIntermedias: number[] = [];
-
   busSeleccionado: OmnibusDisponibleDto | null = null;
   busSeleccionadoArray: OmnibusDisponibleDto[] = [];
 
@@ -71,6 +71,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   siguiente(): void {
+    this.completedSteps[this.step] = true;
     this.step++;
     if (this.step === 2) this.cargarBuses();
   }
@@ -103,8 +104,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     if (!this.busSeleccionado || !this.fechaSalida || !this.fechaLlegada) return;
 
     const total = 2 + this.paradasIntermedias.length;
-    const salida = new Date(this.fechaSalida);
-    const llegada = new Date(this.fechaLlegada);
+    const salida = new Date(this.formatFecha(this.fechaSalida, this.horaSalida));
+    const llegada = new Date(this.formatFecha(this.fechaLlegada, this.horaLlegada));
     const intervalo = (llegada.getTime() - salida.getTime()) / (total - 1);
 
     const localidades = [this.origenId, ...this.paradasIntermedias, this.destinoId];
@@ -117,8 +118,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const alta = {
       origenId: this.origenId,
       destinoId: this.destinoId,
-      fechaHoraSalida: this.formatFecha(this.fechaSalida),
-      fechaHoraLlegada: this.formatFecha(this.fechaLlegada),
+      fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
+      fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada),
       precio: this.precio,
       omnibusId: this.busSeleccionado.id,
       paradas,
@@ -151,8 +152,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const filtro: FiltroDisponibilidadOmnibusDto = {
       origenId: this.origenId,
       destinoId: this.destinoId,
-      fechaHoraSalida: this.formatFecha(this.fechaSalida),
-      fechaHoraLlegada: this.formatFecha(this.fechaLlegada)
+      fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
+      fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada)
     };
 
     this.busService.getDisponibles(filtro).then(buses => {
@@ -167,24 +168,45 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   deberiaDeshabilitarSiguiente(): boolean {
-    if (this.step === 0) return !this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0;
+    if (this.step === 0) return !this.origenId || !this.destinoId || !this.fechaSalida || !this.horaSalida || !this.fechaLlegada || !this.horaLlegada || this.precio <= 0;
     if (this.step === 2) return !this.busSeleccionado;
     return false;
   }
 
-  private formatFecha(fecha: Date | null): string {
-    if (!fecha) return '';
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    const y = fecha.getFullYear();
-    const m = pad(fecha.getMonth() + 1);
-    const d = pad(fecha.getDate());
-    const h = pad(fecha.getHours());
-    const min = pad(fecha.getMinutes());
-    const s = pad(fecha.getSeconds());
-    return `${y}-${m}-${d}T${h}:${min}:${s}`;
-  }
-
   onBusSeleccionadoChange(): void {
     this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
+  }
+
+  private formatFecha(fecha: Date | null, hora: string = ''): string {
+    if (!fecha) return '';
+    const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
+    const fechaConHora = new Date(fecha);
+    fechaConHora.setHours(Number(hh));
+    fechaConHora.setMinutes(Number(mm));
+    fechaConHora.setSeconds(0);
+    const y = fechaConHora.getFullYear();
+    const m = (fechaConHora.getMonth() + 1).toString().padStart(2, '0');
+    const d = fechaConHora.getDate().toString().padStart(2, '0');
+    const h = fechaConHora.getHours().toString().padStart(2, '0');
+    const min = fechaConHora.getMinutes().toString().padStart(2, '0');
+    return `${y}-${m}-${d}T${h}:${min}:00`;
+  }
+
+  ngAfterViewChecked(): void {
+    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
+    headers.forEach((header, index) => {
+      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
+      const label = header.querySelector('.mat-step-label') as HTMLElement;
+      if (index < this.step) {
+        icon.style.backgroundColor = '#3e5f3c';
+        label.style.color = '#3e5f3c';
+      } else if (index === this.step) {
+        icon.style.backgroundColor = '#675992';
+        label.style.color = '#675992';
+      } else {
+        icon.style.backgroundColor = '#ccc';
+        label.style.color = '#444';
+      }
+    });
   }
 }

@@ -10,6 +10,7 @@
 <mat-dialog-content class="dialog-content">
   <div *ngIf="step === 0" class="step">
     <h3>1. Datos del viaje</h3>
+
     <mat-form-field appearance="fill">
       <mat-label>Origen</mat-label>
       <mat-select [(ngModel)]="origenId">
@@ -32,10 +33,20 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill">
+      <mat-label>Hora salida</mat-label>
+      <input matInput type="time" [(ngModel)]="horaSalida" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
       <mat-label>Fecha llegada</mat-label>
       <input matInput [matDatepicker]="pickerLlegada" [(ngModel)]="fechaLlegada" />
       <mat-datepicker-toggle matSuffix [for]="pickerLlegada"></mat-datepicker-toggle>
       <mat-datepicker #pickerLlegada></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Hora llegada</mat-label>
+      <input matInput type="time" [(ngModel)]="horaLlegada" />
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -104,8 +115,8 @@
 
   <div *ngIf="step === 3" class="step">
     <h3>4. Confirmación</h3>
-    <p><strong>Salida:</strong> {{ fechaSalida | date:'short' }}</p>
-    <p><strong>Llegada:</strong> {{ fechaLlegada | date:'short' }}</p>
+    <p><strong>Salida:</strong> {{ fechaSalida | date:'short' }} {{ horaSalida }}</p>
+    <p><strong>Llegada:</strong> {{ fechaLlegada | date:'short' }} {{ horaLlegada }}</p>
     <p><strong>Precio:</strong> {{ precio | currency }}</p>
     <p><strong>Ómnibus:</strong> {{ busSeleccionado?.matricula }}</p>
   </div>

@@ -49,6 +49,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   destinoId = 0;
   fechaSalida: Date | null = null;
   fechaLlegada: Date | null = null;
+  horaSalida = '';
+  horaLlegada = '';
   precio = 0;
   paradaIntermediaId: number | null = null;
   paradasIntermedias: number[] = [];
@@ -102,8 +104,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     if (!this.busSeleccionado || !this.fechaSalida || !this.fechaLlegada) return;
 
     const total = 2 + this.paradasIntermedias.length;
-    const salida = new Date(this.fechaSalida);
-    const llegada = new Date(this.fechaLlegada);
+    const salida = new Date(this.formatFecha(this.fechaSalida, this.horaSalida));
+    const llegada = new Date(this.formatFecha(this.fechaLlegada, this.horaLlegada));
     const intervalo = (llegada.getTime() - salida.getTime()) / (total - 1);
 
     const localidades = [this.origenId, ...this.paradasIntermedias, this.destinoId];
@@ -116,8 +118,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const alta = {
       origenId: this.origenId,
       destinoId: this.destinoId,
-      fechaHoraSalida: this.formatFecha(this.fechaSalida),
-      fechaHoraLlegada: this.formatFecha(this.fechaLlegada),
+      fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
+      fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada),
       precio: this.precio,
       omnibusId: this.busSeleccionado.id,
       paradas,
@@ -150,8 +152,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const filtro: FiltroDisponibilidadOmnibusDto = {
       origenId: this.origenId,
       destinoId: this.destinoId,
-      fechaHoraSalida: this.formatFecha(this.fechaSalida),
-      fechaHoraLlegada: this.formatFecha(this.fechaLlegada)
+      fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
+      fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada)
     };
 
     this.busService.getDisponibles(filtro).then(buses => {
@@ -166,7 +168,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   deberiaDeshabilitarSiguiente(): boolean {
-    if (this.step === 0) return !this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0;
+    if (this.step === 0) return !this.origenId || !this.destinoId || !this.fechaSalida || !this.horaSalida || !this.fechaLlegada || !this.horaLlegada || this.precio <= 0;
     if (this.step === 2) return !this.busSeleccionado;
     return false;
   }
@@ -175,17 +177,20 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
   }
 
-  private formatFecha(fecha: Date | null): string {
+  private formatFecha(fecha: Date | null, hora: string = ''): string {
     if (!fecha) return '';
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    const y = fecha.getFullYear();
-    const m = pad(fecha.getMonth() + 1);
-    const d = pad(fecha.getDate());
-    const h = pad(fecha.getHours());
-    const min = pad(fecha.getMinutes());
-    const s = pad(fecha.getSeconds());
-    return `${y}-${m}-${d}T${h}:${min}:${s}`;
-  } 
+    const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
+    const fechaConHora = new Date(fecha);
+    fechaConHora.setHours(Number(hh));
+    fechaConHora.setMinutes(Number(mm));
+    fechaConHora.setSeconds(0);
+    const y = fechaConHora.getFullYear();
+    const m = (fechaConHora.getMonth() + 1).toString().padStart(2, '0');
+    const d = fechaConHora.getDate().toString().padStart(2, '0');
+    const h = fechaConHora.getHours().toString().padStart(2, '0');
+    const min = fechaConHora.getMinutes().toString().padStart(2, '0');
+    return `${y}-${m}-${d}T${h}:${min}:00`;
+  }
 
   ngAfterViewChecked(): void {
     const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
@@ -204,6 +209,4 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       }
     });
   }
-
-
 }

@@ -1,8 +1,13 @@
-<h2 mat-dialog-title>Advertencia</h2>
+<h2 mat-dialog-title>
+  <mat-icon color="warn" style="vertical-align: middle; margin-right: 8px;">warning</mat-icon>
+  El viaje tiene conflictos
+</h2>
 
-<mat-dialog-content>{{ data.message }}</mat-dialog-content>
+<mat-dialog-content class="message">
+  {{ data.message }}
+</mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-stroked-button class="cancel-btn" (click)="cancelar()">Cancelar</button>
-  <button mat-flat-button class="confirm-btn" (click)="confirmar()">Confirmar</button>
+  <button mat-stroked-button (click)="cancelar()" class="outline-btn">Cancelar</button>
+  <button mat-flat-button (click)="confirmar()" class="create-btn">Confirmar</button>
 </mat-dialog-actions>

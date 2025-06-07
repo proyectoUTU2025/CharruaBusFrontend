@@ -1,11 +1,11 @@
 export interface ViajeDisponibleDto {
   idViaje: number;
-  origen: string;
-  destino: string;
+  nombreLocalidadOrigen: string;
+  nombreLocalidadDestino: string;
   fechaHoraSalida: string;
   fechaHoraLlegada: string;
   asientosDisponibles: number;
-  precioEstimado: number;
+  precioPorTramo: number;
 }
 
 export interface AltaParadaDto {

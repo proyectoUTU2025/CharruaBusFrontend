@@ -103,8 +103,6 @@ mat-dialog-actions {
     }
   }
 }
-
-/* Asegurar que el diálogo no sobresalga de la pantalla */
 :host ::ng-deep .mat-dialog-container {
   width: 80vw !important;
   max-width: 700px !important;

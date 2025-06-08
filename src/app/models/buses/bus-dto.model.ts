@@ -1,11 +1,18 @@
+export interface AsientoDto {
+  id: number;
+  numero: number;
+  estado: string;
+  omnibusId: number;
+}
+
 export interface BusDto {
   id: number;
   matricula: string;
   capacidad: number;
-  ubicacionActual: string;
   activo: boolean;
-
+  asientos: AsientoDto[];
 }
+
 
 export interface AltaBusDto {
   matricula: string;
@@ -13,12 +20,13 @@ export interface AltaBusDto {
   localidadId: number;
 }
 
+
 export interface FiltroBusquedaBusDto {
   matricula?: string;
   minAsientos?: number;
   maxAsientos?: number;
   activo?: boolean;
   localidadId?: number;
-  fechaHoraSalida?: string;  
-  fechaHoraLlegada?: string; 
+  fechaHoraSalida?: string;
+  fechaHoraLlegada?: string;
 }

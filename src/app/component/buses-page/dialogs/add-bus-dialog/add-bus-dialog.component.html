@@ -1,5 +1,3 @@
-<h2 mat-dialog-title>Agregar Ómnibus</h2>
-
 <mat-dialog-content [formGroup]="form">
   <mat-form-field appearance="fill">
     <mat-label>Matrícula</mat-label>
@@ -18,6 +16,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="save-btn" (click)="save()">Guardar</button>
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="save()">Guardar</button>
 </mat-dialog-actions>

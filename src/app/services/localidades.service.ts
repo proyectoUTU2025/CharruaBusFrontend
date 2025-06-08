@@ -12,23 +12,32 @@ import { environment } from '../../environments/environment';
 export class LocalidadService {
   private base = `${environment.apiBaseUrl}/localidades`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(filtro: FiltroBusquedaLocalidadDto = {}, page = 0, size = 10, sort = 'nombre,asc'): Observable<Page<LocalidadDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
       .set('sort', sort);
-
+  
     Object.entries(filtro).forEach(([key, value]) => {
       if (value != null && value !== '') {
         params = params.set(key, value.toString());
       }
     });
-
-    return this.http.get<ApiResponse<Page<LocalidadDto>>>(`${this.base}`, { params })
-      .pipe(map(resp => resp.data));
+  
+    return this.http.get<{ content: LocalidadDto[], totalElements: number, totalPages: number, size: number, number: number }>(`${this.base}`, { params })
+      .pipe(
+        map(resp => ({
+          content: resp.content,
+          totalElements: resp.totalElements,
+          totalPages: resp.totalPages,
+          size: resp.size,
+          number: resp.number
+        }))
+      );
   }
+  
 
   create(localidad: AltaLocalidadDto): Observable<LocalidadDto> {
     return this.http.post<ApiResponse<LocalidadDto>>(`${this.base}`, localidad)

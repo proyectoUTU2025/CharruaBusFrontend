@@ -6,21 +6,24 @@ import { UsersPageComponent } from './component/users-page/users-page.component'
 import { BusesPageComponent } from './component/buses-page/buses-page.component';
 import { LocalidadesPageComponent } from './component/localidades-page/localidades-page.component';
 import { ViajesPageComponent } from './component/viajes-page/viajes-page.component';
-import { AuthGuard } from './core/auth/auth.guard';
+import { BusDetailComponent } from './component/buses-page/bus-detail/bus-detail.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
   { path: 'verificar-codigo', component: VerificarCodigoComponent },
   { path: 'registro', component: SignupPageComponent },
-  {
-    path: '',
-    canActivate: [AuthGuard],
-    children: [
-      { path: '', component: UsersPageComponent },
-      { path: 'omnibus', component: BusesPageComponent },
-      { path: 'localidades', component: LocalidadesPageComponent },
-      { path: 'viajes', component: ViajesPageComponent }
-    ]
-  },
-  { path: '**', redirectTo: '' }
+
+
+  { path: '', component: UsersPageComponent },
+  { path: 'omnibus/:id', component: BusDetailComponent },
+  { path: 'omnibus', component: BusesPageComponent },
+  { path: '', redirectTo: '/omnibus', pathMatch: 'full' },
+  { path: 'localidades', component: LocalidadesPageComponent },
+  { path: 'viajes', component: ViajesPageComponent },
+
+
+
+
+
+  { path: '**', redirectTo: '' },
 ];

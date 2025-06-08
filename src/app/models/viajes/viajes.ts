@@ -7,7 +7,7 @@ export interface Viaje {
   origen: string;
   destino: string;
   precio: number;
-  asientos: number;
+  pasajesVendibles: number;
   tipo: string;
   venta: string;
 }

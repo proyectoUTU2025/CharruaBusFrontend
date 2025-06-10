@@ -1,83 +1,102 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatListModule } from '@angular/material/list';
+import { MatStepperModule } from '@angular/material/stepper';
 import { CompraRequestDto } from '../../models/compra';
 import { SeatsComponent } from '../seats/seats.component';
-import { CompraService } from '../../services/compra.service.service';
+import { SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
+import { CompraService } from '../../services/compra.service';
+import { PurchaseSummaryDialogComponent } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
 
 @Component({
   selector: 'app-compra-page',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, SeatsComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    MatStepperModule,
+    MatDialogModule,
+    MatListModule,
+    SeatsComponent,
+    PurchaseSummaryDialogComponent
+  ],
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
 })
 export class CompraPageComponent implements OnInit {
-  viajeIdaId!: number;
-  viajeVueltaId?: number;
-  clienteId!: number;
-  localidadOrigenId!: number;
-  localidadDestinoId!: number;
-  paradaOrigenVueltaId?: number;
-  paradaDestinoVueltaId?: number;
-  capacidad!: number;
-
-  asientosIda: number[] = [];
-  asientosVuelta: number[] = [];
-
-  paso = 1;
+  searchForm!: FormGroup;
+  viajes: any[] = [];
+  selectedSeats: number[] = [];
 
   constructor(
-    private route: ActivatedRoute,
+    private fb: FormBuilder,
     private compraService: CompraService,
-    private router: Router
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    const state = history.state;
-
-    this.viajeIdaId = state.viajeIdaId;
-    this.viajeVueltaId = state.viajeVueltaId;
-    this.clienteId = state.clienteId;
-    this.localidadOrigenId = state.localidadOrigenId;
-    this.localidadDestinoId = state.localidadDestinoId;
-    this.paradaOrigenVueltaId = state.paradaOrigenVueltaId;
-    this.paradaDestinoVueltaId = state.paradaDestinoVueltaId;
-    this.capacidad = state.capacidad;
+    this.searchForm = this.fb.group({
+      origen: [null, Validators.required],
+      destino: [null, Validators.required],
+      fechaIda: [null, Validators.required],
+      pasajeros: [1, [Validators.min(1), Validators.max(5)]]
+    });
   }
 
-  onAsientosSeleccionados(asientos: number[]): void {
-    if (this.paso === 1) {
-      this.asientosIda = asientos;
-      if (this.viajeVueltaId) {
-        this.paso = 2;
-      } else {
-        this.confirmarCompra();
+  buscar(): void {
+    // implementar llamada real
+    this.viajes = [];
+  }
+
+  openSeatDialog(): void {
+    // ejemplo: seleccionas seats aquí
+    this.selectedSeats = [1, 2];
+  }
+
+  openPurchase(): void {
+    const dialogRef = this.dialog.open<PurchaseSummaryDialogComponent, SummaryDialogData, boolean>(
+      PurchaseSummaryDialogComponent,
+      {
+        width: '400px',
+        data: {
+          seats: this.selectedSeats,
+          total: this.selectedSeats.length * 250
+        }
       }
-    } else if (this.paso === 2) {
-      this.asientosVuelta = asientos;
-      this.confirmarCompra();
-    }
+    );
+    dialogRef.afterClosed().subscribe(ok => {
+      if (ok) this.confirmarCompra();
+    });
   }
 
   confirmarCompra(): void {
     const dto: CompraRequestDto = {
-      viajeIdaId: this.viajeIdaId,
-      viajeVueltaId: this.viajeVueltaId,
-      asientosIda: this.asientosIda,
-      asientosVuelta: this.viajeVueltaId ? this.asientosVuelta : undefined,
-      clienteId: this.clienteId,
-      localidadOrigenId: this.localidadOrigenId,
-      localidadDestinoId: this.localidadDestinoId,
-      paradaOrigenVueltaId: this.paradaOrigenVueltaId,
-      paradaDestinoVueltaId: this.paradaDestinoVueltaId
+      viajeIdaId: 1,
+      viajeVueltaId: null,
+      asientosIda: this.selectedSeats,
+      asientosVuelta: undefined,
+      clienteId: 1,
+      localidadOrigenId: 1,
+      localidadDestinoId: 2,
+      paradaOrigenVueltaId: null,
+      paradaDestinoVueltaId: null
     };
-
-    this.compraService.iniciarCompra(dto).subscribe({
-      next: (res) => window.location.href = res.data.sessionUrl,
-      error: () => alert('Error al iniciar la compra. Intente nuevamente.')
+    this.compraService.iniciarCompra(dto).subscribe(res => {
+      window.location.href = res.data.sessionUrl;
     });
   }
 }

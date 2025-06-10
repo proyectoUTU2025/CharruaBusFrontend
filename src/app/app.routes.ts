@@ -7,6 +7,7 @@ import { BusesPageComponent } from './component/buses-page/buses-page.component'
 import { LocalidadesPageComponent } from './component/localidades-page/localidades-page.component';
 import { ViajesPageComponent } from './component/viajes-page/viajes-page.component';
 import { AuthGuard } from './core/auth/auth.guard';
+import { CompraPageComponent } from './component/compra-page/compra-page.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -19,7 +20,8 @@ export const routes: Routes = [
       { path: '', component: UsersPageComponent },
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
-      { path: 'viajes', component: ViajesPageComponent }
+      { path: 'viajes', component: ViajesPageComponent },
+      { path: 'comprar', component: CompraPageComponent }
     ]
   },
   { path: '**', redirectTo: '' }

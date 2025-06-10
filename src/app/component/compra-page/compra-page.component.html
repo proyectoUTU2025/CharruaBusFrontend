@@ -1,14 +1,35 @@
 <mat-card class="compra-card">
-  <h2>Selección de Asientos</h2>
-  <p *ngIf="paso === 1">Seleccione hasta 5 asientos para el viaje de ida</p>
-  <p *ngIf="paso === 2">Seleccione hasta 5 asientos para el viaje de vuelta</p>
+  <form [formGroup]="searchForm" class="filters">
+    <mat-form-field appearance="fill">
+      <mat-label>Origen</mat-label>
+      <mat-select formControlName="origen"></mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Destino</mat-label>
+      <mat-select formControlName="destino"></mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Fecha Ida</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="fechaIda">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Pasajeros</mat-label>
+      <mat-select formControlName="pasajeros">
+        <mat-option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="buscar()">Buscar</button>
+  </form>
 
-  <app-seats
-    [cantidadAsientos]="capacidad"
-    [viajeId]="paso === 1 ? viajeIdaId : viajeVueltaId!"
-    [clienteId]="clienteId"
-    [origenId]="paso === 1 ? localidadOrigenId : paradaOrigenVueltaId!"
-    [destinoId]="paso === 1 ? localidadDestinoId : paradaDestinoVueltaId!"
-    (bookingConfirmed)="onAsientosSeleccionados($event)">
-  </app-seats>
+  <mat-list *ngIf="viajes.length">
+    <mat-list-item *ngFor="let v of viajes" (click)="openSeatDialog()">
+      {{ v.origen }} → {{ v.destino }} — {{ v.precio | currency:'UYU' }}
+    </mat-list-item>
+  </mat-list>
+
+  <div class="actions" *ngIf="selectedSeats.length">
+    <button mat-raised-button color="primary" (click)="openPurchase()">Summary & Pay</button>
+  </div>
 </mat-card>

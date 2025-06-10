@@ -1,12 +1,7 @@
-<div style="text-align:center">
-  <h3>Seat Chart Layout</h3>
-</div>
-
 <div class="seat-container">
   <div *ngFor="let row of seats" class="seatrow">
     <ng-container *ngFor="let seat of row; let i = index">
-      
-      <div *ngIf="seat.seatLabel; else emptySeat"
+      <div *ngIf="seat.seatLabel; else empty"
            (click)="selectSeat(seat)"
            class="seat-item"
            [ngClass]="{
@@ -15,28 +10,18 @@
            }">
         {{ seat.seatNo }}
       </div>
-      
-      <ng-template #emptySeat>
-        <div class="seat-empty"></div>
-      </ng-template>
-      
-      <ng-container *ngIf="i === 1">
-        <div class="aisle"></div>
-      </ng-container>
-      
+      <ng-template #empty><div class="seat-empty"></div></ng-template>
+      <div *ngIf="i === 1" class="aisle"></div>
     </ng-container>
   </div>
 </div>
 
 <div class="summary-bar">
-  <div>Total Selected: {{ cart.selectedSeats.length }}</div>
-  <div>Total Amount: {{ cart.totalamount }} Usd</div>
-  <div class="selected-seats">
-    <span *ngFor="let s of cart.selectedSeats" class="badge badge-primary">{{ s }}</span>
-  </div>
-  <button [disabled]="!cart.selectedSeats.length"
-          (click)="processBooking()"
-          class="btn btn-primary">
-    Book Now
+  <div>Seleccionados: {{ cart.selectedIds.length }}</div>
+  <div>Total: {{ cart.totalamount }} UYU</div>
+  <button mat-raised-button color="primary"
+          [disabled]="cart.selectedIds.length === 0"
+          (click)="processBooking()">
+    Confirmar
   </button>
 </div>

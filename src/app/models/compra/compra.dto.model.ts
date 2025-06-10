@@ -15,3 +15,55 @@ export interface CompraResponseDto {
   sessionUrl: string;
   sessionId: string;
 }
+
+export interface ConfirmCompraRequestDto {
+  sessionId: string;
+}
+
+export interface CancelarCompraRequestDto {
+  sessionId: string;
+}
+
+export interface CompraDto {
+  id: number;
+  fechaCompra: string;       
+  precioActual: number;
+  precioOriginal: number;
+  vendedorId?: number;
+  clienteId: number;
+  cantidadPasajes: number;
+  estado: string;
+}
+
+export interface PasajeDto {
+  id: number;
+  compraId: number;
+  fecha: string;            
+  numeroAsiento: number;
+  paradaOrigen: string;
+  paradaDestino: string;
+  precio: number;
+  descuento: number;
+  subtotal: number;
+  estadoPasaje: string;
+}
+
+export interface DetalleCompraDto {
+  id: number;
+  fechaCompra: string;
+  precioActual: number;
+  precioOriginal: number;
+  vendedorId?: number;
+  clienteId: number;
+  cantidadPasajes: number;
+  estado: string;
+  pasajes: PasajeDto[];
+}
+
+export interface FiltroBusquedaCompraDto {
+  estados?: string[];
+  fechaDesde?: string;       
+  fechaHasta?: string;     
+  montoMin?: number;
+  montoMax?: number;
+}

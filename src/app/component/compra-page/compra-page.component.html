@@ -1,12 +1,17 @@
+<!-- src/app/component/compra-page/compra-page.component.html -->
 <mat-card class="compra-card">
   <form [formGroup]="searchForm" class="filters">
     <mat-form-field appearance="fill">
       <mat-label>Origen</mat-label>
-      <mat-select formControlName="origen"></mat-select>
+      <mat-select formControlName="origen">
+        <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombreConDepartamento }}</mat-option>
+      </mat-select>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Destino</mat-label>
-      <mat-select formControlName="destino"></mat-select>
+      <mat-select formControlName="destino">
+        <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombreConDepartamento }}</mat-option>
+      </mat-select>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Fecha Ida</mat-label>
@@ -22,13 +27,20 @@
     </mat-form-field>
     <button mat-raised-button color="primary" (click)="buscar()">Buscar</button>
   </form>
-
-  <mat-list *ngIf="viajes.length">
-    <mat-list-item *ngFor="let v of viajes" (click)="openSeatDialog()">
-      {{ v.origen }} → {{ v.destino }} — {{ v.precio | currency:'UYU' }}
-    </mat-list-item>
-  </mat-list>
-
+  <div *ngIf="viajes.length" class="viajes-grid">
+    <mat-card *ngFor="let v of viajes" class="viaje-card">
+      <mat-card-content>
+        <h3>{{ v.origen }} → {{ v.destino }}</h3>
+        <p>{{ v.fechaHoraSalida | date:'shortTime' }} – {{ v.fechaHoraLlegada | date:'shortTime' }}</p>
+        <p>{{ v.asientosDisponibles }} seats</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-icon-button color="primary" (click)="openSeatDialog(v)">
+          <mat-icon>shopping_cart</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
   <div class="actions" *ngIf="selectedSeats.length">
     <button mat-raised-button color="primary" (click)="openPurchase()">Summary & Pay</button>
   </div>

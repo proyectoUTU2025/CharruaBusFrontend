@@ -32,5 +32,13 @@ export interface FiltroBusquedaViajeDto {
   fechaHasta: string;
 }
 
-  
+  export interface CompraViajeDto {
+  id: number;
+  origen: string;
+  destino: string;
+  fechaHoraSalida: string;
+  fechaHoraLlegada: string;
+  precio: number;
+  asientosDisponibles: number;
+}
 

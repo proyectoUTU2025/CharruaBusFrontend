@@ -12,11 +12,30 @@
   gap: 1rem;
   margin-bottom: 1rem;
 }
+.filters-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.buscar-btn {
+  background-color: #675992;
+  color: #fff;
+  border-radius: 18px;
+  text-transform: none;
+}
+.buscar-btn:hover {
+  background-color: #5c4d84;
+}
+.outline-btn {
+  border: 1px solid #675992;
+  color: #675992;
+  border-radius: 18px;
+  text-transform: none;
+}
 .viajes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
   gap: 1rem;
-  margin-top: 1rem;
 }
 .viaje-card {
   display: flex;

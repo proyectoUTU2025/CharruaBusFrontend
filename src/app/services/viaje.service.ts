@@ -36,15 +36,11 @@ export class ViajeService {
     }
 
     return firstValueFrom(
-      this.http.get<Page<ViajeDisponibleDto>>(`${this.baseUrl}`, { params })
+      this.http.get<Page<ViajeDisponibleDto>>(this.baseUrl, { params })
     );
   }
 
-  buscarParaCompra(
-    filtro: FiltroBusquedaViajeDto,
-    page = 0,
-    size = 5
-  ): Promise<Page<CompraViajeDto>> {
+  buscarParaCompra(filtro: FiltroBusquedaViajeDto, page = 0, size = 5): Promise<Page<CompraViajeDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -64,7 +60,18 @@ export class ViajeService {
     }
 
     return firstValueFrom(
-      this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}`, { params })
+      this.http.get<Page<CompraViajeDto>>(this.baseUrl, { params })
+    );
+  }
+
+  getAllViajes(page = 0, size = 5): Promise<Page<CompraViajeDto>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', 'fechaHoraSalida,asc');
+
+    return firstValueFrom(
+      this.http.get<Page<CompraViajeDto>>(this.baseUrl, { params })
     );
   }
 

@@ -1,21 +1,20 @@
-<!-- src/app/component/compra-page/compra-page.component.html -->
 <mat-card class="compra-card">
   <form [formGroup]="searchForm" class="filters">
     <mat-form-field appearance="fill">
       <mat-label>Origen</mat-label>
-      <mat-select formControlName="origen">
+      <mat-select formControlName="localidadOrigenId">
         <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombreConDepartamento }}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Destino</mat-label>
-      <mat-select formControlName="destino">
+      <mat-select formControlName="localidadDestinoId">
         <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombreConDepartamento }}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Fecha Ida</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="fechaIda">
+      <input matInput [matDatepicker]="picker" formControlName="fechaDesde">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
@@ -25,7 +24,10 @@
         <mat-option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</mat-option>
       </mat-select>
     </mat-form-field>
-    <button mat-raised-button color="primary" (click)="buscar()">Buscar</button>
+    <div class="filters-actions">
+      <button mat-raised-button class="buscar-btn" (click)="buscar()">Buscar</button>
+      <button mat-flat-button class="outline-btn" (click)="limpiarFiltros()">Limpiar filtros</button>
+    </div>
   </form>
   <div *ngIf="viajes.length" class="viajes-grid">
     <mat-card *ngFor="let v of viajes" class="viaje-card">

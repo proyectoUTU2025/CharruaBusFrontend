@@ -11,15 +11,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatIconModule } from '@angular/material/icon';
 import { CompraRequestDto } from '../../models/compra';
+
 import { ViajeService } from '../../services/viaje.service';
 import { CompraViajeDto, FiltroBusquedaViajeDto } from '../../models/viajes';
 import { SeatsComponent } from '../seats/seats.component';
 import { CompraService } from '../../services/compra.service';
+import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
 import { LocalidadService } from '../../services/localidades.service';
-import { PurchaseSummaryDialogComponent } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
-import {SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
-import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-compra-page',
   standalone: true,
@@ -36,9 +37,9 @@ import { MatIconModule } from '@angular/material/icon';
     MatStepperModule,
     MatDialogModule,
     MatListModule,
+    MatIconModule,
     SeatsComponent,
-    PurchaseSummaryDialogComponent,
-    MatIconModule
+    PurchaseSummaryDialogComponent
   ],
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
@@ -60,13 +61,16 @@ export class CompraPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
-      origen:    [null, Validators.required],
-      destino:   [null, Validators.required],
-      fechaIda:  [null, Validators.required],
-      pasajeros: [1, [Validators.min(1), Validators.max(5)]]
+      localidadOrigenId:  [null, Validators.required],
+      localidadDestinoId: [null, Validators.required],
+      fechaDesde:         [null, Validators.required],
+      pasajeros:          [1, [Validators.min(1), Validators.max(5)]]
     });
-    this.localidadService.getAllFlat().subscribe(list => this.localidades = list);
-    this.searchForm.get('origen')!.valueChanges.subscribe(id =>
+    this.localidadService.getAllFlat().subscribe(list => {
+      this.localidades = list;
+      this.destinos     = list;
+    });
+    this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id =>
       this.localidadService.getDestinos(id).subscribe(d => this.destinos = d)
     );
   }
@@ -74,6 +78,12 @@ export class CompraPageComponent implements OnInit {
   buscar(): void {
     const f = this.searchForm.value as FiltroBusquedaViajeDto;
     this.viajeService.buscarParaCompra(f).then(page => this.viajes = page.content);
+  }
+
+  limpiarFiltros(): void {
+    this.searchForm.reset({ pasajeros: 1 });
+    this.destinos = this.localidades;
+    this.viajes = [];
   }
 
   openSeatDialog(v: CompraViajeDto): void {
@@ -94,15 +104,15 @@ export class CompraPageComponent implements OnInit {
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const dto: CompraRequestDto = {
-      viajeIdaId: this.viajes[0].id,
-      viajeVueltaId: null,
-      asientosIda: this.selectedSeats,
-      asientosVuelta: undefined,
-      clienteId: 1,
-      localidadOrigenId: f.origen,
-      localidadDestinoId: f.destino,
+      viajeIdaId:           this.viajes[0].id,
+      viajeVueltaId:        null,
+      asientosIda:          this.selectedSeats,
+      asientosVuelta:       undefined,
+      clienteId:            1,
+      localidadOrigenId:    f.localidadOrigenId,
+      localidadDestinoId:   f.localidadDestinoId,
       paradaOrigenVueltaId: null,
-      paradaDestinoVueltaId: null
+      paradaDestinoVueltaId:null
     };
     this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
   }

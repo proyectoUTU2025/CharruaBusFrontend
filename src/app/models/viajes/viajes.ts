@@ -29,7 +29,7 @@ export interface FiltroBusquedaViajeDto {
   localidadOrigenId?: number | null;
   localidadDestinoId?: number | null;
   fechaDesde: string;
-  fechaHasta: string;
+  fechaHasta?: string;
 }
 
   export interface CompraViajeDto {

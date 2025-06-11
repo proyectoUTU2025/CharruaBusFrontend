@@ -1,3 +1,14 @@
+<mat-horizontal-stepper [selectedIndex]="step" linear class="stepper">
+  <mat-step label="Búsqueda" [completed]="step > 0"></mat-step>
+  <mat-step label="Selección" [completed]="step > 1"></mat-step>
+  <mat-step label="Asientos" [completed]="step > 2"></mat-step>
+  <mat-step label="Resumen" [completed]="step > 3"></mat-step>
+  <mat-step label="Pago"></mat-step>
+</mat-horizontal-stepper>
+<mat-tab-group [selectedIndex]="tipoViaje === 'IDA' ? 0 : 1" (selectedIndexChange)="cambiarTipoViaje($event)">
+  <mat-tab label="Ida"></mat-tab>
+  <mat-tab label="Ida y Vuelta"></mat-tab>
+</mat-tab-group>
 <mat-card class="compra-card">
   <form [formGroup]="searchForm" class="filters">
     <mat-form-field appearance="fill">
@@ -18,6 +29,12 @@
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
+    <mat-form-field appearance="fill" *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
+    <mat-label>Fecha Vuelta</mat-label>
+      <input matInput [matDatepicker]="pickerVuelta" formControlName="fechaVuelta">
+      <mat-datepicker-toggle matSuffix [for]="pickerVuelta"></mat-datepicker-toggle>
+      <mat-datepicker #pickerVuelta></mat-datepicker>
+    </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Pasajeros</mat-label>
       <mat-select formControlName="pasajeros">
@@ -29,6 +46,7 @@
       <button mat-flat-button class="outline-btn" (click)="limpiarFiltros()">Limpiar filtros</button>
     </div>
   </form>
+
   <div *ngIf="viajes.length" class="viajes-grid">
     <mat-card *ngFor="let v of viajes" class="viaje-card">
       <mat-card-content>
@@ -43,6 +61,7 @@
       </mat-card-actions>
     </mat-card>
   </div>
+
   <div class="actions" *ngIf="selectedSeats.length">
     <button mat-raised-button color="primary" (click)="openPurchase()">Summary & Pay</button>
   </div>

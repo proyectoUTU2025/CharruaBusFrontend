@@ -1,48 +1,99 @@
 .compra-card {
-  max-width: 800px;
+  max-width: 900px;
   margin: 2rem auto;
   padding: 1.5rem;
   border-radius: 12px;
   background: #f9f9f9;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
 .filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
 }
+
 .filters-actions {
   display: flex;
   gap: 1rem;
   align-items: center;
 }
+
 .buscar-btn {
   background-color: #675992;
   color: #fff;
   border-radius: 18px;
   text-transform: none;
 }
+
 .buscar-btn:hover {
   background-color: #5c4d84;
 }
+
 .outline-btn {
   border: 1px solid #675992;
   color: #675992;
   border-radius: 18px;
   text-transform: none;
 }
+
 .viajes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
 }
+
 .viaje-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
+
 .actions {
   margin-top: 1rem;
   text-align: right;
+}
+
+.stepper {
+  margin-bottom: 16px;
+}
+
+::ng-deep .mat-horizontal-stepper-header .mat-step-icon {
+  background-color: #ccc;
+  color: white;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] .mat-step-icon {
+  background-color: #675992;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-disabled='false']:not([aria-selected='true']) .mat-step-icon {
+  background-color: #3e5f3c;
+}
+
+::ng-deep .mat-horizontal-stepper-header .mat-step-label {
+  color: #444;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] .mat-step-label {
+  color: #675992;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-disabled='false']:not([aria-selected='true']) .mat-step-label {
+  color: #3e5f3c;
+}
+
+::ng-deep .mat-horizontal-stepper-line {
+  border-top-width: 2px;
+  border-top-style: solid;
+  border-color: #ccc;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-disabled='false'] + .mat-horizontal-stepper-line {
+  border-color: #3e5f3c;
+}
+
+::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] + .mat-horizontal-stepper-line {
+  border-color: #675992;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -12,10 +12,10 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { CompraRequestDto } from '../../models/compra';
-
 import { ViajeService } from '../../services/viaje.service';
-import { CompraViajeDto, FiltroBusquedaViajeDto } from '../../models/viajes';
+import { CompraViajeDto } from '../../models/viajes';
 import { SeatsComponent } from '../seats/seats.component';
 import { CompraService } from '../../services/compra.service';
 import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
@@ -38,13 +38,17 @@ import { LocalidadService } from '../../services/localidades.service';
     MatDialogModule,
     MatListModule,
     MatIconModule,
+    MatTabsModule,
     SeatsComponent,
     PurchaseSummaryDialogComponent
   ],
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
 })
-export class CompraPageComponent implements OnInit {
+export class CompraPageComponent implements OnInit, AfterViewChecked {
+  step = 0;
+  completedSteps: boolean[] = [false, false, false, false, false, false];
+  tipoViaje: 'IDA' | 'IDA_Y_VUELTA' = 'IDA';
   searchForm!: FormGroup;
   localidades: any[] = [];
   destinos: any[] = [];
@@ -64,30 +68,48 @@ export class CompraPageComponent implements OnInit {
       localidadOrigenId:  [null, Validators.required],
       localidadDestinoId: [null, Validators.required],
       fechaDesde:         [null, Validators.required],
+      fechaVuelta:        [null],
       pasajeros:          [1, [Validators.min(1), Validators.max(5)]]
     });
-    this.localidadService.getAllFlat().subscribe(list => {
-      this.localidades = list;
-      this.destinos     = list;
+
+    this.localidadService.getLocalidadesOrigenValidas()
+      .subscribe(list => this.localidades = list);
+
+    this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
+      this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
-    this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id =>
-      this.localidadService.getDestinos(id).subscribe(d => this.destinos = d)
-    );
+  }
+
+  cambiarTipoViaje(index: number) {
+    this.tipoViaje = index === 0 ? 'IDA' : 'IDA_Y_VUELTA';
+    this.searchForm.get('fechaVuelta')?.reset();
   }
 
   buscar(): void {
-    const f = this.searchForm.value as FiltroBusquedaViajeDto;
-    this.viajeService.buscarParaCompra(f).then(page => this.viajes = page.content);
+    const f = this.searchForm.value;
+    const filtro = {
+      idLocalidadOrigen: f.localidadOrigenId,
+      idLocalidadDestino: f.localidadDestinoId,
+      fechaViaje: f.fechaDesde,
+      cantidadPasajes: f.pasajeros
+    };
+    this.viajeService.buscarDisponibles(filtro).then(page => {
+      this.viajes = page.content;
+      this.siguientePaso();
+    });
   }
 
   limpiarFiltros(): void {
     this.searchForm.reset({ pasajeros: 1 });
     this.destinos = this.localidades;
     this.viajes = [];
+    this.step = 0;
+    this.completedSteps = [false, false, false, false, false, false];
   }
 
   openSeatDialog(v: CompraViajeDto): void {
     this.selectedSeats = [];
+    this.siguientePaso();
   }
 
   openPurchase(): void {
@@ -98,7 +120,12 @@ export class CompraPageComponent implements OnInit {
         data: { seats: this.selectedSeats, total: this.selectedSeats.length * 250 }
       }
     );
-    dialogRef.afterClosed().subscribe(ok => { if (ok) this.confirmarCompra(); });
+    dialogRef.afterClosed().subscribe(ok => {
+      if (ok) {
+        this.siguientePaso();
+        this.confirmarCompra();
+      }
+    });
   }
 
   confirmarCompra(): void {
@@ -115,5 +142,36 @@ export class CompraPageComponent implements OnInit {
       paradaDestinoVueltaId:null
     };
     this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
+  }
+
+  siguientePaso(): void {
+    if (this.step < this.completedSteps.length) {
+      this.completedSteps[this.step] = true;
+      this.step++;
+    }
+  }
+
+  anteriorPaso(): void {
+    if (this.step > 0) {
+      this.step--;
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
+    headers.forEach((header, index) => {
+      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
+      const label = header.querySelector('.mat-step-label') as HTMLElement;
+      if (index < this.step) {
+        icon.style.backgroundColor = '#3e5f3c';
+        label.style.color = '#3e5f3c';
+      } else if (index === this.step) {
+        icon.style.backgroundColor = '#675992';
+        label.style.color = '#675992';
+      } else {
+        icon.style.backgroundColor = '#ccc';
+        label.style.color = '#444';
+      }
+    });
   }
 }

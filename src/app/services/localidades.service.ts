@@ -40,12 +40,6 @@ export class LocalidadService {
     return this.http.get<LocalidadNombreDepartamentoDto[]>(`${this.base}/all`);
   }
 
-  getDestinos(origenId: number): Observable<LocalidadNombreDepartamentoDto[]> {
-    return this.http.get<LocalidadNombreDepartamentoDto[]>(
-      `${this.base}/destinos-posibles/${origenId}`
-    );
-  }
-
   create(localidad: AltaLocalidadDto): Observable<LocalidadDto> {
     return this.http
       .post<ApiResponse<LocalidadDto>>(`${this.base}`, localidad)
@@ -60,4 +54,12 @@ export class LocalidadService {
       .post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
       .pipe(map(resp => resp.data));
   }
+  getLocalidadesOrigenValidas(): Observable<LocalidadDto[]> {
+    return this.http.get<LocalidadDto[]>(`${this.base}/origenes-posibles`);
+  }
+
+  getDestinosPosibles(idOrigen: number): Observable<LocalidadDto[]> {
+    return this.http.get<LocalidadDto[]>(`${this.base}/destinos-posibles/${idOrigen}`);
+  }
+
 }

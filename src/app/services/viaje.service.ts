@@ -40,29 +40,30 @@ export class ViajeService {
     );
   }
 
-  buscarParaCompra(filtro: FiltroBusquedaViajeDto, page = 0, size = 5): Promise<Page<CompraViajeDto>> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('sort', 'fechaHoraSalida,asc');
+  buscarDisponibles(
+  filtro: {
+    idLocalidadOrigen: number;
+    idLocalidadDestino: number;
+    fechaViaje: string;
+    cantidadPasajes: number;
+  },
+  page = 0,
+  size = 5
+): Promise<Page<CompraViajeDto>> {
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString())
+    .set('sort', 'fechaHoraSalida,asc')
+    .set('idLocalidadOrigen', filtro.idLocalidadOrigen.toString())
+    .set('idLocalidadDestino', filtro.idLocalidadDestino.toString())
+    .set('fechaViaje', filtro.fechaViaje)
+    .set('cantidadPasajes', filtro.cantidadPasajes.toString());
 
-    if (filtro.localidadOrigenId != null) {
-      params = params.set('localidadOrigenId', filtro.localidadOrigenId.toString());
-    }
-    if (filtro.localidadDestinoId != null) {
-      params = params.set('localidadDestinoId', filtro.localidadDestinoId.toString());
-    }
-    if (filtro.fechaDesde) {
-      params = params.set('fechaDesde', filtro.fechaDesde);
-    }
-    if (filtro.fechaHasta) {
-      params = params.set('fechaHasta', filtro.fechaHasta);
-    }
+  return firstValueFrom(
+    this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
+  );
+}
 
-    return firstValueFrom(
-      this.http.get<Page<CompraViajeDto>>(this.baseUrl, { params })
-    );
-  }
 
   getAllViajes(page = 0, size = 5): Promise<Page<CompraViajeDto>> {
     let params = new HttpParams()

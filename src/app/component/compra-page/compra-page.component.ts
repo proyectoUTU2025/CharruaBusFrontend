@@ -23,6 +23,8 @@ import { LocalidadService } from '../../services/localidades.service';
 import { CompraService } from '../../services/compra.service';
 import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
 
+type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
+
 @Component({
   selector: 'app-compra-page',
   standalone: true,
@@ -57,9 +59,9 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   pasajerosForm!: FormGroup;
   localidades: any[] = [];
   destinos: any[] = [];
-  viajes: (CompraViajeDto & { seleccionado?: boolean })[] = [];
+  viajes: CompraViajeSeleccionable[] = [];
   selectedSeats: number[] = [];
-  viajeSeleccionado: CompraViajeDto | null = null;
+  viajeSeleccionado: CompraViajeSeleccionable | null = null;
 
   totalElements = 0;
   pageSize = 5;
@@ -102,22 +104,19 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   private generarFormularioPasajeros(cantidad: number): void {
-  const array = this.fb.array<FormGroup>([]); // Tipo explícito
-
-  for (let i = 0; i < cantidad; i++) {
-    const grupo = this.fb.group({
-      nombre: ['', Validators.required],
-      documento: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      telefono: ['', Validators.required],
-      direccion: ['', Validators.required]
-    }) as FormGroup;
-
-    array.push(grupo);
+    const array = this.fb.array<FormGroup>([]);
+    for (let i = 0; i < cantidad; i++) {
+      const grupo = this.fb.group({
+        nombre: ['', Validators.required],
+        documento: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        telefono: ['', Validators.required],
+        direccion: ['', Validators.required]
+      }) as FormGroup;
+      array.push(grupo);
+    }
+    this.pasajerosForm.setControl('pasajeros', array);
   }
-
-  this.pasajerosForm.setControl('pasajeros', array);
-}
 
   cambiarTipoViaje(index: number): void {
     this.tipoViaje = index === 0 ? 'IDA' : 'IDA_Y_VUELTA';
@@ -141,7 +140,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
     this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize)
       .then(page => {
-        this.viajes = page.content;
+        this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
         this.totalElements = page.totalElements;
         this.step = 1;
       });
@@ -162,15 +161,12 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     this.completedSteps = [false, false, false, false, false];
   }
 
-  seleccionarViaje(v: CompraViajeDto): void {
+  seleccionarViaje(v: CompraViajeSeleccionable): void {
+    this.viajes.forEach(viaje => viaje.seleccionado = false);
+    v.seleccionado = true;
     this.viajeSeleccionado = v;
-    this.viajes = this.viajes.map(viaje => ({
-      ...viaje,
-      seleccionado: viaje.id === v.id
-  }));
-  this.completedSteps[1] = true;
-}
-
+    this.completedSteps[1] = true;
+  }
 
   abrirDialogPasajeros(): void {
     if (!this.viajeSeleccionado) return;
@@ -179,8 +175,8 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
       width: '600px',
       data: {
         pasajeros,
-        viajeId: this.viajeSeleccionado?.id,
-        cantidadAsientos: this.viajeSeleccionado?.asientosDisponibles
+        viajeId: this.viajeSeleccionado.id,
+        cantidadAsientos: this.viajeSeleccionado.asientosDisponibles
       }
     });
 

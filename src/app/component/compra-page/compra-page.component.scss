@@ -85,3 +85,73 @@
   margin-top: 1.5rem;
   text-align: right;
 }
+.viajes-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.viaje-item {
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: white;
+  transition: box-shadow 0.2s;
+}
+
+.viaje-item.selected {
+  border: 2px solid #675992;
+  background: #f2e9ff;
+}
+
+.viaje-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.viaje-item.selected {
+  border: 2px solid #675992;
+  background-color: #f1eaff;
+  border-radius: 12px;
+}
+.horario {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+.pasajero-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-asientos {
+  margin-top: 1rem;
+  font-weight: 500;
+  color: #5b4d8a;
+}
+.pasajero-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pasajero-form-row p {
+  margin: 0;
+}
+
+.pasajero-form-row strong {
+  color: #4c3b78;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}

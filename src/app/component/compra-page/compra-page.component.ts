@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -21,6 +21,7 @@ import { SeatsComponent } from '../seats/seats.component';
 import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
 import { LocalidadService } from '../../services/localidades.service';
 import { CompraService } from '../../services/compra.service';
+import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
 
 @Component({
   selector: 'app-compra-page',
@@ -49,14 +50,16 @@ import { CompraService } from '../../services/compra.service';
 })
 export class CompraPageComponent implements OnInit, AfterViewChecked {
   step = 0;
-  completedSteps: boolean[] = [false, false, false, false, false, false];
+  completedSteps: boolean[] = [false, false, false, false, false];
   tipoViaje: 'IDA' | 'IDA_Y_VUELTA' = 'IDA';
   selectedTabIndex = 0;
   searchForm!: FormGroup;
+  pasajerosForm!: FormGroup;
   localidades: any[] = [];
   destinos: any[] = [];
   viajes: CompraViajeDto[] = [];
   selectedSeats: number[] = [];
+  viajeSeleccionado: CompraViajeDto | null = null;
 
   totalElements = 0;
   pageSize = 5;
@@ -81,12 +84,40 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
       pasajeros: [1, [Validators.min(1), Validators.max(5)]]
     });
 
-    this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
+    this.pasajerosForm = this.fb.group({
+      pasajeros: this.fb.array([])
+    });
 
+    this.searchForm.get('pasajeros')!.valueChanges.subscribe(n => this.generarFormularioPasajeros(n));
+    this.generarFormularioPasajeros(this.searchForm.value.pasajeros);
+
+    this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
       this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
   }
+
+  get pasajeros(): FormArray {
+    return this.pasajerosForm.get('pasajeros') as FormArray;
+  }
+
+  private generarFormularioPasajeros(cantidad: number): void {
+  const array = this.fb.array<FormGroup>([]); // Tipo explícito
+
+  for (let i = 0; i < cantidad; i++) {
+    const grupo = this.fb.group({
+      nombre: ['', Validators.required],
+      documento: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: ['', Validators.required],
+      direccion: ['', Validators.required]
+    }) as FormGroup;
+
+    array.push(grupo);
+  }
+
+  this.pasajerosForm.setControl('pasajeros', array);
+}
 
   cambiarTipoViaje(index: number): void {
     this.tipoViaje = index === 0 ? 'IDA' : 'IDA_Y_VUELTA';
@@ -112,7 +143,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
       .then(page => {
         this.viajes = page.content;
         this.totalElements = page.totalElements;
-        this.siguientePaso();
+        this.step = 1;
       });
   }
 
@@ -127,12 +158,31 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     this.destinos = this.localidades;
     this.viajes = [];
     this.step = 0;
-    this.completedSteps = [false, false, false, false, false, false];
+    this.viajeSeleccionado = null;
+    this.completedSteps = [false, false, false, false, false];
   }
 
-  openSeatDialog(v: CompraViajeDto): void {
-    this.selectedSeats = [];
-    this.siguientePaso();
+  seleccionarViaje(v: CompraViajeDto): void {
+    this.viajeSeleccionado = v;
+  }
+
+  abrirDialogPasajeros(): void {
+    const pasajeros = this.searchForm.value.pasajeros;
+    const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
+      width: '600px',
+      data: {
+        pasajeros,
+        viajeId: this.viajeSeleccionado?.id,
+        cantidadAsientos: this.viajeSeleccionado?.asientosDisponibles
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.selectedSeats = result.asientos;
+        this.completedSteps[2] = true;
+      }
+    });
   }
 
   openPurchase(): void {
@@ -145,7 +195,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     );
     dialogRef.afterClosed().subscribe(ok => {
       if (ok) {
-        this.siguientePaso();
+        this.step = 4;
         this.confirmarCompra();
       }
     });
@@ -154,7 +204,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const dto: CompraRequestDto = {
-      viajeIdaId: this.viajes[0].id,
+      viajeIdaId: this.viajeSeleccionado?.id || 0,
       viajeVueltaId: null,
       asientosIda: this.selectedSeats,
       asientosVuelta: undefined,
@@ -168,7 +218,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   siguientePaso(): void {
-    if (this.step < this.completedSteps.length) {
+    if (this.puedeAvanzar() && this.step < this.completedSteps.length) {
       this.completedSteps[this.step] = true;
       this.step++;
     }
@@ -178,6 +228,13 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     if (this.step > 0) {
       this.step--;
     }
+  }
+
+  puedeAvanzar(): boolean {
+    if (this.step === 0) return this.searchForm.valid;
+    if (this.step === 1) return this.viajeSeleccionado !== null;
+    if (this.step === 2) return this.pasajerosForm.valid && this.selectedSeats.length > 0;
+    return true;
   }
 
   ngAfterViewChecked(): void {
@@ -203,13 +260,12 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   calcularDuracion(inicio: string, fin: string): string {
-  const d1 = new Date(inicio);
-  const d2 = new Date(fin);
-  const diffMs = d2.getTime() - d1.getTime();
-  const minutos = Math.floor(diffMs / 60000);
-  const horas = Math.floor(minutos / 60);
-  const mins = minutos % 60;
-  return `${horas}h ${mins}m`;
-}
-
+    const d1 = new Date(inicio);
+    const d2 = new Date(fin);
+    const diffMs = d2.getTime() - d1.getTime();
+    const minutos = Math.floor(diffMs / 60000);
+    const horas = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    return `${horas}h ${mins}m`;
+  }
 }

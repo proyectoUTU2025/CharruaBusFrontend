@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Datos de los Pasajeros</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <div formArrayName="pasajeros">
+      <div *ngFor="let p of pasajeros.controls; let i = index" [formGroupName]="i" style="margin-bottom: 1rem;">
+        <label>Pasajero {{ i + 1 }}</label>
+        <input formControlName="nombre" placeholder="Nombre" required>
+        <input formControlName="documento" placeholder="Documento" required>
+      </div>
+    </div>
+  </form>
+
+  <h3>Seleccionar Asientos</h3>
+  <app-seats
+    [viajeId]="data.viajeId"
+    [cantidadAsientos]="data.cantidadAsientos"
+    [maxSeleccion]="data.pasajeros"
+    (bookingConfirmed)="onAsientosSeleccionados($event)">
+  </app-seats>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary"
+          [disabled]="form.invalid || selectedSeats.length !== data.pasajeros"
+          (click)="confirmar()">Confirmar</button>
+</mat-dialog-actions>

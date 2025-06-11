@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  padding: 1.5rem;
+}
+
+mat-dialog-content {
+  padding: 1rem 0;
+}
+
+h3 {
+  margin-top: 2rem;
+  color: #4c3b78;
+  font-weight: 600;
+}
+
+button.mat-raised-button {
+  background-color: #675992;
+  color: white;
+  border-radius: 20px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+}
+
+button.mat-button {
+  color: #675992;
+  font-weight: 500;
+}
+
+mat-form-field {
+  margin-right: 1rem;
+  width: 200px;
+}

@@ -57,7 +57,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   pasajerosForm!: FormGroup;
   localidades: any[] = [];
   destinos: any[] = [];
-  viajes: CompraViajeDto[] = [];
+  viajes: (CompraViajeDto & { seleccionado?: boolean })[] = [];
   selectedSeats: number[] = [];
   viajeSeleccionado: CompraViajeDto | null = null;
 
@@ -164,9 +164,16 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   seleccionarViaje(v: CompraViajeDto): void {
     this.viajeSeleccionado = v;
-  }
+    this.viajes = this.viajes.map(viaje => ({
+      ...viaje,
+      seleccionado: viaje.id === v.id
+  }));
+  this.completedSteps[1] = true;
+}
+
 
   abrirDialogPasajeros(): void {
+    if (!this.viajeSeleccionado) return;
     const pasajeros = this.searchForm.value.pasajeros;
     const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
       width: '600px',

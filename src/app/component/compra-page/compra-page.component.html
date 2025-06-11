@@ -57,16 +57,18 @@
 </mat-card>
 
 <!-- Paso 1: Seleccionar viaje -->
-<mat-card class="viajes-card" *ngIf="step === 1">
-  <h2>Viajes Disponibles</h2>
-  <div *ngFor="let v of viajes" class="viaje-item" [class.selected]="v.id === viajeSeleccionado?.id" (click)="seleccionarViaje(v)">
+<mat-card class="viajes-card" *ngIf="step === 1">  
+  <div *ngFor="let v of viajes"
+     class="viaje-item"
+     [class.selected]="v.seleccionado"
+     (click)="seleccionarViaje(v)">
     <div class="ruta"><strong>{{ v.origen }}</strong> → <strong>{{ v.destino }}</strong></div>
     <div class="horario">
       <mat-icon>schedule</mat-icon>
       {{ v.fechaHoraSalida | date:'shortTime' }} - {{ v.fechaHoraLlegada | date:'shortTime' }}
       · {{ calcularDuracion(v.fechaHoraSalida, v.fechaHoraLlegada) }}
     </div>
-    <div class="info">{{ v.asientosDisponibles }} asientos disponibles · ${{ v.precio }}</div>
+    <div class="info">{{ v.asientosDisponibles }} asientos disponibles · ${{ v.precioEstimado }}</div>
   </div>
 
   <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="pageIndex"
@@ -75,8 +77,7 @@
 </mat-card>
 
 <!-- Paso 2: Datos de pasajeros -->
-<mat-card class="viajes-card" *ngIf="step === 2">
-  <h2>Pasajeros</h2>
+<mat-card class="viajes-card" *ngIf="step === 2">  
   <form [formGroup]="pasajerosForm">
     <div formArrayName="pasajeros">
       <div *ngFor="let pasajero of pasajeros.controls; let i = index" [formGroupName]="i" class="pasajero-form-row">
@@ -118,8 +119,7 @@
 </mat-card>
 
 <!-- Paso 3: Resumen -->
-<mat-card class="viajes-card" *ngIf="step === 3">
-  <h2>Resumen</h2>
+<mat-card class="viajes-card" *ngIf="step === 3">  
   <p>Revisá que todos los datos ingresados sean correctos antes de proceder al pago.</p>
   <div class="filters-actions">
     <button mat-raised-button color="primary" (click)="openPurchase()">Ir al pago</button>
@@ -127,8 +127,7 @@
 </mat-card>
 
 <!-- Paso 4: Pago -->
-<mat-card class="viajes-card" *ngIf="step === 4">
-  <h2>Pago</h2>
+<mat-card class="viajes-card" *ngIf="step === 4">  
   <p>Estamos redirigiéndote a la pasarela de pago. Por favor no cierres esta ventana.</p>
 </mat-card>
 

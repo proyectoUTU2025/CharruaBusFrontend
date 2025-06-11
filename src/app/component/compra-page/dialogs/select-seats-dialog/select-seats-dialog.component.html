@@ -3,10 +3,16 @@
 <mat-dialog-content>
   <form [formGroup]="form">
     <div formArrayName="pasajeros">
-      <div *ngFor="let p of pasajeros.controls; let i = index" [formGroupName]="i" style="margin-bottom: 1rem;">
-        <label>Pasajero {{ i + 1 }}</label>
-        <input formControlName="nombre" placeholder="Nombre" required>
-        <input formControlName="documento" placeholder="Documento" required>
+      <div *ngFor="let p of pasajeros.controls; let i = index" [formGroupName]="i" class="pasajero-form-row">
+        <mat-form-field appearance="fill">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Documento</mat-label>
+          <input matInput formControlName="documento" required>
+        </mat-form-field>
       </div>
     </div>
   </form>

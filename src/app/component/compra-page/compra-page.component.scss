@@ -155,3 +155,67 @@ hr {
   border-top: 1px solid #ccc;
   margin: 1rem 0;
 }
+.step-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-buttons button {
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 24px;
+}
+
+.step-buttons button[color="primary"] {
+  background-color: #675992;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.step-buttons button[color="primary"]:hover {
+  background-color: #584c7a;
+}
+
+.step-buttons button:not([color="primary"]) {
+  border: 1px solid #675992;
+  background-color: transparent;
+  color: #675992;
+}
+
+.step-buttons button:not([color="primary"]):hover {
+  background-color: #f1eaff;
+}
+.step-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-buttons button {
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 24px;
+}
+
+.step-buttons button[color="primary"] {
+  background-color: #675992;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.step-buttons button[color="primary"]:hover {
+  background-color: #584c7a;
+}
+
+.step-buttons button:not([color="primary"]) {
+  border: 1px solid #675992;
+  background-color: transparent;
+  color: #675992;
+}
+
+.step-buttons button:not([color="primary"]):hover {
+  background-color: #f1eaff;
+}

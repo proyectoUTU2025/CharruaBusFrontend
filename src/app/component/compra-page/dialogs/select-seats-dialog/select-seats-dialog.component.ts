@@ -4,12 +4,19 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { SeatsComponent } from '../../../seats/seats.component';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   standalone: true,
   selector: 'app-seleccionar-pasajeros-dialog',
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, SeatsComponent,MatDialogModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    SeatsComponent,
+    MatFormFieldModule
+  ],
   templateUrl: './select-seats-dialog.component.html',
   styleUrls: ['./select-seats-dialog.component.scss']
 })

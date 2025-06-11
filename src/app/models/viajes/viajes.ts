@@ -38,7 +38,7 @@ export interface FiltroBusquedaViajeDto {
   destino: string;
   fechaHoraSalida: string;
   fechaHoraLlegada: string;
-  precio: number;
+  precioEstimado: number; 
   asientosDisponibles: number;
 }
 

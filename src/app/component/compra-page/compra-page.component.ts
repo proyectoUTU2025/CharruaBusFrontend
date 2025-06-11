@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -13,13 +13,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { CompraRequestDto } from '../../models/compra';
 import { ViajeService } from '../../services/viaje.service';
 import { CompraViajeDto } from '../../models/viajes';
 import { SeatsComponent } from '../seats/seats.component';
-import { CompraService } from '../../services/compra.service';
 import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
 import { LocalidadService } from '../../services/localidades.service';
+import { CompraService } from '../../services/compra.service';
 
 @Component({
   selector: 'app-compra-page',
@@ -39,6 +40,7 @@ import { LocalidadService } from '../../services/localidades.service';
     MatListModule,
     MatIconModule,
     MatTabsModule,
+    MatPaginatorModule,
     SeatsComponent,
     PurchaseSummaryDialogComponent
   ],
@@ -49,11 +51,18 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   step = 0;
   completedSteps: boolean[] = [false, false, false, false, false, false];
   tipoViaje: 'IDA' | 'IDA_Y_VUELTA' = 'IDA';
+  selectedTabIndex = 0;
   searchForm!: FormGroup;
   localidades: any[] = [];
   destinos: any[] = [];
   viajes: CompraViajeDto[] = [];
   selectedSeats: number[] = [];
+
+  totalElements = 0;
+  pageSize = 5;
+  pageIndex = 0;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private fb: FormBuilder,
@@ -65,38 +74,52 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
-      localidadOrigenId:  [null, Validators.required],
+      localidadOrigenId: [null, Validators.required],
       localidadDestinoId: [null, Validators.required],
-      fechaDesde:         [null, Validators.required],
-      fechaVuelta:        [null],
-      pasajeros:          [1, [Validators.min(1), Validators.max(5)]]
+      fechaDesde: [null, Validators.required],
+      fechaVuelta: [null],
+      pasajeros: [1, [Validators.min(1), Validators.max(5)]]
     });
 
-    this.localidadService.getLocalidadesOrigenValidas()
-      .subscribe(list => this.localidades = list);
+    this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
 
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
       this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
   }
 
-  cambiarTipoViaje(index: number) {
+  cambiarTipoViaje(index: number): void {
     this.tipoViaje = index === 0 ? 'IDA' : 'IDA_Y_VUELTA';
+    this.selectedTabIndex = index;
     this.searchForm.get('fechaVuelta')?.reset();
   }
 
   buscar(): void {
+    this.pageIndex = 0;
+    this.buscarConPaginacion();
+  }
+
+  buscarConPaginacion(): void {
     const f = this.searchForm.value;
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,
-      fechaViaje: f.fechaDesde,
+      fechaViaje: this.formatFecha(f.fechaDesde),
       cantidadPasajes: f.pasajeros
     };
-    this.viajeService.buscarDisponibles(filtro).then(page => {
-      this.viajes = page.content;
-      this.siguientePaso();
-    });
+
+    this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize)
+      .then(page => {
+        this.viajes = page.content;
+        this.totalElements = page.totalElements;
+        this.siguientePaso();
+      });
+  }
+
+  cambiarPagina(event: any): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.buscarConPaginacion();
   }
 
   limpiarFiltros(): void {
@@ -131,15 +154,15 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const dto: CompraRequestDto = {
-      viajeIdaId:           this.viajes[0].id,
-      viajeVueltaId:        null,
-      asientosIda:          this.selectedSeats,
-      asientosVuelta:       undefined,
-      clienteId:            1,
-      localidadOrigenId:    f.localidadOrigenId,
-      localidadDestinoId:   f.localidadDestinoId,
+      viajeIdaId: this.viajes[0].id,
+      viajeVueltaId: null,
+      asientosIda: this.selectedSeats,
+      asientosVuelta: undefined,
+      clienteId: 1,
+      localidadOrigenId: f.localidadOrigenId,
+      localidadDestinoId: f.localidadDestinoId,
       paradaOrigenVueltaId: null,
-      paradaDestinoVueltaId:null
+      paradaDestinoVueltaId: null
     };
     this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
   }
@@ -174,4 +197,19 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
       }
     });
   }
+
+  private formatFecha(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  calcularDuracion(inicio: string, fin: string): string {
+  const d1 = new Date(inicio);
+  const d2 = new Date(fin);
+  const diffMs = d2.getTime() - d1.getTime();
+  const minutos = Math.floor(diffMs / 60000);
+  const horas = Math.floor(minutos / 60);
+  const mins = minutos % 60;
+  return `${horas}h ${mins}m`;
+}
+
 }

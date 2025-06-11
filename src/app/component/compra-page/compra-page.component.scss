@@ -1,10 +1,40 @@
+:host {
+  display: block;
+  background: #f3f0f8;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.stepper {
+  margin-bottom: 1rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  background-color: #e9e2f3;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.mat-tab-label {
+  font-weight: 600;
+  color: #5b4d8a;
+}
+
+.mat-tab-label.mat-tab-label-active {
+  background-color: #675992;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+}
+
 .compra-card {
-  max-width: 900px;
-  margin: 2rem auto;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 1.5rem;
-  border-radius: 12px;
-  background: #f9f9f9;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .filters {
@@ -15,85 +45,43 @@
 }
 
 .filters-actions {
+  grid-column: span 2;
   display: flex;
+  justify-content: flex-end;
   gap: 1rem;
-  align-items: center;
+  margin-top: 0.5rem;
 }
 
 .buscar-btn {
   background-color: #675992;
-  color: #fff;
-  border-radius: 18px;
-  text-transform: none;
-}
-
-.buscar-btn:hover {
-  background-color: #5c4d84;
+  color: white;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
 }
 
 .outline-btn {
   border: 1px solid #675992;
   color: #675992;
-  border-radius: 18px;
-  text-transform: none;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
 }
 
 .viajes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .viaje-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .actions {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-align: right;
-}
-
-.stepper {
-  margin-bottom: 16px;
-}
-
-::ng-deep .mat-horizontal-stepper-header .mat-step-icon {
-  background-color: #ccc;
-  color: white;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] .mat-step-icon {
-  background-color: #675992;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-disabled='false']:not([aria-selected='true']) .mat-step-icon {
-  background-color: #3e5f3c;
-}
-
-::ng-deep .mat-horizontal-stepper-header .mat-step-label {
-  color: #444;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] .mat-step-label {
-  color: #675992;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-disabled='false']:not([aria-selected='true']) .mat-step-label {
-  color: #3e5f3c;
-}
-
-::ng-deep .mat-horizontal-stepper-line {
-  border-top-width: 2px;
-  border-top-style: solid;
-  border-color: #ccc;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-disabled='false'] + .mat-horizontal-stepper-line {
-  border-color: #3e5f3c;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] + .mat-horizontal-stepper-line {
-  border-color: #675992;
 }

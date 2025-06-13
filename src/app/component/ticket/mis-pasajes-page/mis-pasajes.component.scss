@@ -1,0 +1,16 @@
+.mis-pasajes-container {
+    max-width: 900px;
+    margin: 2rem auto;
+
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    table {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+}

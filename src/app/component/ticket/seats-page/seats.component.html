@@ -1,0 +1,37 @@
+<div style="text-align:center">
+  <h3>Seat Chart Layout</h3>
+</div>
+
+<div class="seat-container">
+  <div *ngFor="let row of seats" class="seatrow">
+    <ng-container *ngFor="let seat of row; let i = index">
+
+      <div *ngIf="seat.seatLabel; else emptySeat" (click)="selectSeat(seat)" class="seat-item" [ngClass]="{
+             'seat-available': seat.status === 'available',
+             'seat-booked':   seat.status === 'booked'
+           }">
+        {{ seat.seatNo }}
+      </div>
+
+      <ng-template #emptySeat>
+        <div class="seat-empty"></div>
+      </ng-template>
+
+      <ng-container *ngIf="i === 1">
+        <div class="aisle"></div>
+      </ng-container>
+
+    </ng-container>
+  </div>
+</div>
+
+<div class="summary-bar">
+  <div>Total Selected: {{ cart.selectedSeats.length }}</div>
+  <div>Total Amount: {{ cart.totalamount }} Usd</div>
+  <div class="selected-seats">
+    <span *ngFor="let s of cart.selectedSeats" class="badge badge-primary">{{ s }}</span>
+  </div>
+  <button [disabled]="!cart.selectedSeats.length" (click)="processBooking()" class="btn btn-primary">
+    Book Now
+  </button>
+</div>

@@ -1,0 +1,53 @@
+.seat-container {
+  padding: 1rem;
+}
+
+.seatrow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: .5rem;
+}
+
+.seat-item {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  margin: 2px;
+  border-radius: 4px;
+  border: 1px solid #a0a0a0;
+  cursor: pointer;
+}
+
+.seat-available {
+  background: white;
+  color: #a0a0a0;
+}
+
+.seat-booked {
+  background: #a0a0a0;
+  color: white;
+}
+
+.aisle {
+  width: 30px;
+  flex-shrink: 0;
+}
+
+.seat-empty {
+  width: 30px;
+  height: 30px;
+  margin: 2px;
+  visibility: hidden;
+}
+
+.summary-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.selected-seats .badge {
+  margin-right: 4px;
+}

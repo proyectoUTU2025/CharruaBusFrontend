@@ -1,0 +1,14 @@
+.generic-list-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    table {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+
+    mat-paginator {
+        align-self: end;
+    }
+}

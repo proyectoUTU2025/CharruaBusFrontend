@@ -1,0 +1,55 @@
+<div class="page-header">
+  <h1>Gestión de Ómnibus</h1>
+  <p>Crear y administrar ómnibus en el sistema.</p>
+</div>
+
+<form [formGroup]="filterForm" class="filters-container">
+  <div class="filter-field">
+    <mat-form-field appearance="fill">
+      <mat-label>Matrícula</mat-label>
+      <input matInput formControlName="matricula" />
+    </mat-form-field>
+  </div>
+  <div class="filter-field">
+    <mat-form-field appearance="fill">
+      <mat-label>Localidad</mat-label>
+      <mat-select formControlName="localidadId">
+        <mat-option [value]="null">-- Todas --</mat-option>
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id">
+          {{ loc.nombre }} ({{ loc.departamento }})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="filter-field">
+    <mat-form-field appearance="fill">
+      <mat-label>Min. Asientos</mat-label>
+      <input matInput type="number" formControlName="minAsientos" />
+    </mat-form-field>
+  </div>
+  <div class="filter-field">
+    <mat-form-field appearance="fill">
+      <mat-label>Max. Asientos</mat-label>
+      <input matInput type="number" formControlName="maxAsientos" />
+    </mat-form-field>
+  </div>
+  <div class="filter-actions">
+    <button mat-flat-button color="primary" (click)="onSearch()">Buscar</button>
+    <button mat-stroked-button (click)="onClear()">Limpiar</button>
+    <mat-checkbox formControlName="activo">Activos</mat-checkbox>
+  </div>
+</form>
+
+<div class="actions">
+  <button mat-stroked-button (click)="openBulkUpload()">
+    <mat-icon>upload_file</mat-icon> Alta Masiva
+  </button>
+  <button mat-flat-button color="primary" (click)="add()">
+    <mat-icon>directions_bus</mat-icon> Agregar Ómnibus
+  </button>
+</div>
+
+<app-generic-list [columns]="columns" [data]="buses" [totalElements]="totalElements" [pageIndex]="pageIndex"
+  [pageSize]="pageSize" [pageSizeOptions]="[5,10,25]" (pageChange)="loadBuses($event.pageIndex, $event.pageSize)"
+  (action)="onAction($event.row,$event.action)">
+</app-generic-list>

@@ -1,0 +1,132 @@
+$primary-color: #675992;
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  user-select: none;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+
+  .logo {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+
+  .brand {
+    font-size: 20px;
+    font-weight: 700;
+    margin-right: 12px;
+  }
+
+  .role {
+    background-color: $primary-color;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nav-button {
+  color: $primary-color;
+  background: none;
+  border: none;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+
+  mat-icon {
+    margin-right: 4px;
+  }
+}
+
+.logout-button {
+  color: $primary-color;
+  border: 1px solid $primary-color;
+  border-radius: 24px;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+
+  mat-icon {
+    margin-right: 4px;
+  }
+}
+
+.nav-button,
+.nav-button:hover,
+.nav-button:focus,
+.nav-button:active {
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+}
+
+.logout-button,
+.logout-button:hover,
+.logout-button:focus,
+.logout-button:active {
+  color: $primary-color !important;
+  border: 1px solid $primary-color !important;
+  background: none !important;
+}
+
+.clickable {
+  cursor: pointer;
+}
+.navbar .usuarios-button{
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
+  
+.localidades-button {
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
+}
+.viajes-button {
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
+}
+  mat-icon {
+    margin-right: 4px !important;
+  }
+
+.login-button {
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
+
+  mat-icon {
+    margin-right: 4px !important;
+  }
+}
+
+}

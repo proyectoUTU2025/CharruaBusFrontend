@@ -15,7 +15,7 @@ import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
 export class UserService {
   private base = `${environment.apiBaseUrl}/usuarios`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(
     filtro: FiltroBusquedaUsuarioDto = {},
@@ -69,5 +69,14 @@ export class UserService {
       this.http
         .post<ApiResponse<BulkResponseDto>>(`${this.base}/admin/bulk`, formData)
     ).then(resp => resp.data);
+  }
+
+  changePassword(current: string, newP: string, confirm: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<ApiResponse<void>>(
+        `/auth/change-password`,
+        { currentPassword: current, newPassword: newP, confirmPassword: confirm }
+      )
+    ).then(() => { });
   }
 }

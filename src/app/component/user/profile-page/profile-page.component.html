@@ -1,0 +1,42 @@
+<!-- CharruaBusFrontend/src/app/component/profile-page/profile-page.component.html -->
+<div class="profile-page">
+    <h2>Historial de compras</h2>
+
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilter()" class="filter-form">
+        <mat-form-field appearance="fill">
+            <mat-label>Desde</mat-label>
+            <input matInput type="datetime-local" formControlName="fechaDesde" />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Hasta</mat-label>
+            <input matInput type="datetime-local" formControlName="fechaHasta" />
+        </mat-form-field>
+        <button mat-raised-button type="submit">Filtrar</button>
+    </form>
+
+    <table mat-table [dataSource]="compras">
+        <!-- Fecha -->
+        <ng-container matColumnDef="fechaCompra">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let c">
+                {{ c.fechaCompra | date:'short' }}
+            </td>
+        </ng-container>
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let c">{{ c.estado }}</td>
+        </ng-container>
+        <!-- Total -->
+        <ng-container matColumnDef="precioActual">
+            <th mat-header-cell *matHeaderCellDef>Total</th>
+            <td mat-cell *matCellDef="let c">{{ c.precioActual | currency }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['fechaCompra', 'estado', 'precioActual']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['fechaCompra', 'estado', 'precioActual']"></tr>
+    </table>
+
+    <mat-paginator [length]="totalElements" [pageSize]="size" (page)="onPageChange($event.pageIndex)">
+    </mat-paginator>
+</div>

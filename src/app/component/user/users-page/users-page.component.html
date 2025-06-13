@@ -1,0 +1,32 @@
+<!-- src/app/component/users-page/users-page.component.html -->
+<div class="users-page">
+  <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="filter-form">
+    <!-- tus campos de filtro -->
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" />
+    </mat-form-field>
+    <!-- …otros mat-form-field… -->
+    <button mat-raised-button color="primary" type="submit">Buscar</button>
+    <button mat-button type="button" (click)="onClear()">Limpiar</button>
+  </form>
+
+  <div class="actions">
+    <button mat-flat-button color="primary" (click)="add()">
+      <mat-icon>person_add</mat-icon> Nuevo Usuario
+    </button>
+    <button mat-stroked-button (click)="openBulkUpload()">
+      <mat-icon>file_upload</mat-icon> Carga Masiva
+    </button>
+  </div>
+
+  <!-- Aquí sustituimos la tabla y el paginador -->
+  <app-generic-list [columns]="columns" [data]="usuarios" [totalElements]="totalElements" [pageIndex]="pageIndex"
+    [pageSize]="pageSize" [pageSizeOptions]="[5,10,25]" (pageChange)="loadUsers($event.pageIndex, $event.pageSize)">
+  </app-generic-list>
+
+  <!-- Si hay errores de bulk -->
+  <div *ngIf="bulkErrors.length" class="bulk-errors">
+    <div *ngFor="let e of bulkErrors">{{ e }}</div>
+  </div>
+</div>

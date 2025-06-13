@@ -1,0 +1,19 @@
+/* src/app/component/profile-page/profile-page.component.scss */
+.profile-page {
+    .filter-form {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: .5rem;
+        border: 1px solid #ccc;
+    }
+}

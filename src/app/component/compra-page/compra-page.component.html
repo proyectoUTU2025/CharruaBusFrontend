@@ -77,46 +77,43 @@
 </mat-card>
 
 <!-- Paso 2: Datos de pasajeros -->
-<mat-card class="viajes-card" *ngIf="step === 2">  
-  <form [formGroup]="pasajerosForm">
-    <div formArrayName="pasajeros">
-      <div *ngFor="let pasajero of pasajeros.controls; let i = index" [formGroupName]="i" class="pasajero-form-row">
-        <mat-form-field appearance="fill">
-          <mat-label>Nombre</mat-label>
-          <input matInput formControlName="nombre" required>
-        </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Documento</mat-label>
-          <input matInput formControlName="documento" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Teléfono</mat-label>
-          <input matInput formControlName="telefono" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Dirección</mat-label>
-          <input matInput formControlName="direccion" required>
-        </mat-form-field>
-      </div>
+<mat-card class="viajes-card" *ngIf="step === 2">
+  <!-- CLIENTE -->
+  <ng-container *ngIf="loginService.rol === 'CLIENTE' && userInfo">
+    <h3>Datos del Cliente</h3>
+    <div class="datos-cliente">
+      <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+      <p><strong>Email:</strong> {{ userInfo.email }}</p>
+      <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
     </div>
-  </form>
+  </ng-container>
+
+  <!-- VENDEDOR -->
+  <ng-container *ngIf="loginService.rol === 'VENDEDOR'">
+    <h3>Buscar Cliente por Email</h3>
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="searchEmail" />
+    </mat-form-field>
+    <button mat-stroked-button color="primary" (click)="buscarUsuarioPorEmail()">Buscar</button>
+
+    <div class="datos-cliente" *ngIf="userInfo">
+      <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+      <p><strong>Email:</strong> {{ userInfo.email }}</p>
+      <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+    </div>
+  </ng-container>
 
   <div class="info-asientos">
-    Asientos seleccionados: {{ selectedSeats.join(', ') || 'Ninguno' }}
+    Asientos seleccionados: {{ selectedSeats?.join(', ') || 'Ninguno' }}
   </div>
 
   <div class="filters-actions">
     <button mat-stroked-button (click)="abrirDialogPasajeros()">Seleccionar Asientos</button>
   </div>
 </mat-card>
+
 
 <!-- Paso 3: Resumen -->
 <mat-card class="viajes-card" *ngIf="step === 3">  

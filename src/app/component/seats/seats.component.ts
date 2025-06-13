@@ -1,8 +1,10 @@
+import { ApiResponse } from './../../models/api/api-response.model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from '../../../environments/environment';
+import { AsientoDto, DetalleViajeDto } from '../../models';
 
 
 interface Seat {
@@ -36,32 +38,36 @@ export class SeatsComponent implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get<number[]>(
-        `${environment.apiBaseUrl}/viajes/${this.viajeId}/asientos/reservados`
+      .get<ApiResponse<DetalleViajeDto>>(
+        `${environment.apiBaseUrl}/viajes/${this.viajeId}`
       )
-      .subscribe(reservados => this.buildChart(reservados));
+      .subscribe(response => this.buildChart(response.data.asientos || []));
   }
 
-  private buildChart(booked: number[]) {
-    const cols = 2;
-    const perRow = cols * 2;
-    const rows = Math.ceil(this.cantidadAsientos / perRow);
-    let n = 1;
-    this.seats = [];
+  private buildChart(asientos: AsientoDto[]) {
+  const booked = asientos
+    .filter(a => a.estado === 'RESERVADO' || a.estado === 'CONFIRMADO')
+    .map(a => a.numero);
 
-    for (let r = 0; r < rows; r++) {
-      const row: Seat[] = [];
+  const cols = 2;
+  const perRow = cols * 2;
+  const rows = Math.ceil(this.cantidadAsientos / perRow);
+  let n = 1;
+  this.seats = [];
 
-      for (let i = 0; i < cols; i++) {
-        row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
-      }
-      row.push({ status: 'unavailable' }); // pasillo
-      for (let i = 0; i < cols; i++) {
-        row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
-      }
-      this.seats.push(row);
+  for (let r = 0; r < rows; r++) {
+    const row: Seat[] = [];
+
+    for (let i = 0; i < cols; i++) {
+      row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
     }
+    row.push({ status: 'unavailable' }); // pasillo
+    for (let i = 0; i < cols; i++) {
+      row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
+    }
+    this.seats.push(row);
   }
+}
 
   private makeSeat(n: number, booked: number[]): Seat {
     return {

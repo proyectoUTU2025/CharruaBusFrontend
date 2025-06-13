@@ -1,22 +1,4 @@
-<h2 mat-dialog-title>Datos de los Pasajeros</h2>
-
 <mat-dialog-content>
-  <form [formGroup]="form">
-    <div formArrayName="pasajeros">
-      <div *ngFor="let p of pasajeros.controls; let i = index" [formGroupName]="i" class="pasajero-form-row">
-        <mat-form-field appearance="fill">
-          <mat-label>Nombre</mat-label>
-          <input matInput formControlName="nombre" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Documento</mat-label>
-          <input matInput formControlName="documento" required>
-        </mat-form-field>
-      </div>
-    </div>
-  </form>
-
   <h3>Seleccionar Asientos</h3>
   <app-seats
     [viajeId]="data.viajeId"

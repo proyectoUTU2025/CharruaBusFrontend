@@ -68,6 +68,19 @@ export class UserService {
     return firstValueFrom(
       this.http
         .post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
+    ).then(resp => resp.data);  
+  }
+  
+  getById(id: number): Promise<UsuarioDto> {
+    return firstValueFrom(
+      this.http.get<ApiResponse<UsuarioDto>>(`${environment.apiBaseUrl}/usuarios/${id}`)
     ).then(resp => resp.data);
   }
+
+  buscarPorEmail(email: string) {
+    return firstValueFrom(
+      this.http.get<UsuarioDto>(`${environment.apiBaseUrl}/usuarios/buscar?email=${email}`)
+    );
+  }
+
 }

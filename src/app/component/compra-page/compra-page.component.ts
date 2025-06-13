@@ -76,6 +76,12 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  mostrarErrorOrigen = false;
+  mostrarErrorDestino = false;
+  origenError = '';
+  destinoError = '';
+  fechaError = '';
+
   constructor(
     private fb: FormBuilder,
     private localidadService: LocalidadService,
@@ -152,12 +158,37 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   buscar(): void {
+    this.origenError = '';
+    this.destinoError = '';
+    this.fechaError = '';
+
+    const f = this.searchForm.value;
+
+    if (!f.localidadOrigenId) {
+      this.origenError = 'Debe seleccionar un origen.';
+    }
+
+    if (!f.localidadDestinoId) {
+      this.destinoError = 'Debe seleccionar un destino.';
+    }
+
+    if (!f.fechaDesde) {
+      this.fechaError = 'Debe seleccionar una fecha de ida.';
+    }
+
+    if (this.origenError || this.destinoError || this.fechaError) return;
+
     this.pageIndex = 0;
     this.buscarConPaginacion();
   }
 
   buscarConPaginacion(): void {
     const f = this.searchForm.value;
+     
+    if (!f.fechaDesde) {
+      alert('Por favor, ingrese una fecha de ida.');
+      return;
+    }
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,

@@ -14,27 +14,36 @@
 <!-- Paso 0: Búsqueda -->
 <mat-card class="compra-card" *ngIf="step === 0">
   <form [formGroup]="searchForm" class="filters">
+
+    <div class="field-container">
     <mat-form-field appearance="fill">
       <mat-label>Origen</mat-label>
       <mat-select formControlName="localidadOrigenId">
         <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombreConDepartamento }}</mat-option>
       </mat-select>
     </mat-form-field>
-
+    <div class="error-text" *ngIf="origenError">Debe ingresar un origen.</div>
+    </div>
+    <div class="field-container">
     <mat-form-field appearance="fill">
       <mat-label>Destino</mat-label>
       <mat-select formControlName="localidadDestinoId">
         <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombreConDepartamento }}</mat-option>
       </mat-select>
     </mat-form-field>
+    <div class="error-text" *ngIf="destinoError">Debe ingresar un destino.</div>
+    </div>
 
+    <div class="field-container">
     <mat-form-field appearance="fill">
       <mat-label>Fecha Ida</mat-label>
       <input matInput [matDatepicker]="picker" formControlName="fechaDesde" />
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
-
+    <div class="error-text" *ngIf="fechaError">{{ fechaError }}</div>
+    </div>
+    
     <mat-form-field appearance="fill" *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
       <mat-label>Fecha Vuelta</mat-label>
       <input matInput [matDatepicker]="pickerVuelta" formControlName="fechaVuelta" />

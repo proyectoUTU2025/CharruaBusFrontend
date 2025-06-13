@@ -218,3 +218,14 @@ hr {
 .step-buttons button:not([color="primary"]):hover {
   background-color: #f1eaff;
 }
+.field-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.error-text {
+  color: red;
+  font-size: 0.75rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+}

@@ -23,7 +23,12 @@ export class SelectSeatsDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<SelectSeatsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { pasajeros: number; viajeId: number; cantidadAsientos: number }
+    @Inject(MAT_DIALOG_DATA) public data: { 
+      pasajeros: number; 
+      viajeId: number; 
+      cantidadAsientos: number 
+      precio: number
+    }
   ) {}
 
   ngOnInit(): void {}

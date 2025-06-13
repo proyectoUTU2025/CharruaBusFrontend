@@ -10,10 +10,12 @@ import {
   FiltroBusquedaCompraDto
 } from '../models';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
-  private base = '/compras';
+  private base = `${environment.apiBaseUrl}/compras`;
+
 
   constructor(private http: HttpClient) {}
 

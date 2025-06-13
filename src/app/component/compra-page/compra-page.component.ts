@@ -246,7 +246,8 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     data: {
       pasajeros,
       viajeId,
-      cantidadAsientos
+      cantidadAsientos,
+      precio: this.viajeSeleccionado?.precioEstimado
     }
   });
 
@@ -257,24 +258,6 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     }
   });
 }
-
-
-  openPurchase(): void {
-    const dialogRef = this.dialog.open<PurchaseSummaryDialogComponent, SummaryDialogData, boolean>(
-      PurchaseSummaryDialogComponent,
-      {
-        width: '400px',
-        data: { seats: this.selectedSeats, total: this.selectedSeats.length * 250 }
-      }
-    );
-    dialogRef.afterClosed().subscribe(ok => {
-      if (ok) {
-        this.step = 4;
-        this.confirmarCompra();
-      }
-    });
-  }
-
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const clienteId = this.userInfo?.id || 0;

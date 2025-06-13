@@ -91,6 +91,9 @@ export class SeatsComponent implements OnInit {
       this.cart.selectedIds.push(id);
       seat.status = 'booked';
     }
-     this.bookingConfirmed.emit(this.cart.selectedIds);
+
+    this.cart.totalamount = this.cart.selectedIds.length * 250;
+    
+    this.bookingConfirmed.emit(this.cart.selectedIds);
   } 
 }

@@ -1,0 +1,37 @@
+.redirect-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #675992, #483d8b);
+  color: white;
+}
+
+.redirect-card {
+  padding: 3rem;
+  text-align: center;
+  background: white;
+  color: #333;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+}
+
+.icon-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.spinner-icon {
+  font-size: 60px;
+  color: #675992;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

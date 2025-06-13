@@ -25,6 +25,7 @@ import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select
 import { LoginService } from '../../services/login.service';
 import { UserService } from '../../services/user.service';
 import { UsuarioDto } from '../../models';
+import { ActivatedRoute } from '@angular/router';
 
 type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
 
@@ -81,6 +82,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   origenError = '';
   destinoError = '';
   fechaError = '';
+  estadoCompra: 'exito' | 'cancelado' | 'error' | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -89,10 +91,20 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     private compraService: CompraService,
     private dialog: MatDialog,
     public loginService: LoginService,
-    public userService: UserService
+    public userService: UserService,
+    private route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {     
+    this.route.queryParamMap.subscribe(params => {
+      const estado = params.get('estado');
+      if (estado === 'exito' || estado === 'cancelado' || estado === 'error') {
+        this.estadoCompra = estado as any;
+        this.step = 5;
+        this.completedSteps = [true, true, true, true, true];
+      }
+    });
+
     this.searchForm = this.fb.group({
       localidadOrigenId: [null, Validators.required],
       localidadDestinoId: [null, Validators.required],

@@ -8,6 +8,7 @@ import { LocalidadesPageComponent } from './component/localidades-page/localidad
 import { ViajesPageComponent } from './component/viajes-page/viajes-page.component';
 import { AuthGuard } from './core/auth/auth.guard';
 import { CompraPageComponent } from './component/compra-page/compra-page.component';
+import { StripeRedirectComponent } from './component/stripe-redirect.component/stripe-redirect.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -17,11 +18,12 @@ export const routes: Routes = [
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: '', component: UsersPageComponent },
+      { path: '', component: CompraPageComponent },
+      { path: 'users', component: UsersPageComponent },
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
-      { path: 'viajes', component: ViajesPageComponent },
-      { path: 'comprar', component: CompraPageComponent }
+      { path: 'viajes', component: ViajesPageComponent },      
+      {path: 'pago/:estado', component: StripeRedirectComponent}
     ]
   },
   { path: '**', redirectTo: '' }

@@ -144,8 +144,7 @@
   <div class="info-pago">
     <h4>Detalle del Pago</h4>
     <p><strong>Ruta:</strong> {{ viajeSeleccionado?.origen }} → {{ viajeSeleccionado?.destino }}</p>
-    <p><strong>Pasaje:</strong> ${{ viajeSeleccionado?.precioEstimado }}</p>
-    <p><strong>Cargo por servicio:</strong> $0</p>
+    <p><strong>Pasaje:</strong> ${{ viajeSeleccionado?.precioEstimado }}</p>    
     <p><strong>Total:</strong> ${{ selectedSeats.length * 250 }}</p>
   </div>
 
@@ -155,8 +154,23 @@
 </mat-card>
 
 <!-- Paso 4: Pago -->
-<mat-card class="viajes-card" *ngIf="step === 4">  
-  <p>Estamos redirigiéndote a la pasarela de pago. Por favor no cierres esta ventana.</p>
+<mat-card *ngIf="step === 5">
+  <div *ngIf="estadoCompra === 'exito'" class="success-box">
+    <h2>✅ ¡Compra Realizada con Éxito!</h2>
+    <p>Tu pago fue procesado. Recibirás el ticket por correo.</p>
+    <p>Gracias por elegir CharruaBus 🚍</p>
+  </div>
+
+  <div *ngIf="estadoCompra === 'cancelado'" class="cancel-box">
+    <h2>❌ Compra Cancelada</h2>
+    <p>Puedes volver atrás y modificar datos si fue un error.</p>
+    <button mat-button (click)="step = 1">Volver a Seleccionar Viaje</button>
+  </div>
+
+  <div *ngIf="estadoCompra === 'error'" class="error-box">
+    <h2>⚠️ Hubo un error</h2>
+    <p>No se pudo procesar el pago. Intenta de nuevo.</p>
+  </div>
 </mat-card>
 
 <!-- Botones de paso -->

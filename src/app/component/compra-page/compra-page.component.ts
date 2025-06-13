@@ -200,12 +200,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   const pasajeros = this.searchForm.value.pasajeros;
   const viajeId = this.viajeSeleccionado.idViaje;
-  const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
-    console.log('Abriendo diálogo con datos:', {
-    pasajeros,
-    viajeId,
-    cantidadAsientos
-  });
+  const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;   
 
   if (!viajeId || !cantidadAsientos) {
     console.error('No se pudo abrir el diálogo por falta de datos:', {

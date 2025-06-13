@@ -18,10 +18,5 @@
 
 <div class="summary-bar">
   <div>Seleccionados: {{ cart.selectedIds.length }}</div>
-  <div>Total: {{ cart.totalamount }} UYU</div>
-  <button mat-raised-button color="primary"
-          [disabled]="cart.selectedIds.length === 0"
-          (click)="processBooking()">
-    Confirmar
-  </button>
+  <div>Total: {{ cart.totalamount }} UYU</div>  
 </div>

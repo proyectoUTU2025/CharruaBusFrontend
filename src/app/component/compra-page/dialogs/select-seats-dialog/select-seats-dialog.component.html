@@ -11,6 +11,6 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="cancelar()">Cancelar</button>
   <button mat-raised-button color="primary"
-          [disabled]="form.invalid || selectedSeats.length !== data.pasajeros"
+          [disabled]="selectedSeats.length !== data.pasajeros"
           (click)="confirmar()">Confirmar</button>
 </mat-dialog-actions>

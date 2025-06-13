@@ -114,12 +114,35 @@
   </div>
 </mat-card>
 
-
 <!-- Paso 3: Resumen -->
-<mat-card class="viajes-card" *ngIf="step === 3">  
-  <p>Revisá que todos los datos ingresados sean correctos antes de proceder al pago.</p>
+<mat-card class="viajes-card" *ngIf="step === 3">
+  <h3>Resumen de la Compra</h3>
+
+  <div class="info-cliente" *ngIf="userInfo">
+    <h4>Información del Cliente</h4>
+    <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+    <p><strong>Email:</strong> {{ userInfo.email }}</p>
+    <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+    <p><strong>Tipo:</strong> {{ userInfo.rol }}</p>
+  </div>
+
+  <div class="info-asientos">
+    <h4>Asientos Seleccionados</h4>
+    <ul>
+      <li *ngFor="let asiento of selectedSeats">Asiento {{ asiento }}</li>
+    </ul>
+  </div>
+
+  <div class="info-pago">
+    <h4>Detalle del Pago</h4>
+    <p><strong>Ruta:</strong> {{ viajeSeleccionado?.origen }} → {{ viajeSeleccionado?.destino }}</p>
+    <p><strong>Pasaje:</strong> ${{ viajeSeleccionado?.precioEstimado }}</p>
+    <p><strong>Cargo por servicio:</strong> $0</p>
+    <p><strong>Total:</strong> ${{ selectedSeats.length * 250 }}</p>
+  </div>
+
   <div class="filters-actions">
-    <button mat-raised-button color="primary" (click)="openPurchase()">Ir al pago</button>
+    <button mat-raised-button color="primary" (click)="openPurchase()">Proceder al Pago</button>
   </div>
 </mat-card>
 

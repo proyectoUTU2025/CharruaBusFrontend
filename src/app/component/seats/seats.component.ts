@@ -91,11 +91,6 @@ export class SeatsComponent implements OnInit {
       this.cart.selectedIds.push(id);
       seat.status = 'booked';
     }
-  }
-
-  processBooking() {
-    if (this.cart.selectedIds.length > 0) {
-      this.bookingConfirmed.emit(this.cart.selectedIds);
-    }
-  }
+     this.bookingConfirmed.emit(this.cart.selectedIds);
+  } 
 }

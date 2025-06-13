@@ -1,0 +1,35 @@
+<div class="wrapper fadeInDown">
+    <div id="formContent">
+        <h2 class="active">Verificar Email</h2>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="fill" class="fadeIn first">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email" placeholder="Email" />
+                <mat-error *ngIf="form.get('email')?.hasError('required')">
+                    El email es obligatorio
+                </mat-error>
+                <mat-error *ngIf="form.get('email')?.hasError('email')">
+                    Debe ser un email válido
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="fadeIn second">
+                <mat-label>Código de verificación</mat-label>
+                <input matInput type="text" formControlName="verificationCode" placeholder="Código recibido por mail" />
+                <mat-error *ngIf="form.get('verificationCode')?.hasError('required')">
+                    El código es obligatorio
+                </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" class="login-button fadeIn fourth" type="submit"
+                [disabled]="isSubmitting">
+                Validar
+            </button>
+        </form>
+
+        <div *ngIf="errorMessage" class="fadeIn fourth" style="color: red; margin-top: 10px;">
+            {{ errorMessage }}
+        </div>
+    </div>
+</div>

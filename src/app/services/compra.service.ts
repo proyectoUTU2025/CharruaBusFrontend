@@ -9,26 +9,31 @@ import {
   DetalleCompraDto,
   FiltroBusquedaCompraDto
 } from '../models';
-import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
   private base = `${environment.apiBaseUrl}/compras`;
 
-
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   iniciarCompra(dto: CompraRequestDto): Observable<{ data: CompraResponseDto }> {
     return this.http.post<{ data: CompraResponseDto }>(this.base, dto);
   }
 
-  confirmarCompra(sessionId: string): Observable<any> {
-    return this.http.post(`${this.base}/confirmar`, { sessionId } as ConfirmCompraRequestDto);
+  confirmarCompra(sessionId: string): Observable<{ data: CompraResponseDto }> {
+    return this.http.post<{ data: CompraResponseDto }>(
+      `${this.base}/confirmar`,
+      { sessionId } as ConfirmCompraRequestDto
+    );
   }
 
-  cancelarCompra(sessionId: string): Observable<any> {
-    return this.http.post(`${this.base}/cancelar`, { sessionId } as CancelarCompraRequestDto);
+  cancelarCompra(sessionId: string): Observable<{ data: CompraResponseDto }> {
+    return this.http.post<{ data: CompraResponseDto }>(
+      `${this.base}/cancelar`,
+      { sessionId } as CancelarCompraRequestDto
+    );
   }
 
   getHistorialCliente(
@@ -41,7 +46,7 @@ export class CompraService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    if (filtro.estados) {
+    if (filtro.estados?.length) {
       params = params.set('estados', filtro.estados.join(','));
     }
     if (filtro.fechaDesde) {
@@ -58,7 +63,8 @@ export class CompraService {
     }
 
     return this.http.get<{ content: CompraDto[]; totalElements: number }>(
-      `${this.base}/cliente/${clienteId}`, { params }
+      `${this.base}/cliente/${clienteId}`,
+      { params }
     );
   }
 
@@ -71,7 +77,7 @@ export class CompraService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    if (filtro.estados) {
+    if (filtro.estados?.length) {
       params = params.set('estados', filtro.estados.join(','));
     }
     if (filtro.fechaDesde) {
@@ -88,7 +94,8 @@ export class CompraService {
     }
 
     return this.http.get<{ content: CompraDto[]; totalElements: number }>(
-      this.base, { params }
+      this.base,
+      { params }
     );
   }
 

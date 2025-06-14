@@ -1,0 +1,21 @@
+<table>
+    <thead>
+      <tr>
+        <th *ngFor="let col of columns">{{ col.header }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of data">
+        <td *ngFor="let col of columns">{{ row[col.field] }}</td>
+      </tr>
+      <tr *ngIf="data.length === 0">
+        <td [attr.colspan]="columns.length">No hay datos para mostrar.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pagination">
+    <button (click)="changePage(pageIndex - 1)" [disabled]="pageIndex === 0">Anterior</button>
+    <span>Página {{ pageIndex + 1 }} de {{ totalPages }}</span>
+    <button (click)="changePage(pageIndex + 1)" [disabled]="pageIndex + 1 >= totalPages">Siguiente</button>
+  </div>
+  

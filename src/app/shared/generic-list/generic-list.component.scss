@@ -1,0 +1,26 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f5f5f5;
+    }
+}
+
+.pagination {
+    margin: 16px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    button {
+        margin: 0 8px;
+    }
+}

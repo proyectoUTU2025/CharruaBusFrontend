@@ -1,0 +1,40 @@
+<div class="filter-container">
+    <label>
+        Fecha Desde:
+        <input type="datetime-local" [(ngModel)]="filtro.fechaDesde" name="fechaDesde">
+    </label>
+
+    <label>
+        Fecha Hasta:
+        <input type="datetime-local" [(ngModel)]="filtro.fechaHasta" name="fechaHasta">
+    </label>
+
+    <label>
+        Estados:
+        <select [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoChange()" name="estado">
+            <option value="">Todos</option>
+            <option *ngFor="let e of estadosOpts" [value]="e">
+                {{ e }}
+            </option>
+        </select>
+    </label>
+
+    <label>
+        Monto Mínimo:
+        <input type="number" [(ngModel)]="filtro.montoMin" name="montoMin" placeholder="0">
+    </label>
+
+    <label>
+        Monto Máximo:
+        <input type="number" [(ngModel)]="filtro.montoMax" name="montoMax" placeholder="0">
+    </label>
+
+    <button (click)="onFilter()" [disabled]="loading">Filtrar</button>
+</div>
+
+<div *ngIf="loading" class="loading">Cargando...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<app-generic-list *ngIf="!loading && !error" [columns]="columns" [data]="compras" [totalElements]="totalElements"
+    [pageSize]="pageSize" [pageIndex]="pageIndex" (pageChange)="onPageChange($event)">
+</app-generic-list>

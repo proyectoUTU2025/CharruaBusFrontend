@@ -1,0 +1,14 @@
+.filter-container {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    label {
+        display: flex;
+        flex-direction: column;
+    }
+
+    button {
+        align-self: flex-end;
+    }
+}

@@ -12,24 +12,35 @@ import {
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
+interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CompraService {
   private base = `${environment.apiBaseUrl}/compras`;
 
   constructor(private http: HttpClient) { }
 
-  iniciarCompra(dto: CompraRequestDto): Observable<{ data: CompraResponseDto }> {
+  iniciarCompra(
+    dto: CompraRequestDto
+  ): Observable<{ data: CompraResponseDto }> {
     return this.http.post<{ data: CompraResponseDto }>(this.base, dto);
   }
 
-  confirmarCompra(sessionId: string): Observable<{ data: CompraResponseDto }> {
+  confirmarCompra(
+    sessionId: string
+  ): Observable<{ data: CompraResponseDto }> {
     return this.http.post<{ data: CompraResponseDto }>(
       `${this.base}/confirmar`,
       { sessionId } as ConfirmCompraRequestDto
     );
   }
 
-  cancelarCompra(sessionId: string): Observable<{ data: CompraResponseDto }> {
+  cancelarCompra(
+    sessionId: string
+  ): Observable<{ data: CompraResponseDto }> {
     return this.http.post<{ data: CompraResponseDto }>(
       `${this.base}/cancelar`,
       { sessionId } as CancelarCompraRequestDto
@@ -41,7 +52,7 @@ export class CompraService {
     filtro: FiltroBusquedaCompraDto,
     page = 0,
     size = 20
-  ): Observable<{ content: CompraDto[]; totalElements: number }> {
+  ): Observable<PageResponse<CompraDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -62,7 +73,7 @@ export class CompraService {
       params = params.set('montoMax', filtro.montoMax.toString());
     }
 
-    return this.http.get<{ content: CompraDto[]; totalElements: number }>(
+    return this.http.get<PageResponse<CompraDto>>(
       `${this.base}/cliente/${clienteId}`,
       { params }
     );
@@ -72,7 +83,7 @@ export class CompraService {
     filtro: FiltroBusquedaCompraDto,
     page = 0,
     size = 20
-  ): Observable<{ content: CompraDto[]; totalElements: number }> {
+  ): Observable<PageResponse<CompraDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -93,13 +104,14 @@ export class CompraService {
       params = params.set('montoMax', filtro.montoMax.toString());
     }
 
-    return this.http.get<{ content: CompraDto[]; totalElements: number }>(
-      this.base,
-      { params }
-    );
+    return this.http.get<PageResponse<CompraDto>>(this.base, { params });
   }
 
-  getDetalle(compraId: number): Observable<{ data: DetalleCompraDto }> {
-    return this.http.get<{ data: DetalleCompraDto }>(`${this.base}/${compraId}`);
+  getDetalle(
+    compraId: number
+  ): Observable<{ data: DetalleCompraDto }> {
+    return this.http.get<{ data: DetalleCompraDto }>(
+      `${this.base}/${compraId}`
+    );
   }
 }

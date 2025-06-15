@@ -7,9 +7,18 @@
   <tbody>
     <tr *ngFor="let row of data">
       <td *ngFor="let col of columns">
-        <ng-container *ngIf="col.field.toLowerCase().includes('fecha'); else normalCell">
+
+        <ng-container *ngIf="col.field.toLowerCase().includes('fecha'); else checkAccion">
           {{ row[col.field] | date:'short' }}
         </ng-container>
+
+
+        <ng-template #checkAccion>
+          <ng-container *ngIf="col.field === 'acciones'; else normalCell">
+            <button mat-button (click)="action.emit(row.id)">Ver detalle</button>
+          </ng-container>
+        </ng-template>
+
         <ng-template #normalCell>
           {{ row[col.field] }}
         </ng-template>

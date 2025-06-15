@@ -14,6 +14,8 @@ export class GenericListComponent {
     @Input() totalElements = 0;
     @Input() pageSize = 20;
     @Input() pageIndex = 0;
+
+    @Output() action = new EventEmitter<number>();
     @Output() pageChange = new EventEmitter<number>();
 
     get totalPages(): number {

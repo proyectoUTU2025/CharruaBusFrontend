@@ -12,3 +12,10 @@
         align-self: flex-end;
     }
 }
+
+.loading,
+.error {
+    text-align: center;
+    margin: 1rem 0;
+    font-weight: bold;
+}

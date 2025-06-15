@@ -1,15 +1,25 @@
-import { TipoEstadoCompra } from '../../models/tipo-estado-compra';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { CompraService } from '../../services/compra.service';
-import { LoginService } from '../../services/login.service';
-import { CompraDto, FiltroBusquedaCompraDto } from '../../models';
-import { GenericListComponent } from '../../shared/generic-list/generic-list.component';
+import { AuthService } from '../../services/auth.service';
+import {
+    CompraDto,
+    FiltroBusquedaCompraDto
+} from '../../models/compra/compra.dto.model';
+import { TipoEstadoCompra } from '../../models/tipo-estado-compra';
+import { GenericListComponent } from '../shared/generic-list/generic-list.component';
+import { DetalleCompraDialogComponent } from '../shared/detalle-compra-dialog/detalle-compra-dialog.component';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, FormsModule, GenericListComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        GenericListComponent
+    ],
     selector: 'app-profile-page',
     templateUrl: './profile-page.component.html',
     styleUrls: ['./profile-page.component.scss']
@@ -20,7 +30,6 @@ export class ProfilePageComponent implements OnInit {
     pageIndex = 0;
     pageSize = 20;
 
-
     filtro: FiltroBusquedaCompraDto = {
         estados: [],
         fechaDesde: undefined,
@@ -29,11 +38,8 @@ export class ProfilePageComponent implements OnInit {
         montoMax: undefined
     };
 
-
-    selectedEstado: TipoEstadoCompra | '' = '';
-
-
     estadosOpts = Object.values(TipoEstadoCompra);
+    selectedEstado: TipoEstadoCompra | '' = '';
 
     loading = false;
     error: string | null = null;
@@ -41,33 +47,26 @@ export class ProfilePageComponent implements OnInit {
     columns = [
         { field: 'fechaCompra', header: 'Fecha' },
         { field: 'estado', header: 'Estado' },
-        { field: 'precioActual', header: 'Total' }
+        { field: 'precioActual', header: 'Total' },
+        { field: 'acciones', header: 'Acciones' }
     ];
-
-    clienteId: number | null = null;
 
     constructor(
         private compraService: CompraService,
-        private loginService: LoginService
+        private auth: AuthService,
+        private dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
-        this.clienteId = this.loginService.id;
-        this.loadCompras();
+        const id = this.auth.userId;
+        if (id != null) {
+            this.loadCompras(id);
+        }
     }
 
-
-    onEstadoChange(): void {
-        this.filtro.estados = this.selectedEstado ? [this.selectedEstado] : [];
-        this.pageIndex = 0;
-        this.loadCompras();
-    }
-
-    loadCompras(): void {
-        if (this.clienteId == null) return;
+    private loadCompras(clienteId: number) {
         this.loading = true;
         this.error = null;
-
 
         const filtroEnv = {
             ...this.filtro,
@@ -80,7 +79,7 @@ export class ProfilePageComponent implements OnInit {
         };
 
         this.compraService
-            .getHistorialCliente(this.clienteId, filtroEnv, this.pageIndex, this.pageSize)
+            .getHistorialCliente(clienteId, filtroEnv, this.pageIndex, this.pageSize)
             .subscribe({
                 next: resp => {
                     this.compras = resp.content;
@@ -94,6 +93,13 @@ export class ProfilePageComponent implements OnInit {
             });
     }
 
+    onEstadoChange(): void {
+        this.filtro.estados = this.selectedEstado ? [this.selectedEstado] : [];
+        this.pageIndex = 0;
+        const id = this.auth.userId;
+        if (id != null) this.loadCompras(id);
+    }
+
     onFilter(): void {
         if (
             this.filtro.fechaDesde &&
@@ -104,11 +110,20 @@ export class ProfilePageComponent implements OnInit {
             return;
         }
         this.pageIndex = 0;
-        this.loadCompras();
+        const id = this.auth.userId;
+        if (id != null) this.loadCompras(id);
     }
 
     onPageChange(page: number): void {
         this.pageIndex = page;
-        this.loadCompras();
+        const id = this.auth.userId;
+        if (id != null) this.loadCompras(id);
+    }
+
+    openDetalle(compraId: number) {
+        this.dialog.open(DetalleCompraDialogComponent, {
+            width: '600px',
+            data: { compraId }
+        });
     }
 }

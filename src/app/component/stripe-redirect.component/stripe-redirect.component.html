@@ -1,9 +1,11 @@
-<div class="redirect-container">
-  <mat-card class="redirect-card">
-    <div class="icon-box">
-      <mat-icon class="spinner-icon" svgIcon="autorenew"></mat-icon>
-    </div>
-    <h2>Procesando compra...</h2>
-    <p>Un momento mientras confirmamos el estado de tu pago.</p>
-  </mat-card>
-</div>
+<mat-card class="redirect-card">
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Procesando tu transacción, por favor espera...</p>
+  </div>
+
+  <div *ngIf="!cargando" class="resultado-container">
+    <h2>{{ mensaje }}</h2>
+    <button mat-stroked-button color="primary" routerLink="/comprar">Volver a la página de compra</button>
+  </div>
+</mat-card>

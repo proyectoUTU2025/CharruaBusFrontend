@@ -23,7 +23,8 @@ export const routes: Routes = [
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },      
-      {path: 'pago/:estado', component: StripeRedirectComponent}
+      { path: 'compras/exito', component: StripeRedirectComponent},
+      { path: 'compras/cancelada', component: StripeRedirectComponent}
     ]
   },
   { path: '**', redirectTo: '' }

@@ -1,0 +1,16 @@
+<div class="auth-container">
+  <h2>Verificar código</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>
+      Correo
+      <input formControlName="email" type="email" />
+    </label>
+    <label>
+      Código de recuperación
+      <input formControlName="verificationCode" />
+    </label>
+    <button type="submit" [disabled]="loading || form.invalid">Verificar</button>
+  </form>
+  <div *ngIf="loading" class="info">Validando...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+</div>

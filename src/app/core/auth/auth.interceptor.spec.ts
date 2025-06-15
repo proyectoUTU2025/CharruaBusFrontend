@@ -2,21 +2,21 @@ import { TestBed } from '@angular/core/testing';
 import { HttpRequest, HttpHandler } from '@angular/common/http';
 import { of } from 'rxjs';
 import { AuthInterceptor } from './auth.interceptor';
-import { LoginService } from '../../services/login.service';
+import { AuthService } from '../../services/auth.service';
 
 describe('AuthInterceptor', () => {
   let interceptor: AuthInterceptor;
-  let loginServiceSpy: jasmine.SpyObj<LoginService>;
+  let loginServiceSpy: jasmine.SpyObj<AuthService>;
   let next: HttpHandler;
 
   beforeEach(() => {
-    loginServiceSpy = jasmine.createSpyObj('LoginService', [], { token: 'test-token' });
+    loginServiceSpy = jasmine.createSpyObj('AuthService', [], { token: 'test-token' });
     next = jasmine.createSpyObj('HttpHandler', ['handle']);
     (next.handle as jasmine.Spy).and.returnValue(of());
     TestBed.configureTestingModule({
       providers: [
         AuthInterceptor,
-        { provide: LoginService, useValue: loginServiceSpy }
+        { provide: AuthService, useValue: loginServiceSpy }
       ]
     });
     interceptor = TestBed.inject(AuthInterceptor);

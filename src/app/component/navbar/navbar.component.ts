@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { LoginService } from '../../services/login.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -21,7 +21,7 @@ import { LoginService } from '../../services/login.service';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  constructor(private router: Router, private loginService: LoginService) {}
+  constructor(private router: Router, private loginService: AuthService) { }
 
   onLogoClick(): void {
     if (this.router.url === '/' || this.router.url === '') {

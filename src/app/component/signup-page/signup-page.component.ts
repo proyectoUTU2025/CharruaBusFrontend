@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { LoginService } from '../../services/login.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup-page',
@@ -32,7 +32,7 @@ export class SignupPageComponent {
   tiposDocumento = ['CEDULA', 'OTRO', 'PASAPORTE'];
   situacionesLaborales = ['ESTUDIANTE', 'JUBILADO', 'OTRO'];
 
-  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.signupForm = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
@@ -54,7 +54,7 @@ export class SignupPageComponent {
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) return;
     try {
-      await this.loginService.registrarCliente(this.signupForm.value);
+      await this.authService.register(this.signupForm.value);
       this.router.navigate(['/verificar-codigo']);
     } catch (error) {
       this.error = 'Error al registrar. Verificá los datos.';

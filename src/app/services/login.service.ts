@@ -6,6 +6,13 @@ import { firstValueFrom } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../environments/environment';
 
+interface DecodedToken extends JwtPayload {
+  name?: string;
+  sub?: string;
+  role?: string;
+  id?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class LoginService {
   constructor(
@@ -49,7 +56,7 @@ export class LoginService {
     });
   }
 
-  private get decoded(): (JwtPayload & { name?: string; sub?: string; role?: string }) | null {
+  private get decoded(): DecodedToken | null {
     const token = this.token;
     if (!token) return null;
     try {
@@ -75,10 +82,15 @@ export class LoginService {
     return this.decoded?.role || null;
   }
 
+  get id(): number | null {
+    return this.decoded?.id ? +this.decoded.id : null;
+  }
+
   estaLogueado(): boolean {
     return !!this.token;
   }
- logout() {
+
+  logout() {
     firstValueFrom(this.http.post(`${environment.apiBaseUrl}/auth/logout`, {}))
       .finally(() => {
         this.cookies.delete('access_token', '/');

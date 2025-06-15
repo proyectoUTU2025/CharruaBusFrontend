@@ -1,12 +1,19 @@
+// src/app/services/localidad.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 import { Page } from '../models';
-import { AltaLocalidadDto, FiltroBusquedaLocalidadDto, LocalidadDto} from '../models/localidades/localidades-dto.model';
+import {
+  AltaLocalidadDto,
+  FiltroBusquedaLocalidadDto,
+  LocalidadDto
+} from '../models/localidades/localidades-dto.model';
+
 import { ApiResponse } from '../models/api';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
-import { environment } from '../../environments/environment';
+import { LocalidadNombreDepartamentoDto } from '../models/localidades/localidad-nombre-departamento-dto.model';
 
 @Injectable({ providedIn: 'root' })
 export class LocalidadService {
@@ -26,11 +33,16 @@ export class LocalidadService {
       }
     });
 
-    return this.http.get<Page<LocalidadDto>>(`${this.base}`, { params });      
+    return this.http.get<Page<LocalidadDto>>(`${this.base}`, { params });
   }
-   
+
+  getAllFlat(): Observable<LocalidadNombreDepartamentoDto[]> {
+    return this.http.get<LocalidadNombreDepartamentoDto[]>(`${this.base}/all`);
+  }
+
   create(localidad: AltaLocalidadDto): Observable<LocalidadDto> {
-    return this.http.post<ApiResponse<LocalidadDto>>(`${this.base}`, localidad)
+    return this.http
+      .post<ApiResponse<LocalidadDto>>(`${this.base}`, localidad)
       .pipe(map(resp => resp.data));
   }
 
@@ -38,7 +50,16 @@ export class LocalidadService {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
+    return this.http
+      .post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
       .pipe(map(resp => resp.data));
   }
+  getLocalidadesOrigenValidas(): Observable<LocalidadDto[]> {
+    return this.http.get<LocalidadDto[]>(`${this.base}/origenes-posibles`);
+  }
+
+  getDestinosPosibles(idOrigen: number): Observable<LocalidadDto[]> {
+    return this.http.get<LocalidadDto[]>(`${this.base}/destinos-posibles/${idOrigen}`);
+  }
+
 }

@@ -1,0 +1,16 @@
+<mat-dialog-content>
+  <h3>Seleccionar Asientos</h3>
+  <app-seats
+    [viajeId]="data.viajeId"
+    [cantidadAsientos]="data.cantidadAsientos"
+    [maxSeleccion]="data.pasajeros"
+    (bookingConfirmed)="onAsientosSeleccionados($event)">
+  </app-seats>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button class="btn-violeta" (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button class="btn-violeta"
+          [disabled]="selectedSeats.length !== data.pasajeros"
+          (click)="confirmar()">Confirmar</button>
+</mat-dialog-actions>

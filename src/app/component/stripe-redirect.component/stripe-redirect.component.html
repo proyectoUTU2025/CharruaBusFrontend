@@ -1,0 +1,12 @@
+<mat-card class="redirect-card">
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Procesando tu transacción, por favor espera...</p>
+  </div>
+
+  <div *ngIf="!cargando" class="resultado-container">
+    <h2>{{ mensaje }}</h2>
+    <p>Serás redirigido en unos segundos...</p>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</mat-card>

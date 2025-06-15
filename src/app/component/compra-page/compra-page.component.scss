@@ -1,11 +1,231 @@
+:host {
+  display: block;  
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.stepper {
+  margin-bottom: 1rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  background-color: #e9e2f3;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.mat-tab-label {
+  font-weight: 600;
+  color: #5b4d8a;
+}
+
+.mat-tab-label.mat-tab-label-active {
+  background-color: #675992;
+  color: white !important;
+  border-radius: 6px 6px 0 0;
+}
+
 .compra-card {
-  max-width: 800px;
-  margin: 2rem auto;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 1.5rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filters-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.buscar-btn {
+  background-color: #675992;
+  color: white;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
+}
+
+.outline-btn {
+  border: 1px solid #675992;
+  color: #675992;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
+}
+
+.viajes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.viaje-card {
+  padding: 1rem;
   border-radius: 12px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  h2 {
-    color: #675992;
-  }
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.actions {
+  margin-top: 1.5rem;
+  text-align: right;
+}
+.viajes-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.viaje-item {
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: white;
+  transition: box-shadow 0.2s;
+}
+
+.viaje-item.selected {
+  border: 2px solid #675992;
+  background: #f2e9ff;
+}
+
+.viaje-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.viaje-item.selected {
+  border: 2px solid #675992;
+  background-color: #f1eaff;
+  border-radius: 12px;
+}
+.horario {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+.pasajero-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-asientos {
+  margin-top: 1rem;
+  font-weight: 500;
+  color: #5b4d8a;
+}
+.pasajero-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pasajero-form-row p {
+  margin: 0;
+}
+
+.pasajero-form-row strong {
+  color: #4c3b78;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}
+.step-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-buttons button {
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 24px;
+}
+
+.step-buttons button[color="primary"] {
+  background-color: #675992;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.step-buttons button[color="primary"]:hover {
+  background-color: #584c7a;
+}
+
+.step-buttons button:not([color="primary"]) {
+  border: 1px solid #675992;
+  background-color: transparent;
+  color: #675992;
+}
+
+.step-buttons button:not([color="primary"]):hover {
+  background-color: #f1eaff;
+}
+.step-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-buttons button {
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 24px;
+}
+
+.step-buttons button[color="primary"] {
+  background-color: #675992;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.step-buttons button[color="primary"]:hover {
+  background-color: #584c7a;
+}
+
+.step-buttons button:not([color="primary"]) {
+  border: 1px solid #675992;
+  background-color: transparent;
+  color: #675992;
+}
+
+.step-buttons button:not([color="primary"]):hover {
+  background-color: #f1eaff;
+}
+.field-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.error-text {
+  color: red;
+  font-size: 0.75rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }

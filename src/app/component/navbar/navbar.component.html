@@ -8,39 +8,52 @@
   <span class="spacer"></span>
   
     <button mat-stroked-button 
-          class="usuarios-button" 
-          routerLink="/usuarios">
+      class="usuarios-button"
+      routerLink="/usuarios">
       <mat-icon>people</mat-icon>
         Usuarios
     </button> 
     
     <button mat-stroked-button
-          color="primary"
-          class="usuarios-button"
-          routerLink="/omnibus">
+      color="primary"
+      class="usuarios-button"
+      routerLink="/omnibus">
       <mat-icon>directions_bus</mat-icon>
-      Ómnibus
+        Ómnibus
     </button>
 
-    <button mat-button class="nav-button localidades-button" routerLink="/localidades">
+    <button mat-button  
+      class="nav-button localidades-button" 
+      routerLink="/localidades">
       <mat-icon>location_city</mat-icon>
-      Localidades
+        Localidades
     </button>
     
-    <button mat-button class="nav-button viajes-button" routerLink="/viajes">
-       <mat-icon>event</mat-icon>
-       Viajes
+    <button mat-button 
+      class="nav-button viajes-button" 
+      routerLink="/viajes">
+      <mat-icon>event</mat-icon>
+        Viajes
     </button>
 
-    <button mat-button class="nav-button login-button" routerLink="/login">
+    <button mat-stroked-button
+      class="nav-button"
+      routerLink="/comprar">
+      <mat-icon>shopping_cart</mat-icon>
+        Comprar
+    </button>
+
+    <button mat-button 
+      class="nav-button login-button" 
+      routerLink="/login">
       <mat-icon>login</mat-icon>
-      Login
+        Login
     </button>
 
     <button mat-stroked-button 
-        class="logout-button"
-        (click)="onLogout()">
-        <mat-icon>logout</mat-icon>
+      class="logout-button"
+      (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
         Cerrar Sesión
     </button>
 </mat-toolbar>

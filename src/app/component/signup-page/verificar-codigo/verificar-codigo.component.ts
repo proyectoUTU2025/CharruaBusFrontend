@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { LoginService } from '../../../services/login.service';
+import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -24,19 +24,28 @@ export class VerificarCodigoComponent {
   form: FormGroup;
   error: string | null = null;
 
-  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      code: ['', Validators.required]
+      verificationCode: ['', Validators.required]
     });
   }
 
   async onSubmit(): Promise<void> {
+    if (this.form.invalid) return;
+
+    this.error = null;
+    const { email, verificationCode } = this.form.value;
+
     try {
-      await this.loginService.validateCode(this.form.value.email, this.form.value.code);
+      await this.authService.verifyEmail(email, verificationCode);
       this.router.navigate(['/login']);
     } catch {
-      this.error = 'Código inválido';
+      this.error = 'Código inválido o expirado';
     }
   }
 }

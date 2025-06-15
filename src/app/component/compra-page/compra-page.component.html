@@ -3,7 +3,7 @@
   <mat-step label="Seleccionar viaje" [completed]="step > 1"></mat-step>
   <mat-step label="Pasajeros" [completed]="step > 2"></mat-step>
   <mat-step label="Resumen" [completed]="step > 3"></mat-step>
-  <mat-step label="Pago"></mat-step>
+  <mat-step label="Pago" [completed]="step > 4"></mat-step>
 </mat-horizontal-stepper>
 
 <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="cambiarTipoViaje($event)" class="tabs">
@@ -11,39 +11,38 @@
   <mat-tab label="Ida y Vuelta"></mat-tab>
 </mat-tab-group>
 
-<!-- Paso 0: Búsqueda -->
 <mat-card class="compra-card" *ngIf="step === 0">
   <form [formGroup]="searchForm" class="filters">
-
     <div class="field-container">
-    <mat-form-field appearance="fill">
-      <mat-label>Origen</mat-label>
-      <mat-select formControlName="localidadOrigenId">
-        <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombreConDepartamento }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <div class="error-text" *ngIf="origenError">Debe ingresar un origen.</div>
-    </div>
-    <div class="field-container">
-    <mat-form-field appearance="fill">
-      <mat-label>Destino</mat-label>
-      <mat-select formControlName="localidadDestinoId">
-        <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombreConDepartamento }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <div class="error-text" *ngIf="destinoError">Debe ingresar un destino.</div>
+      <mat-form-field appearance="fill">
+        <mat-label>Origen</mat-label>
+        <mat-select formControlName="localidadOrigenId">
+          <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombreConDepartamento }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="error-text" *ngIf="origenError">Debe ingresar un origen.</div>
     </div>
 
     <div class="field-container">
-    <mat-form-field appearance="fill">
-      <mat-label>Fecha Ida</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="fechaDesde" />
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
-    <div class="error-text" *ngIf="fechaError">{{ fechaError }}</div>
+      <mat-form-field appearance="fill">
+        <mat-label>Destino</mat-label>
+        <mat-select formControlName="localidadDestinoId">
+          <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombreConDepartamento }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="error-text" *ngIf="destinoError">Debe ingresar un destino.</div>
     </div>
-    
+
+    <div class="field-container">
+      <mat-form-field appearance="fill">
+        <mat-label>Fecha Ida</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fechaDesde" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <div class="error-text" *ngIf="fechaError">{{ fechaError }}</div>
+    </div>
+
     <mat-form-field appearance="fill" *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
       <mat-label>Fecha Vuelta</mat-label>
       <input matInput [matDatepicker]="pickerVuelta" formControlName="fechaVuelta" />
@@ -65,12 +64,11 @@
   </form>
 </mat-card>
 
-<!-- Paso 1: Seleccionar viaje -->
 <mat-card class="viajes-card" *ngIf="step === 1">  
   <div *ngFor="let v of viajes"
-     class="viaje-item"
-     [class.selected]="v.seleccionado"
-     (click)="seleccionarViaje(v)">
+       class="viaje-item"
+       [class.selected]="v.seleccionado"
+       (click)="seleccionarViaje(v)">
     <div class="ruta"><strong>{{ v.origen }}</strong> → <strong>{{ v.destino }}</strong></div>
     <div class="horario">
       <mat-icon>schedule</mat-icon>
@@ -85,10 +83,7 @@
   </mat-paginator>
 </mat-card>
 
-<!-- Paso 2: Datos de pasajeros -->
-
 <mat-card class="viajes-card" *ngIf="step === 2">
-  <!-- CLIENTE -->
   <ng-container *ngIf="loginService.rol === 'CLIENTE' && userInfo">
     <h3>Datos del Cliente</h3>
     <div class="datos-cliente">
@@ -98,7 +93,6 @@
     </div>
   </ng-container>
 
-  <!-- VENDEDOR -->
   <ng-container *ngIf="loginService.rol === 'VENDEDOR'">
     <h3>Buscar Cliente por Email</h3>
     <mat-form-field appearance="fill">
@@ -123,9 +117,7 @@
   </div>
 </mat-card>
 
-<!-- Paso 3: Resumen -->
 <mat-card class="viajes-card" *ngIf="step === 3"> 
-
   <div class="info-cliente" *ngIf="userInfo">
     <h4>Información del Cliente</h4>
     <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
@@ -153,8 +145,7 @@
   </div>
 </mat-card>
 
-<!-- Paso 4: Pago -->
-<mat-card *ngIf="step === 5">
+<mat-card class="redirect-card" *ngIf="step === 5">
   <div *ngIf="estadoCompra === 'exito'" class="success-box">
     <h2>✅ ¡Compra Realizada con Éxito!</h2>
     <p>Tu pago fue procesado. Recibirás el ticket por correo.</p>
@@ -164,17 +155,21 @@
   <div *ngIf="estadoCompra === 'cancelado'" class="cancel-box">
     <h2>❌ Compra Cancelada</h2>
     <p>Puedes volver atrás y modificar datos si fue un error.</p>
-    <button mat-button (click)="step = 1">Volver a Seleccionar Viaje</button>
   </div>
 
   <div *ngIf="estadoCompra === 'error'" class="error-box">
     <h2>⚠️ Hubo un error</h2>
     <p>No se pudo procesar el pago. Intenta de nuevo.</p>
   </div>
+
+  <div class="step-buttons" style="margin-top: 20px; text-align: center;">
+    <button mat-flat-button color="primary" routerLink="/comprar">Realizar nueva compra</button>
+    <button mat-stroked-button color="accent" routerLink="/mis-compras">Ver mis compras</button>
+  </div>
 </mat-card>
 
 <!-- Botones de paso -->
-<div class="step-buttons">
+<div class="step-buttons" *ngIf="step < 5">
   <button mat-flat-button (click)="anteriorPaso()" [disabled]="step === 0">Anterior</button>
-  <button mat-flat-button color="primary" (click)="siguientePaso()" [disabled]="!puedeAvanzar() || step === 4">Siguiente</button>
+  <button mat-flat-button color="primary" (click)="siguientePaso()" [disabled]="!puedeAvanzar()">Siguiente</button>
 </div>

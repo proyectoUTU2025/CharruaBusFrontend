@@ -6,6 +6,7 @@
 
   <div *ngIf="!cargando" class="resultado-container">
     <h2>{{ mensaje }}</h2>
-    <button mat-stroked-button color="primary" routerLink="/comprar">Volver a la página de compra</button>
+    <p>Serás redirigido en unos segundos...</p>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 </mat-card>

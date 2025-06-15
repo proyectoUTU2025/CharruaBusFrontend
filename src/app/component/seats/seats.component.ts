@@ -19,7 +19,7 @@ interface Seat {
   standalone: true,
   imports: [CommonModule, MatTooltipModule],
   templateUrl: './seats.component.html',
-  styleUrls: ['./seats.component.css']
+  styleUrls: ['./seats.component.scss']
 })
 export class SeatsComponent implements OnInit {
   @Input() cantidadAsientos!: number;

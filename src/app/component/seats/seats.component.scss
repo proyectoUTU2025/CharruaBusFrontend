@@ -1,0 +1,64 @@
+$violeta-gastado: #675992;
+$gris-claro: #d8d8d8;
+$gris-oscuro: #888;
+
+.seat-container {
+  padding: 1rem;
+}
+
+.seatrow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.seat-item {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  margin: 3px;
+  border-radius: 8px;
+  border: 2px solid $violeta-gastado;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.seat-available {
+  background: white;
+  color: $violeta-gastado;
+
+  &:hover {
+    background-color: lighten($violeta-gastado, 40%);
+  }
+}
+
+.seat-booked {
+  background: $violeta-gastado;
+  color: white;
+}
+
+.aisle {
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.seat-empty {
+  width: 36px;
+  height: 36px;
+  margin: 3px;
+  visibility: hidden;
+}
+
+.summary-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f8f8;
+  border-top: 1px solid $gris-claro;
+  font-weight: 500;
+  font-size: 14px;
+  color: $gris-oscuro;
+}

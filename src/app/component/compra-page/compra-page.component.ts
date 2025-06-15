@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +18,7 @@ import { CompraRequestDto } from '../../models/compra';
 import { ViajeService } from '../../services/viaje.service';
 import { CompraViajeDto } from '../../models/viajes';
 import { SeatsComponent } from '../seats/seats.component';
-import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
+import { PurchaseSummaryDialogComponent } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
 import { LocalidadService } from '../../services/localidades.service';
 import { CompraService } from '../../services/compra.service';
 import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
@@ -55,7 +55,7 @@ type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
 })
-export class CompraPageComponent implements OnInit, AfterViewChecked {
+export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChecked {
   step = 0;
   completedSteps: boolean[] = [false, false, false, false, false];
   tipoViaje: 'IDA' | 'IDA_Y_VUELTA' = 'IDA';
@@ -95,16 +95,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {     
-    this.route.queryParamMap.subscribe(params => {
-      const estado = params.get('estado');
-      if (estado === 'exito' || estado === 'cancelado' || estado === 'error') {
-        this.estadoCompra = estado as any;
-        this.step = 5;
-        this.completedSteps = [true, true, true, true, true];
-      }
-    });
-
+  ngOnInit(): void {
     this.searchForm = this.fb.group({
       localidadOrigenId: [null, Validators.required],
       localidadDestinoId: [null, Validators.required],
@@ -121,18 +112,39 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
       this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
-    
 
-    
     if (this.loginService.rol === 'CLIENTE') {
       const id = this.loginService.id;
       if (id) {
-        this.userService.getById(id).then(data => {          
+        this.userService.getById(id).then(data => {
           this.userInfo = data;
-        }).catch(() => {          
+        }).catch(() => {
           this.userInfo = null;
         });
       }
+    }
+  }
+
+  ngAfterViewInit(): void {
+    const url = this.route.snapshot.url.map(s => s.path).join('/');
+    const estado = this.route.snapshot.queryParamMap.get('estado');
+
+    if (url.includes('compras/exito') && estado === 'exito') {
+      this.estadoCompra = 'exito';
+      this.step = 5;
+      this.completedSteps = [true, true, true, true, true];
+    }
+
+    if (url.includes('compras/cancelada') && estado === 'cancelado') {
+      this.estadoCompra = 'cancelado';
+      this.step = 5;
+      this.completedSteps = [true, true, true, true, true];
+    }
+
+    if (url.includes('compras/cancelada') && estado === 'error') {
+      this.estadoCompra = 'error';
+      this.step = 5;
+      this.completedSteps = [true, true, true, true, true];
     }
   }
 
@@ -176,17 +188,9 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
     const f = this.searchForm.value;
 
-    if (!f.localidadOrigenId) {
-      this.origenError = 'Debe seleccionar un origen.';
-    }
-
-    if (!f.localidadDestinoId) {
-      this.destinoError = 'Debe seleccionar un destino.';
-    }
-
-    if (!f.fechaDesde) {
-      this.fechaError = 'Debe seleccionar una fecha de ida.';
-    }
+    if (!f.localidadOrigenId) this.origenError = 'Debe seleccionar un origen.';
+    if (!f.localidadDestinoId) this.destinoError = 'Debe seleccionar un destino.';
+    if (!f.fechaDesde) this.fechaError = 'Debe seleccionar una fecha de ida.';
 
     if (this.origenError || this.destinoError || this.fechaError) return;
 
@@ -196,11 +200,9 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   buscarConPaginacion(): void {
     const f = this.searchForm.value;
-     
-    if (!f.fechaDesde) {
-      alert('Por favor, ingrese una fecha de ida.');
-      return;
-    }
+
+    if (!f.fechaDesde) return;
+
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,
@@ -239,37 +241,32 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   abrirDialogPasajeros(): void {
-  if (!this.viajeSeleccionado) return;
+    if (!this.viajeSeleccionado) return;
 
-  const pasajeros = this.searchForm.value.pasajeros;
-  const viajeId = this.viajeSeleccionado.idViaje;
-  const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;   
+    const pasajeros = this.searchForm.value.pasajeros;
+    const viajeId = this.viajeSeleccionado.idViaje;
+    const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
 
-  if (!viajeId || !cantidadAsientos) {
-    console.error('No se pudo abrir el diálogo por falta de datos:', {
-      viajeId,
-      cantidadAsientos
+    if (!viajeId || !cantidadAsientos) return;
+
+    const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
+      width: '600px',
+      data: {
+        pasajeros,
+        viajeId,
+        cantidadAsientos,
+        precio: this.viajeSeleccionado?.precioEstimado
+      }
     });
-    return;
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.selectedSeats = result.asientos;
+        this.completedSteps[2] = true;
+      }
+    });
   }
 
-  const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
-    width: '600px',
-    data: {
-      pasajeros,
-      viajeId,
-      cantidadAsientos,
-      precio: this.viajeSeleccionado?.precioEstimado
-    }
-  });
-
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      this.selectedSeats = result.asientos;
-      this.completedSteps[2] = true;
-    }
-  });
-}
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const clienteId = this.userInfo?.id || 0;
@@ -288,6 +285,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   siguientePaso(): void {
+    if (this.step === 4) return; // No permitir avanzar manualmente al paso 5
     if (this.puedeAvanzar() && this.step < this.completedSteps.length) {
       this.completedSteps[this.step] = true;
       this.step++;
@@ -295,7 +293,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   anteriorPaso(): void {
-    if (this.step > 0) {
+    if (this.step > 0 && this.step < 5) {
       this.step--;
     }
   }
@@ -304,6 +302,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     if (this.step === 0) return this.searchForm.valid;
     if (this.step === 1) return this.viajeSeleccionado !== null;
     if (this.step === 2) return this.selectedSeats.length > 0;
+    if (this.step === 3) return false; // Deshabilita avanzar desde "Resumen"
     return true;
   }
 

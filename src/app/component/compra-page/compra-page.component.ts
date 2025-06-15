@@ -22,7 +22,7 @@ import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/pur
 import { LocalidadService } from '../../services/localidades.service';
 import { CompraService } from '../../services/compra.service';
 import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
-import { LoginService } from '../../services/login.service';
+import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UsuarioDto } from '../../models';
 
@@ -88,9 +88,9 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     private viajeService: ViajeService,
     private compraService: CompraService,
     private dialog: MatDialog,
-    public loginService: LoginService,
+    public authService: AuthService,
     public userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
@@ -109,15 +109,15 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
       this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
-    
 
-    
-    if (this.loginService.rol === 'CLIENTE') {
-      const id = this.loginService.id;
+
+
+    if (this.authService.rol === 'CLIENTE') {
+      const id = this.authService.id;
       if (id) {
-        this.userService.getById(id).then(data => {          
+        this.userService.getById(id).then(data => {
           this.userInfo = data;
-        }).catch(() => {          
+        }).catch(() => {
           this.userInfo = null;
         });
       }
@@ -184,7 +184,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   buscarConPaginacion(): void {
     const f = this.searchForm.value;
-     
+
     if (!f.fechaDesde) {
       alert('Por favor, ingrese una fecha de ida.');
       return;
@@ -227,37 +227,37 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   abrirDialogPasajeros(): void {
-  if (!this.viajeSeleccionado) return;
+    if (!this.viajeSeleccionado) return;
 
-  const pasajeros = this.searchForm.value.pasajeros;
-  const viajeId = this.viajeSeleccionado.idViaje;
-  const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;   
+    const pasajeros = this.searchForm.value.pasajeros;
+    const viajeId = this.viajeSeleccionado.idViaje;
+    const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
 
-  if (!viajeId || !cantidadAsientos) {
-    console.error('No se pudo abrir el diálogo por falta de datos:', {
-      viajeId,
-      cantidadAsientos
+    if (!viajeId || !cantidadAsientos) {
+      console.error('No se pudo abrir el diálogo por falta de datos:', {
+        viajeId,
+        cantidadAsientos
+      });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
+      width: '600px',
+      data: {
+        pasajeros,
+        viajeId,
+        cantidadAsientos,
+        precio: this.viajeSeleccionado?.precioEstimado
+      }
     });
-    return;
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.selectedSeats = result.asientos;
+        this.completedSteps[2] = true;
+      }
+    });
   }
-
-  const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
-    width: '600px',
-    data: {
-      pasajeros,
-      viajeId,
-      cantidadAsientos,
-      precio: this.viajeSeleccionado?.precioEstimado
-    }
-  });
-
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      this.selectedSeats = result.asientos;
-      this.completedSteps[2] = true;
-    }
-  });
-}
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const clienteId = this.userInfo?.id || 0;

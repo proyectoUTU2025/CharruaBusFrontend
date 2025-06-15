@@ -1,3 +1,4 @@
+import { ApiResponse } from './../models/api/api-response.model';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -7,15 +8,15 @@ import {
   FiltroBusquedaUsuarioDto,
   Page
 } from '../models';
-import { ApiResponse } from '../models/api';
-import { environment } from '../../environments/environment';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
+import { ChangePasswordRequestDto } from '../models/auth/change-password-request.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private base = `${environment.apiBaseUrl}/usuarios`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(
     filtro: FiltroBusquedaUsuarioDto = {},
@@ -41,24 +42,27 @@ export class UserService {
     );
   }
 
+  getById(id: number): Promise<UsuarioDto> {
+    return firstValueFrom(
+      this.http.get<ApiResponse<UsuarioDto>>(`${this.base}/${id}`)
+    ).then(resp => resp.data);
+  }
+
   create(alta: AltaUsuarioDto): Promise<UsuarioDto> {
     return firstValueFrom(
-      this.http
-        .post<ApiResponse<UsuarioDto>>(`${this.base}`, alta)
+      this.http.post<ApiResponse<UsuarioDto>>(this.base, alta)
     ).then(resp => resp.data);
   }
 
   update(u: UsuarioDto): Promise<UsuarioDto> {
     return firstValueFrom(
-      this.http
-        .put<ApiResponse<UsuarioDto>>(`${this.base}/${u.id}`, u)
+      this.http.put<ApiResponse<UsuarioDto>>(`${this.base}/${u.id}`, u)
     ).then(resp => resp.data);
   }
 
   delete(id: number): Promise<void> {
     return firstValueFrom(
-      this.http
-        .delete<void>(`${this.base}/${id}`)
+      this.http.delete<void>(`${this.base}/${id}`)
     );
   }
 
@@ -66,21 +70,24 @@ export class UserService {
     const formData = new FormData();
     formData.append('file', file);
     return firstValueFrom(
-      this.http
-        .post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
-    ).then(resp => resp.data);  
-  }
-  
-  getById(id: number): Promise<UsuarioDto> {
-    return firstValueFrom(
-      this.http.get<ApiResponse<UsuarioDto>>(`${environment.apiBaseUrl}/usuarios/${id}`)
+      this.http.post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
     ).then(resp => resp.data);
   }
 
-  buscarPorEmail(email: string) {
+  buscarPorEmail(email: string): Promise<UsuarioDto> {
     return firstValueFrom(
-      this.http.get<UsuarioDto>(`${environment.apiBaseUrl}/usuarios/buscar?email=${email}`)
-    );
+      this.http.get<ApiResponse<UsuarioDto>>(`${this.base}/buscar`, {
+        params: new HttpParams().set('email', email)
+      })
+    ).then(resp => resp.data);
   }
 
+  changePassword(dto: ChangePasswordRequestDto): Promise<void> {
+    return firstValueFrom(
+      this.http.post<ApiResponse<void>>(
+        `${this.base}/change-password`,
+        dto
+      )
+    ).then(() => { });
+  }
 }

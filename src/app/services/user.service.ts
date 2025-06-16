@@ -10,6 +10,7 @@ import {
 } from '../models';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
 import { ChangePasswordRequestDto } from '../models/auth/change-password-request.dto';
+import { EditarUsuarioRequestDto } from '../models/users/editar-usuario-request.dto';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -54,12 +55,6 @@ export class UserService {
     ).then(resp => resp.data);
   }
 
-  update(u: UsuarioDto): Promise<UsuarioDto> {
-    return firstValueFrom(
-      this.http.put<ApiResponse<UsuarioDto>>(`${this.base}/${u.id}`, u)
-    ).then(resp => resp.data);
-  }
-
   delete(id: number): Promise<void> {
     return firstValueFrom(
       this.http.delete<void>(`${this.base}/${id}`)
@@ -89,5 +84,14 @@ export class UserService {
         dto
       )
     ).then(() => { });
+  }
+
+  editProfile(id: number, dto: EditarUsuarioRequestDto): Promise<UsuarioDto> {
+    return firstValueFrom(
+      this.http.patch<ApiResponse<UsuarioDto>>(
+        `${this.base}/${id}`,
+        dto
+      )
+    ).then(resp => resp.data);
   }
 }

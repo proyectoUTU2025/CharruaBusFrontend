@@ -26,6 +26,7 @@ import { LoginService } from '../../services/login.service';
 import { UserService } from '../../services/user.service';
 import { UsuarioDto } from '../../models';
 import { ActivatedRoute } from '@angular/router';
+import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
 
 type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
 
@@ -50,7 +51,8 @@ type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
     MatTabsModule,
     MatPaginatorModule,
     SeatsComponent,
-    PurchaseSummaryDialogComponent
+    PurchaseSummaryDialogComponent,
+    MatAutocompleteModule
   ],
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
@@ -67,6 +69,8 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   viajes: CompraViajeSeleccionable[] = [];
   selectedSeats: number[] = [];
   viajeSeleccionado: CompraViajeDto | null = null;
+  searchTerm: string = '';
+  clientesFiltrados: UsuarioDto[] = [];
 
   userInfo: UsuarioDto | null = null;
   searchEmail: string = '';
@@ -76,7 +80,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   pageIndex = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
+  @ViewChild('auto') auto!: MatAutocomplete;
   mostrarErrorOrigen = false;
   mostrarErrorDestino = false;
   origenError = '';
@@ -336,5 +340,33 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     const horas = Math.floor(minutos / 60);
     const mins = minutos % 60;
     return `${horas}h ${mins}m`;
+  }
+
+  buscarClientes(): void {
+    const query = this.searchTerm.trim();
+    if (query.length < 2) return;
+
+    this.userService.buscarClientes(query, 0, 5).subscribe({
+      next: (clientes) => {
+        this.clientesFiltrados = clientes;
+        console.log('Clientes filtrados:', this.clientesFiltrados);
+      },
+      error: (e) => {
+        console.error('Error buscando clientes', e);
+        this.clientesFiltrados = [];
+      }
+    });
+  }
+
+
+
+  displayCliente(cliente: UsuarioDto): string {
+    return cliente ? `${cliente.nombre} ${cliente.apellido}` : '';
+  }
+
+  seleccionarCliente(cliente: UsuarioDto): void {
+    this.userInfo = cliente;
+    this.searchTerm = this.displayCliente(cliente);
+    this.clientesFiltrados = [];
   }
 }

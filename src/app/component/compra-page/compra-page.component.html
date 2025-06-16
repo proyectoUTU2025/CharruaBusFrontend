@@ -93,20 +93,46 @@
     </div>
   </ng-container>
 
+  <!-- VENDEDOR -->
   <ng-container *ngIf="loginService.rol === 'VENDEDOR'">
-    <h3>Buscar Cliente por Email</h3>
-    <mat-form-field appearance="fill">
-      <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="searchEmail" />
-    </mat-form-field>
-    <button mat-stroked-button color="primary" (click)="buscarUsuarioPorEmail()">Buscar</button>
+    <h3>Buscar Cliente</h3>
 
-    <div class="datos-cliente" *ngIf="userInfo">
-      <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
-      <p><strong>Email:</strong> {{ userInfo.email }}</p>
-      <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
-    </div>
+    <mat-form-field appearance="fill" class="autocomplete-field">
+      <mat-label>Buscar cliente</mat-label>
+      <input
+        type="text"
+        matInput
+        [(ngModel)]="searchTerm"
+        (input)="buscarClientes()"
+        [matAutocomplete]="auto"
+        autocomplete="off"
+      />
+    </mat-form-field>
+
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayCliente"
+      (optionSelected)="seleccionarCliente($event.option.value)">
+      <mat-option *ngFor="let c of clientesFiltrados" [value]="c">
+        <div class="autocomplete-option">
+          <mat-icon>person</mat-icon>
+          {{ c.nombre }} {{ c.apellido }} ({{ c.documento }})
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+
+    <mat-card class="ficha-cliente" *ngIf="userInfo">
+      <mat-card-title>{{ userInfo.nombre }} {{ userInfo.apellido }}</mat-card-title>
+      <mat-card-content>
+        <p><strong>Email:</strong> {{ userInfo.email }}</p>
+        <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+        <p><strong>Tipo:</strong> {{ userInfo.tipoDocumento }}</p>
+        <p><strong>Categoría:</strong> {{ userInfo.situacionLaboral || 'No especificada' }}</p>
+      </mat-card-content>
+    </mat-card>
   </ng-container>
+
+
 
   <div class="info-asientos">
     Asientos seleccionados: {{ selectedSeats?.join(', ') || 'Ninguno' }}

@@ -1,0 +1,6 @@
+export enum TipoCategoriaCliente {
+  EMPLEADO = 'EMPLEADO',
+  ESTUDIANTE = 'ESTUDIANTE',
+  JUBILADO = 'JUBILADO',
+  DESEMPLEADO = 'DESEMPLEADO'
+}

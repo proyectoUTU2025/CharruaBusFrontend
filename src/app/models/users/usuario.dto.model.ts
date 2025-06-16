@@ -1,3 +1,4 @@
+import { TipoCategoriaCliente } from './tipo-categoria-cliente.enum';
 import { TipoDocumento } from './tipo-documento.enum';
 import { TipoRol } from './tipo-rol.enum';
 
@@ -12,6 +13,7 @@ export interface UsuarioDto {
   rol: TipoRol;
   fechaNacimiento: string; 
   activo: boolean;
+  situacionLaboral?: TipoCategoriaCliente; 
 }
 
 export interface AltaUsuarioDto {

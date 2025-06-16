@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import {
   UsuarioDto,
   AltaUsuarioDto,
@@ -10,6 +10,7 @@ import {
 import { ApiResponse } from '../models/api';
 import { environment } from '../../environments/environment';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -82,5 +83,13 @@ export class UserService {
       this.http.get<UsuarioDto>(`${environment.apiBaseUrl}/usuarios/buscar?email=${email}`)
     );
   }
+  buscarClientes(query: string, page = 0, size = 5): Observable<UsuarioDto[]> {
+    return this.http.get<ApiResponse<Page<UsuarioDto>>>(
+      `${environment.apiBaseUrl}/usuarios/buscar-cliente?query=${query}&page=${page}&size=${size}`
+    ).pipe(
+      map(resp => resp.data?.content ?? [])
+    );
+  }
+
 
 }

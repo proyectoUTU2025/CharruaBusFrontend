@@ -1,5 +1,7 @@
 export interface FiltroDisponibilidadOmnibusDto {
-    fecha: string;
-    origenId?: number;
-    destinoId?: number;
+    origenId: number;
+    destinoId: number;
+    fechaHoraSalida: string;
+    fechaHoraLlegada: string;
+    minAsientos?: number;
 }

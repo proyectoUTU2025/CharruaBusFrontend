@@ -112,7 +112,8 @@
     <mat-autocomplete
       #auto="matAutocomplete"
       [displayWith]="displayCliente"
-      (optionSelected)="seleccionarCliente($event.option.value)">
+      (optionSelected)="seleccionarCliente($event.option.value)"
+    >
       <mat-option *ngFor="let c of clientesFiltrados" [value]="c">
         <div class="autocomplete-option">
           <mat-icon>person</mat-icon>

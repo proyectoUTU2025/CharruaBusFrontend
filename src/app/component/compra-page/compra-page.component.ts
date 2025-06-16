@@ -358,10 +358,9 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     });
   }
 
-
-
   displayCliente(cliente: UsuarioDto): string {
-    return cliente ? `${cliente.nombre} ${cliente.apellido}` : '';
+    if (!cliente) return '';
+    return `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.trim();
   }
 
   seleccionarCliente(cliente: UsuarioDto): void {

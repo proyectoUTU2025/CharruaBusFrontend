@@ -69,27 +69,31 @@ export class UserService {
     return firstValueFrom(
       this.http
         .post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
-    ).then(resp => resp.data);  
+    ).then(resp => resp.data);
   }
   
   getById(id: number): Promise<UsuarioDto> {
     return firstValueFrom(
-      this.http.get<ApiResponse<UsuarioDto>>(`${environment.apiBaseUrl}/usuarios/${id}`)
+      this.http.get<ApiResponse<UsuarioDto>>(`${this.base}/${id}`)
     ).then(resp => resp.data);
   }
 
   buscarPorEmail(email: string) {
     return firstValueFrom(
-      this.http.get<UsuarioDto>(`${environment.apiBaseUrl}/usuarios/buscar?email=${email}`)
+      this.http.get<UsuarioDto>(`${this.base}/buscar?email=${email}`)
     );
   }
+
   buscarClientes(query: string, page = 0, size = 5): Observable<UsuarioDto[]> {
-    return this.http.get<ApiResponse<Page<UsuarioDto>>>(
-      `${environment.apiBaseUrl}/usuarios/buscar-cliente?query=${query}&page=${page}&size=${size}`
-    ).pipe(
-      map(resp => resp.data?.content ?? [])
-    );
+    const params = new HttpParams()
+      .set('query', query)
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', 'email,ASC');
+
+    return this.http.get<Page<UsuarioDto>>(`${this.base}/buscar-cliente`, { params })
+      .pipe(
+        map(resp => resp.content ?? [])
+      );
   }
-
-
 }

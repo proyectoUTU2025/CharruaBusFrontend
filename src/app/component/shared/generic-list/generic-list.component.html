@@ -8,20 +8,27 @@
     <tr *ngFor="let row of data">
       <td *ngFor="let col of columns">
 
-        <ng-container *ngIf="col.field.toLowerCase().includes('fecha'); else checkAccion">
+
+        <ng-container *ngIf="col.field.toLowerCase().includes('fecha'); else checkActions">
           {{ row[col.field] | date:'short' }}
         </ng-container>
 
-
-        <ng-template #checkAccion>
+        <ng-template #checkActions>
           <ng-container *ngIf="col.field === 'acciones'; else normalCell">
-            <button mat-button (click)="action.emit(row.id)">Ver detalle</button>
+            <button mat-button (click)="action.emit(row.id)">
+              Ver detalle
+            </button>
+            <button mat-button *ngIf="row.estadoPasaje === 'COMPLETADO'" (click)="refund.emit(row.id)">
+              Devolver
+            </button>
           </ng-container>
         </ng-template>
+
 
         <ng-template #normalCell>
           {{ row[col.field] }}
         </ng-template>
+
       </td>
     </tr>
     <tr *ngIf="data.length === 0">

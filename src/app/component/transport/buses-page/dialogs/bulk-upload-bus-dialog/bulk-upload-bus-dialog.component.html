@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Alta Masiva de Ómnibus</h2>
+
+<mat-dialog-content class="bulk-content">
+    <p class="intro">Cargue un archivo CSV con los datos de los ómnibus a crear.</p>
+
+    <div class="dropzone-wrapper" (drop)="onFileDrop($event)" (dragover)=" $event.preventDefault() "
+        (click)="fileInput.click()">
+        <div class="icon-wrapper">
+            <mat-icon>upload_file</mat-icon>
+        </div>
+        <div class="dropzone">
+            <p class="drop-text">Arrastre y suelte su archivo CSV aquí</p>
+            <p class="drop-text">o haga clic para seleccionar un archivo</p>
+            <input #fileInput type="file" accept=".csv" (change)="onFileSelect($event)" hidden />
+            <p *ngIf="file" class="filename">{{ file.name }}</p>
+        </div>
+    </div>
+
+    <p class="template">
+        ¿No tiene un archivo CSV?
+        <button mat-button class="template-btn" (click)="downloadTemplate()">
+            <mat-icon>download</mat-icon>
+            Descargar Plantilla
+        </button>
+    </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
+    <button mat-flat-button class="process-btn" [disabled]="!file" (click)="process()">Procesar Archivo</button>
+</mat-dialog-actions>

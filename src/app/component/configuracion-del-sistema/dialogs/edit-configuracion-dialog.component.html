@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Editar Configuración</h2>
+
+<mat-dialog-content [formGroup]="form">
+    <mat-form-field class="full-width">
+        <mat-label>Parámetro</mat-label>
+        <input matInput formControlName="nombre" [disabled]="true" />
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Valor (número)</mat-label>
+        <input matInput type="number" formControlName="valorInt" />
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Valor (texto)</mat-label>
+        <input matInput formControlName="valor" />
+    </mat-form-field>
+
+    <div *ngIf="form.errors?.['oneOfTwo']" class="error">
+        Debe especificar valor numérico o de texto, pero no ambos.
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-stroked-button (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="save()" [disabled]="!form.valid">
+        Guardar
+    </button>
+</mat-dialog-actions>

@@ -61,4 +61,10 @@ export class PasajeService {
     descargarPdf(pasajeId: number): Observable<Blob> {
         return this.http.get(`${this.base}/${pasajeId}/pdf`, { responseType: 'blob' });
     }
+
+    reembolsarPasaje(pasajeId: number): Observable<string> {
+        return this.http
+            .post<ApiResponse<string>>(`${this.base}/${pasajeId}/reembolsar`, {})
+            .pipe(map(resp => resp.data));
+    }
 }

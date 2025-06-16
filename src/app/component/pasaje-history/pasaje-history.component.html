@@ -40,5 +40,6 @@
 <div *ngIf="error" class="error">{{ error }}</div>
 
 <app-generic-list *ngIf="!loading && !error" [columns]="columns" [data]="pasajes" [totalElements]="totalElements"
-  [pageSize]="pageSize" [pageIndex]="pageIndex" (pageChange)="onPageChange($event)" (action)="openDetalle($event)">
+  [pageSize]="pageSize" [pageIndex]="pageIndex" (pageChange)="onPageChange($event)" (action)="openDetalle($event)"
+  (refund)="devolver($event)">
 </app-generic-list>

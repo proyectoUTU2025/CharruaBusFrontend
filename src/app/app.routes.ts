@@ -14,6 +14,7 @@ import { ProfilePageComponent } from './component/profile-page/profile-page.comp
 import { PasajeHistoryComponent } from './component/pasaje-history/pasaje-history.component';
 import { ChangePasswordComponent } from './component/change-password/change-password.component';
 import { AuthGuard } from './core/auth/auth.guard';
+import { EditUserDialogComponent } from './component/users-page/dialogs/edit-user-dialog/edit-user-dialog.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -33,6 +34,7 @@ export const routes: Routes = [
       { path: 'viajes', component: ViajesPageComponent },
       { path: 'comprar', component: CompraPageComponent },
       { path: 'perfil', component: ProfilePageComponent },
+      { path: 'perfil/editar', component: EditUserDialogComponent },
       { path: 'pasajes', component: PasajeHistoryComponent },
       { path: 'change-password', component: ChangePasswordComponent },
     ]

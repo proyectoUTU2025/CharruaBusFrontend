@@ -19,7 +19,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: '', component: CompraPageComponent },
-      { path: 'users', component: UsersPageComponent },
+      { path: 'usuarios', component: UsersPageComponent },
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },      

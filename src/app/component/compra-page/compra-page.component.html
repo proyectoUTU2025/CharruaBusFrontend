@@ -2,8 +2,14 @@
   <mat-step label="Búsqueda" [completed]="step > 0"></mat-step>
   <mat-step label="Seleccionar viaje" [completed]="step > 1"></mat-step>
   <mat-step label="Pasajeros" [completed]="step > 2"></mat-step>
-  <mat-step label="Resumen" [completed]="step > 3"></mat-step>
-  <mat-step label="Pago" [completed]="step > 4"></mat-step>
+  <ng-container *ngIf="tipoViaje === 'IDA'">
+    <mat-step label="Resumen" [completed]="step > 3"></mat-step>
+  </ng-container>
+  <ng-container *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
+    <mat-step label="Viaje vuelta" [completed]="step > 3"></mat-step>
+    <mat-step label="Asientos vuelta" [completed]="step > 4"></mat-step>
+    <mat-step label="Resumen" [completed]="step > 5"></mat-step>
+  </ng-container>
 </mat-horizontal-stepper>
 
 <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="cambiarTipoViaje($event)" class="tabs">
@@ -93,20 +99,47 @@
     </div>
   </ng-container>
 
+  <!-- VENDEDOR -->
   <ng-container *ngIf="loginService.rol === 'VENDEDOR'">
-    <h3>Buscar Cliente por Email</h3>
-    <mat-form-field appearance="fill">
-      <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="searchEmail" />
-    </mat-form-field>
-    <button mat-stroked-button color="primary" (click)="buscarUsuarioPorEmail()">Buscar</button>
+    <h3>Buscar Cliente</h3>
 
-    <div class="datos-cliente" *ngIf="userInfo">
-      <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
-      <p><strong>Email:</strong> {{ userInfo.email }}</p>
-      <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
-    </div>
+    <mat-form-field appearance="fill" class="autocomplete-field">
+      <mat-label>Buscar cliente</mat-label>
+      <input
+        type="text"
+        matInput
+        [(ngModel)]="searchTerm"
+        (input)="buscarClientes()"
+        [matAutocomplete]="auto"
+        autocomplete="off"
+      />
+    </mat-form-field>
+
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayCliente"
+      (optionSelected)="seleccionarCliente($event.option.value)"
+    >
+      <mat-option *ngFor="let c of clientesFiltrados" [value]="c">
+        <div class="autocomplete-option">
+          <mat-icon>person</mat-icon>
+          {{ c.nombre }} {{ c.apellido }} ({{ c.documento }})
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+
+    <mat-card class="ficha-cliente" *ngIf="userInfo">
+      <mat-card-title>{{ userInfo.nombre }} {{ userInfo.apellido }}</mat-card-title>
+      <mat-card-content>
+        <p><strong>Email:</strong> {{ userInfo.email }}</p>
+        <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+        <p><strong>Tipo:</strong> {{ userInfo.tipoDocumento }}</p>
+        <p><strong>Categoría:</strong> {{ userInfo.situacionLaboral || 'No especificada' }}</p>
+      </mat-card-content>
+    </mat-card>
   </ng-container>
+
+
 
   <div class="info-asientos">
     Asientos seleccionados: {{ selectedSeats?.join(', ') || 'Ninguno' }}
@@ -117,7 +150,26 @@
   </div>
 </mat-card>
 
-<mat-card class="viajes-card" *ngIf="step === 3"> 
+
+<!-- Paso 3: Selección de viaje vuelta (IDA_Y_VUELTA) -->
+<mat-card class="viajes-card" *ngIf="step === 3 && tipoViaje === 'IDA_Y_VUELTA'">
+  <h3>Seleccione viaje de vuelta</h3>
+  <div *ngFor="let v of viajesVuelta"
+       class="viaje-item"
+       [class.selected]="v.seleccionado"
+       (click)="seleccionarViaje(v, true)">
+    <div class="ruta"><strong>{{ v.origen }}</strong> → <strong>{{ v.destino }}</strong></div>
+    <div class="horario">
+      <mat-icon>schedule</mat-icon>
+      {{ v.fechaHoraSalida | date:'shortTime' }} - {{ v.fechaHoraLlegada | date:'shortTime' }}
+      · {{ calcularDuracion(v.fechaHoraSalida, v.fechaHoraLlegada) }}
+    </div>
+    <div class="info">{{ v.asientosDisponibles }} asientos disponibles · ${{ v.precioEstimado }}</div>
+  </div>
+</mat-card>
+
+<!-- Paso 3: Resumen (IDA) -->
+<mat-card class="viajes-card" *ngIf="step === 3 && tipoViaje === 'IDA'">
   <div class="info-cliente" *ngIf="userInfo">
     <h4>Información del Cliente</h4>
     <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
@@ -135,9 +187,9 @@
 
   <div class="info-pago">
     <h4>Detalle del Pago</h4>
-    <p><strong>Ruta:</strong> {{ viajeSeleccionado?.origen }} → {{ viajeSeleccionado?.destino }}</p>
-    <p><strong>Pasaje:</strong> ${{ viajeSeleccionado?.precioEstimado }}</p>    
-    <p><strong>Total:</strong> ${{ selectedSeats.length * 250 }}</p>
+    <p><strong>Ruta:</strong> {{ viajeIdaSeleccionado?.origen }} → {{ viajeIdaSeleccionado?.destino }}</p>
+    <p><strong>Pasaje:</strong> ${{ viajeIdaSeleccionado?.precioEstimado }}</p>
+    <p><strong>Total:</strong> ${{ selectedSeats.length * (viajeIdaSeleccionado?.precioEstimado || 0) }}</p>
   </div>
 
   <div class="filters-actions">
@@ -145,7 +197,52 @@
   </div>
 </mat-card>
 
-<mat-card class="redirect-card" *ngIf="step === 5">
+<!-- Paso 4: Asientos vuelta (IDA_Y_VUELTA) -->
+<mat-card class="viajes-card" *ngIf="step === 4 && tipoViaje === 'IDA_Y_VUELTA'">
+  <div class="info-asientos">
+    <h4>Asientos viaje de vuelta</h4>
+    Asientos seleccionados: {{ selectedSeatsVuelta?.join(', ') || 'Ninguno' }}
+  </div>
+  <div class="filters-actions">
+    <button mat-stroked-button class="outline-btn" (click)="abrirDialogPasajeros(true)">Seleccionar Asientos</button>
+  </div>
+</mat-card>
+
+<!-- Paso 5: Resumen (IDA_Y_VUELTA) -->
+<mat-card class="viajes-card" *ngIf="step === 5 && tipoViaje === 'IDA_Y_VUELTA'">
+  <div class="info-cliente" *ngIf="userInfo">
+    <h4>Información del Cliente</h4>
+    <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+    <p><strong>Email:</strong> {{ userInfo.email }}</p>
+    <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+    <p><strong>Tipo:</strong> {{ userInfo.rol }}</p>
+  </div>
+
+  <div class="info-asientos">
+    <h4>Asientos Seleccionados</h4>
+    <ul>
+      <li *ngFor="let a of selectedSeats">Asiento Ida {{ a }}</li>
+      <li *ngFor="let a of selectedSeatsVuelta">Asiento Vuelta {{ a }}</li>
+    </ul>
+  </div>
+
+  <div class="info-pago">
+    <h4>Detalle del Pago</h4>
+    <p><strong>Ruta Ida:</strong> {{ viajeIdaSeleccionado?.origen }} → {{ viajeIdaSeleccionado?.destino }}</p>
+    <p><strong>Ruta Vuelta:</strong> {{ viajeVueltaSeleccionado?.origen }} → {{ viajeVueltaSeleccionado?.destino }}</p>
+    <p><strong>Total:</strong>
+      ${{ (viajeIdaSeleccionado?.precioEstimado || 0) * selectedSeats.length +
+          (viajeVueltaSeleccionado?.precioEstimado || 0) * selectedSeatsVuelta.length }}
+    </p>
+  </div>
+
+  <div class="filters-actions">
+    <button mat-raised-button class="outline-btn" (click)="confirmarCompra()">Proceder al Pago</button>
+  </div>
+</mat-card>
+
+<!-- Paso 6: Resultado final (IDA_Y_VUELTA) -->
+<mat-card class="redirect-card" *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 6">
   <div *ngIf="estadoCompra === 'exito'" class="success-box">
     <h2>✅ ¡Compra Realizada con Éxito!</h2>
     <p>Tu pago fue procesado. Recibirás el ticket por correo.</p>
@@ -169,7 +266,8 @@
 </mat-card>
 
 <!-- Botones de paso -->
-<div class="step-buttons" *ngIf="step < 5">
+<div class="step-buttons"
+     *ngIf="(tipoViaje === 'IDA' && step < 4) || (tipoViaje === 'IDA_Y_VUELTA' && step < 6)">
   <button mat-flat-button (click)="anteriorPaso()" [disabled]="step === 0">Anterior</button>
   <button mat-flat-button color="primary" (click)="siguientePaso()" [disabled]="!puedeAvanzar()">Siguiente</button>
 </div>

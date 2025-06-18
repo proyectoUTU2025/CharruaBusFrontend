@@ -30,7 +30,7 @@ export class OmnibusHistoryComponent implements OnChanges {
     pageIndex = 0;
     pageSize = 5;
 
-    @ViewChild('paginator') paginator!: any;
+    @ViewChild('paginator') paginator!: MatPaginator;
 
     localidades: any[] = [];
     localidadesMap: Record<number, string> = {};

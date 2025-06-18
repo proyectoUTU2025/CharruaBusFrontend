@@ -326,7 +326,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     }
   }
 
-
   anteriorPaso(): void {
     if (this.step > 0 && this.step < 6) {
       this.step--;

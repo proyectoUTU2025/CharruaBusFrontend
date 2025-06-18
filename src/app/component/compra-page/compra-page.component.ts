@@ -18,7 +18,7 @@ import { CompraRequestDto } from '../../models/compra';
 import { ViajeService } from '../../services/viaje.service';
 import { CompraViajeDto } from '../../models/viajes';
 import { SeatsComponent } from '../seats/seats.component';
-import { PurchaseSummaryDialogComponent, SummaryDialogData } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
+import { PurchaseSummaryDialogComponent } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
 import { LocalidadService } from '../../services/localidades.service';
 import { CompraService } from '../../services/compra.service';
 import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
@@ -66,16 +66,12 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   viajes: CompraViajeSeleccionable[] = [];
   selectedSeats: number[] = [];
   viajeSeleccionado: CompraViajeDto | null = null;
-
   userInfo: UsuarioDto | null = null;
-  searchEmail: string = '';
-
+  searchEmail = '';
   totalElements = 0;
   pageSize = 5;
   pageIndex = 0;
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   mostrarErrorOrigen = false;
   mostrarErrorDestino = false;
   origenError = '';
@@ -100,26 +96,17 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
       fechaVuelta: [null],
       pasajeros: [1, [Validators.min(1), Validators.max(5)]]
     });
-
     this.pasajerosForm = this.fb.group({ pasajeros: this.fb.array([]) });
     this.generarFormularioPasajeros(this.searchForm.value.pasajeros);
     this.searchForm.get('pasajeros')!.valueChanges.subscribe(n => this.generarFormularioPasajeros(n));
-
     this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
       this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
-
-
-
     if (this.authService.rol === 'CLIENTE') {
       const id = this.authService.id;
       if (id) {
-        this.userService.getById(id).then(data => {
-          this.userInfo = data;
-        }).catch(() => {
-          this.userInfo = null;
-        });
+        this.userService.getById(id).then(data => this.userInfo = data).catch(() => this.userInfo = null);
       }
     }
   }
@@ -144,11 +131,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   buscarUsuarioPorEmail(): void {
     if (!this.searchEmail.trim()) return;
-    this.userService.buscarPorEmail(this.searchEmail).then(usuario => {
-      this.userInfo = usuario;
-    }).catch(() => {
-      this.userInfo = null;
-    });
+    this.userService.buscarPorEmail(this.searchEmail).then(usuario => this.userInfo = usuario).catch(() => this.userInfo = null);
   }
 
   cambiarTipoViaje(index: number): void {
@@ -161,41 +144,24 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
     this.origenError = '';
     this.destinoError = '';
     this.fechaError = '';
-
     const f = this.searchForm.value;
-
-    if (!f.localidadOrigenId) {
-      this.origenError = 'Debe seleccionar un origen.';
-    }
-
-    if (!f.localidadDestinoId) {
-      this.destinoError = 'Debe seleccionar un destino.';
-    }
-
-    if (!f.fechaDesde) {
-      this.fechaError = 'Debe seleccionar una fecha de ida.';
-    }
-
+    if (!f.localidadOrigenId) this.origenError = 'Debe seleccionar un origen.';
+    if (!f.localidadDestinoId) this.destinoError = 'Debe seleccionar un destino.';
+    if (!f.fechaDesde) this.fechaError = 'Debe seleccionar una fecha de ida.';
     if (this.origenError || this.destinoError || this.fechaError) return;
-
     this.pageIndex = 0;
     this.buscarConPaginacion();
   }
 
   buscarConPaginacion(): void {
     const f = this.searchForm.value;
-
-    if (!f.fechaDesde) {
-      alert('Por favor, ingrese una fecha de ida.');
-      return;
-    }
+    if (!f.fechaDesde) return;
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,
       fechaViaje: this.formatFecha(f.fechaDesde),
       cantidadPasajes: f.pasajeros
     };
-
     this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize)
       .then(page => {
         this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
@@ -228,29 +194,14 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
 
   abrirDialogPasajeros(): void {
     if (!this.viajeSeleccionado) return;
-
     const pasajeros = this.searchForm.value.pasajeros;
     const viajeId = this.viajeSeleccionado.idViaje;
     const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
-
-    if (!viajeId || !cantidadAsientos) {
-      console.error('No se pudo abrir el diálogo por falta de datos:', {
-        viajeId,
-        cantidadAsientos
-      });
-      return;
-    }
-
+    if (!viajeId || !cantidadAsientos) return;
     const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
       width: '600px',
-      data: {
-        pasajeros,
-        viajeId,
-        cantidadAsientos,
-        precio: this.viajeSeleccionado?.precioEstimado
-      }
+      data: { pasajeros, viajeId, cantidadAsientos, precio: this.viajeSeleccionado.precioEstimado }
     });
-
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.selectedSeats = result.asientos;
@@ -258,6 +209,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
       }
     });
   }
+
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const clienteId = this.userInfo?.id || 0;
@@ -283,9 +235,7 @@ export class CompraPageComponent implements OnInit, AfterViewChecked {
   }
 
   anteriorPaso(): void {
-    if (this.step > 0) {
-      this.step--;
-    }
+    if (this.step > 0) this.step--;
   }
 
   puedeAvanzar(): boolean {

@@ -23,7 +23,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: CompraPageComponent },
       { path: 'configuracion', component: ConfiguracionDelSistemaComponent },
-      { path: 'users', component: UsersPageComponent },
+      { path: 'usuarios', component: UsersPageComponent },
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'omnibus/:id', component: BusDetailComponent },
       { path: 'localidades', component: LocalidadesPageComponent },

@@ -67,11 +67,13 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   localidades: any[] = [];
   destinos: any[] = [];
   viajes: CompraViajeSeleccionable[] = [];
+  viajesVuelta: CompraViajeSeleccionable[] = [];
   selectedSeats: number[] = [];
-  viajeSeleccionado: CompraViajeDto | null = null;
+  selectedSeatsVuelta: number[] = [];
+  viajeIdaSeleccionado: CompraViajeDto | null = null;
+  viajeVueltaSeleccionado: CompraViajeDto | null = null;
   searchTerm: string = '';
   clientesFiltrados: UsuarioDto[] = [];
-
   userInfo: UsuarioDto | null = null;
   searchEmail: string = '';
 
@@ -81,8 +83,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('auto') auto!: MatAutocomplete;
-  mostrarErrorOrigen = false;
-  mostrarErrorDestino = false;
+
   origenError = '';
   destinoError = '';
   fechaError = '';
@@ -122,9 +123,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       if (id) {
         this.userService.getById(id).then(data => {
           this.userInfo = data;
-        }).catch(() => {
-          this.userInfo = null;
-        });
+        }).catch(() => this.userInfo = null);
       }
     }
   }
@@ -136,19 +135,16 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     if (url.includes('compras/exito') && estado === 'exito') {
       this.estadoCompra = 'exito';
       this.step = 5;
-      this.completedSteps = [true, true, true, true, true];
     }
 
     if (url.includes('compras/cancelada') && estado === 'cancelado') {
       this.estadoCompra = 'cancelado';
       this.step = 5;
-      this.completedSteps = [true, true, true, true, true];
     }
 
     if (url.includes('compras/cancelada') && estado === 'error') {
       this.estadoCompra = 'error';
       this.step = 5;
-      this.completedSteps = [true, true, true, true, true];
     }
   }
 
@@ -170,19 +166,12 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.pasajerosForm.setControl('pasajeros', array);
   }
 
-  buscarUsuarioPorEmail(): void {
-    if (!this.searchEmail.trim()) return;
-    this.userService.buscarPorEmail(this.searchEmail).then(usuario => {
-      this.userInfo = usuario;
-    }).catch(() => {
-      this.userInfo = null;
-    });
-  }
-
   cambiarTipoViaje(index: number): void {
     this.tipoViaje = index === 0 ? 'IDA' : 'IDA_Y_VUELTA';
     this.selectedTabIndex = index;
     this.searchForm.get('fechaVuelta')?.reset();
+    this.step = 0;
+    this.completedSteps = Array(this.tipoViaje === 'IDA' ? 5 : 7).fill(false);
   }
 
   buscar(): void {
@@ -214,13 +203,32 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       cantidadPasajes: f.pasajeros
     };
 
-    this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize)
-      .then(page => {
-        this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
-        this.totalElements = page.totalElements;
-        this.step = 1;
-      });
+    this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize).then(page => {
+      this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
+      this.totalElements = page.totalElements;
+      this.step = 1;
+    });
   }
+
+  buscarViajesVuelta(): void {
+    const f = this.searchForm.value;
+    const filtro = {
+      idLocalidadOrigen: f.localidadDestinoId,
+      idLocalidadDestino: f.localidadOrigenId,
+      fechaViaje: this.formatFecha(f.fechaVuelta),
+      cantidadPasajes: f.pasajeros
+    };
+
+    const fechaLlegadaIda = new Date(this.viajeIdaSeleccionado?.fechaHoraLlegada || '');
+
+    this.viajeService.buscarDisponibles(filtro, 0, 10).then(page => {
+      this.viajesVuelta = page.content
+        .filter(v => new Date(v.fechaHoraSalida) > fechaLlegadaIda)
+        .map(v => ({ ...v, seleccionado: false }));
+      this.step = 3;
+    });
+  }
+
 
   cambiarPagina(event: any): void {
     this.pageIndex = event.pageIndex;
@@ -232,41 +240,51 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.searchForm.reset({ pasajeros: 1 });
     this.destinos = this.localidades;
     this.viajes = [];
+    this.viajesVuelta = [];
+    this.selectedSeats = [];
+    this.selectedSeatsVuelta = [];
+    this.viajeIdaSeleccionado = null;
+    this.viajeVueltaSeleccionado = null;
     this.step = 0;
-    this.viajeSeleccionado = null;
-    this.completedSteps = [false, false, false, false, false];
+    this.completedSteps = Array(this.tipoViaje === 'IDA' ? 5 : 7).fill(false);
   }
 
-  seleccionarViaje(v: CompraViajeSeleccionable): void {
-    this.viajes.forEach(viaje => viaje.seleccionado = false);
-    v.seleccionado = true;
-    this.viajeSeleccionado = v;
-    this.completedSteps[1] = true;
+  seleccionarViaje(v: CompraViajeSeleccionable, esVuelta: boolean = false): void {
+    if (esVuelta) {
+      this.viajesVuelta.forEach(viaje => viaje.seleccionado = false);
+      v.seleccionado = true;
+      this.viajeVueltaSeleccionado = v;
+      this.completedSteps[3] = true;
+    } else {
+      this.viajes.forEach(viaje => viaje.seleccionado = false);
+      v.seleccionado = true;
+      this.viajeIdaSeleccionado = v;
+      this.completedSteps[1] = true;
+    }
   }
 
-  abrirDialogPasajeros(): void {
-    if (!this.viajeSeleccionado) return;
+  abrirDialogPasajeros(esVuelta: boolean = false): void {
+    const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
+    if (!viaje) return;
 
     const pasajeros = this.searchForm.value.pasajeros;
-    const viajeId = this.viajeSeleccionado.idViaje;
-    const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
-
-    if (!viajeId || !cantidadAsientos) return;
+    const viajeId = viaje.idViaje;
+    const cantidadAsientos = viaje.asientosDisponibles;
 
     const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
       width: '600px',
-      data: {
-        pasajeros,
-        viajeId,
-        cantidadAsientos,
-        precio: this.viajeSeleccionado?.precioEstimado
-      }
+      data: { pasajeros, viajeId, cantidadAsientos, precio: viaje.precioEstimado }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.selectedSeats = result.asientos;
-        this.completedSteps[2] = true;
+        if (esVuelta) {
+          this.selectedSeatsVuelta = result.asientos;
+          this.completedSteps[4] = true;
+        } else {
+          this.selectedSeats = result.asientos;
+          this.completedSteps[2] = true;
+        }
       }
     });
   }
@@ -274,39 +292,59 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const clienteId = this.userInfo?.id || 0;
+
     const dto: CompraRequestDto = {
-      viajeIdaId: this.viajeSeleccionado?.idViaje || 0,
-      viajeVueltaId: null,
+      viajeIdaId: this.viajeIdaSeleccionado?.idViaje || 0,
+      viajeVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? this.viajeVueltaSeleccionado?.idViaje : null,
       asientosIda: this.selectedSeats,
-      asientosVuelta: undefined,
+      asientosVuelta: this.tipoViaje === 'IDA_Y_VUELTA' ? this.selectedSeatsVuelta : undefined,
       clienteId,
       localidadOrigenId: f.localidadOrigenId,
       localidadDestinoId: f.localidadDestinoId,
-      paradaOrigenVueltaId: null,
-      paradaDestinoVueltaId: null
+      paradaOrigenVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadDestinoId : null,
+      paradaDestinoVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadOrigenId : null
     };
+
+    console.log('DTO enviado al backend:', dto);
     this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
   }
 
-  siguientePaso(): void {
-    if (this.step === 4) return; // No permitir avanzar manualmente al paso 5
-    if (this.puedeAvanzar() && this.step < this.completedSteps.length) {
+
+ siguientePaso(): void {
+    if (this.step === 4 && this.tipoViaje === 'IDA') return;
+
+    if (this.puedeAvanzar()) {
       this.completedSteps[this.step] = true;
-      this.step++;
+
+      // Si es viaje de ida y vuelta y estamos por entrar al paso 3 (viaje vuelta)
+      if (this.tipoViaje === 'IDA_Y_VUELTA' && this.step === 2) {
+        this.step++; // avanzamos al paso 3
+        this.buscarViajesVuelta(); // y ahora sí hacemos la búsqueda
+      } else {
+        this.step++;
+      }
     }
   }
 
+
   anteriorPaso(): void {
-    if (this.step > 0 && this.step < 5) {
+    if (this.step > 0 && this.step < 6) {
       this.step--;
     }
   }
 
   puedeAvanzar(): boolean {
     if (this.step === 0) return this.searchForm.valid;
-    if (this.step === 1) return this.viajeSeleccionado !== null;
+    if (this.step === 1) return this.viajeIdaSeleccionado !== null;
     if (this.step === 2) return this.selectedSeats.length > 0;
-    if (this.step === 3) return false; // Deshabilita avanzar desde "Resumen"
+    if (this.tipoViaje === 'IDA_Y_VUELTA') {
+      if (this.step === 3) return this.viajeVueltaSeleccionado !== null;
+      if (this.step === 4) return this.selectedSeatsVuelta.length > 0;
+      if (this.step === 5) return false;
+    }
+    if (this.tipoViaje === 'IDA') {
+      if (this.step === 3) return false;
+    }
     return true;
   }
 
@@ -349,10 +387,8 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.userService.buscarClientes(query, 0, 5).subscribe({
       next: (clientes) => {
         this.clientesFiltrados = clientes;
-        console.log('Clientes filtrados:', this.clientesFiltrados);
       },
-      error: (e) => {
-        console.error('Error buscando clientes', e);
+      error: () => {
         this.clientesFiltrados = [];
       }
     });

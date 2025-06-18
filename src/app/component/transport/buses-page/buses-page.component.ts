@@ -54,7 +54,7 @@ export class BusesPageComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private busService: BusService,
-        private LocalidadService: LocalidadService,
+        private localidadService: LocalidadService,
         private dialog: MatDialog,
         private snackBar: MatSnackBar,
         private router: Router
@@ -69,7 +69,7 @@ export class BusesPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.LocalidadService.getAll({}, 0, 1000).subscribe({
+        this.localidadService.getAll({}, 0, 1000).subscribe({
             next: page => this.localidades = page.content,
             error: err => console.error('Error cargando localidades:', err)
         });

@@ -6,7 +6,7 @@ import { MovimientoOmnibusDto } from '../../../../../models/movimiento-omnibus/m
 import { Page } from '../../../../../models';
 import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
     standalone: true,

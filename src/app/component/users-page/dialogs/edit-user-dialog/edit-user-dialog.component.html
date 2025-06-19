@@ -1,43 +1,59 @@
-<h2 mat-dialog-title>Editar Usuario</h2>
+<div class="edit-container" *ngIf="!loading; else loadingTpl">
+  <h2>Editar Perfil</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" />
+      <mat-error *ngIf="form.get('nombre')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
 
-<form [formGroup]="form" mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>Nombre</mat-label>
-    <input matInput formControlName="nombre" />
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="apellido" />
+      <mat-error *ngIf="form.get('apellido')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Correo</mat-label>
-    <input matInput formControlName="email" />
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Fecha de Nacimiento</mat-label>
+      <input matInput type="date" formControlName="fechaNacimiento" />
+      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Documento</mat-label>
-    <input matInput formControlName="documento" />
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Tipo de Documento</mat-label>
+      <mat-select formControlName="tipoDocumento">
+        <mat-option *ngFor="let t of tiposDocumento" [value]="t.value">
+          {{ t.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('tipoDocumento')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Fecha de Nacimiento</mat-label>
-    <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" />
-    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Documento</mat-label>
+      <input matInput formControlName="documento" />
+      <mat-error *ngIf="form.get('documento')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Rol</mat-label>
-    <mat-select formControlName="rol">
-      <mat-option value="Administrador">Administrador</mat-option>
-      <mat-option value="Vendedor">Vendedor</mat-option>
-      <mat-option value="Cliente">Cliente</mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Situación Laboral</mat-label>
+      <mat-select formControlName="situacionLaboral">
+        <mat-option value="">— Ninguna —</mat-option>
+        <mat-option *ngFor="let s of situacionesLaborales" [value]="s.value">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <div class="checkbox-field">
-    <mat-checkbox formControlName="activo">Usuario activo</mat-checkbox>
-  </div>
-</form>
+    <div *ngIf="error" class="error">{{ error }}</div>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button class="massive-btn" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="create-btn" (click)="save()">Guardar</button>
-</mat-dialog-actions>
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Guardar</button>
+      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading">Cargando datos…</div>
+</ng-template>

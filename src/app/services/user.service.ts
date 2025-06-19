@@ -10,6 +10,7 @@ import {
 } from '../models';
 import { BulkResponseDto } from '../models/bulk/bulk-response.dto';
 import { ChangePasswordRequestDto } from '../models/auth/change-password-request.dto';
+import { EditarUsuarioRequestDto } from '../models/users/editar-usuario-request.dto';
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
 
@@ -29,7 +30,6 @@ export class UserService {
       .set('page', page.toString())
       .set('size', size.toString())
       .set('sort', sort);
-
     Object.entries(filtro).forEach(([k, v]) => {
       if (v != null && v !== '') {
         Array.isArray(v)
@@ -37,42 +37,28 @@ export class UserService {
           : (params = params.set(k, v.toString()));
       }
     });
-
-    return firstValueFrom(
-      this.http.get<Page<UsuarioDto>>(this.base, { params })
-    );
+    return firstValueFrom(this.http.get<Page<UsuarioDto>>(this.base, { params }));
   }
 
   getById(id: number): Promise<UsuarioDto> {
-    return firstValueFrom(
-      this.http.get<ApiResponse<UsuarioDto>>(`${this.base}/${id}`)
-    ).then(resp => resp.data);
+    return firstValueFrom(this.http.get<ApiResponse<UsuarioDto>>(`${this.base}/${id}`))
+      .then(resp => resp.data);
   }
 
   create(alta: AltaUsuarioDto): Promise<UsuarioDto> {
-    return firstValueFrom(
-      this.http.post<ApiResponse<UsuarioDto>>(this.base, alta)
-    ).then(resp => resp.data);
-  }
-
-  update(u: UsuarioDto): Promise<UsuarioDto> {
-    return firstValueFrom(
-      this.http.put<ApiResponse<UsuarioDto>>(`${this.base}/${u.id}`, u)
-    ).then(resp => resp.data);
+    return firstValueFrom(this.http.post<ApiResponse<UsuarioDto>>(this.base, alta))
+      .then(resp => resp.data);
   }
 
   delete(id: number): Promise<void> {
-    return firstValueFrom(
-      this.http.delete<void>(`${this.base}/${id}`)
-    );
+    return firstValueFrom(this.http.delete<void>(`${this.base}/${id}`));
   }
 
   bulkUpload(file: File): Promise<BulkResponseDto> {
     const formData = new FormData();
     formData.append('file', file);
-    return firstValueFrom(
-      this.http.post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData)
-    ).then(resp => resp.data);
+    return firstValueFrom(this.http.post<ApiResponse<BulkResponseDto>>(`${this.base}/bulk`, formData))
+      .then(resp => resp.data);
   }
 
   buscarPorEmail(email: string): Promise<UsuarioDto> {
@@ -84,11 +70,18 @@ export class UserService {
   }
 
   changePassword(dto: ChangePasswordRequestDto): Promise<void> {
-    return firstValueFrom(
-      this.http.post<ApiResponse<void>>(
-        `${this.base}/change-password`,
-        dto
-      )
-    ).then(() => { });
+    return firstValueFrom(this.http.post<ApiResponse<void>>(`${this.base}/change-password`, dto))
+      .then(() => { });
+  }
+
+  editProfile(id: number, dto: EditarUsuarioRequestDto): Promise<UsuarioDto> {
+    return firstValueFrom(this.http.patch<ApiResponse<UsuarioDto>>(`${this.base}/${id}`, dto))
+      .then(resp => resp.data);
+  }
+
+  update(updated: UsuarioDto): Promise<UsuarioDto> {
+    const { id, ...dto } = updated;
+    return firstValueFrom(this.http.patch<ApiResponse<UsuarioDto>>(`${this.base}/${id}`, dto))
+      .then(resp => resp.data);
   }
 }

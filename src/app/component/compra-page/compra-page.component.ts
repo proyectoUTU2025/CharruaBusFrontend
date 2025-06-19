@@ -75,12 +75,10 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   searchTerm: string = '';
   clientesFiltrados: UsuarioDto[] = [];
   userInfo: UsuarioDto | null = null;
-  searchEmail: string = '';
-
+  searchEmail = '';
   totalElements = 0;
   pageSize = 5;
   pageIndex = 0;
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('auto') auto!: MatAutocomplete;
 
@@ -108,18 +106,13 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       fechaVuelta: [null],
       pasajeros: [1, [Validators.min(1), Validators.max(5)]]
     });
-
     this.pasajerosForm = this.fb.group({ pasajeros: this.fb.array([]) });
     this.generarFormularioPasajeros(this.searchForm.value.pasajeros);
     this.searchForm.get('pasajeros')!.valueChanges.subscribe(n => this.generarFormularioPasajeros(n));
-
     this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
       this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
     });
-
-
-
     if (this.authService.rol === 'CLIENTE') {
       const id = this.authService.id;
 
@@ -184,7 +177,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.origenError = '';
     this.destinoError = '';
     this.fechaError = '';
-
     const f = this.searchForm.value;
 
     if (!f.localidadOrigenId) this.origenError = 'Debe seleccionar un origen.';
@@ -192,18 +184,13 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     if (!f.fechaDesde) this.fechaError = 'Debe seleccionar una fecha de ida.';
 
     if (this.origenError || this.destinoError || this.fechaError) return;
-
     this.pageIndex = 0;
     this.buscarConPaginacion();
   }
 
   buscarConPaginacion(): void {
     const f = this.searchForm.value;
-
-    if (!f.fechaDesde) {
-      alert('Por favor, ingrese una fecha de ida.');
-      return;
-    }
+    if (!f.fechaDesde) return;
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,
@@ -278,25 +265,11 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     const pasajeros = this.searchForm.value.pasajeros;
     const viajeId = this.viajeSeleccionado.idViaje;
     const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
-
-    if (!viajeId || !cantidadAsientos) {
-      console.error('No se pudo abrir el diálogo por falta de datos:', {
-        viajeId,
-        cantidadAsientos
-      });
-      return;
-    }
-
+    if (!viajeId || !cantidadAsientos) return;
     const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
       width: '600px',
-      data: {
-        pasajeros,
-        viajeId,
-        cantidadAsientos,
-        precio: this.viajeSeleccionado?.precioEstimado
-      }
+      data: { pasajeros, viajeId, cantidadAsientos, precio: this.viajeSeleccionado.precioEstimado }
     });
-
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (esVuelta) {

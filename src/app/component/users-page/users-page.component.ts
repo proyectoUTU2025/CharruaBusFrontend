@@ -69,7 +69,7 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   ngAfterViewInit() {
     this.paginator.page.subscribe(() => this.loadUsers());
@@ -86,10 +86,8 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
       roles: rawFiltro.rol ? [rawFiltro.rol] : undefined,
       activo: rawFiltro.activo
     };
-
     const page = this.paginator?.pageIndex || 0;
     const size = this.paginator?.pageSize || 5;
-
     this.userService.getAll(filtro, page, size)
       .then((resp: Page<UsuarioDto>) => {
         this.usuarios = resp.content;
@@ -104,58 +102,52 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
   }
 
   onClear() {
-    this.filterForm.reset({
-      nombre: '', apellido: '', email: '', documento: '', rol: '', activo: null
-    });
+    this.filterForm.reset({ nombre: '', apellido: '', email: '', documento: '', rol: '', activo: null });
     this.onSearch();
   }
+
   bulkErrors: string[] = [];
+
   openBulkUpload() {
-  this.dialog.open(BulkUploadDialogComponent, { width: '600px' })
-    .afterClosed()
-    .subscribe((file: File | undefined) => {
-      if (file) {
-        this.userService.bulkUpload(file)
-          .then((resp: BulkResponseDto) => {
-            const errores = resp.results.filter((r: BulkLineResult) => !r.creado);
-            if (errores.length > 0) {
-              this.bulkErrors = errores.map((e: BulkLineResult) => `Fila ${e.fila}: ${e.mensaje}`);
-            } else {
-              this.bulkErrors = ['Archivo procesado exitosamente sin errores.'];
-            }
-            this.loadUsers();
-          })
-          .catch(console.error);
-      }
-    });
-}
+    this.dialog.open(BulkUploadDialogComponent, { width: '600px' })
+      .afterClosed()
+      .subscribe((file: File | undefined) => {
+        if (file) {
+          this.userService.bulkUpload(file)
+            .then((resp: BulkResponseDto) => {
+              const errores = resp.results.filter((r: BulkLineResult) => !r.creado);
+              this.bulkErrors = errores.length > 0
+                ? errores.map((e: BulkLineResult) => `Fila ${e.fila}: ${e.mensaje}`)
+                : ['Archivo procesado exitosamente sin errores.'];
+              this.loadUsers();
+            })
+            .catch(console.error);
+        }
+      });
+  }
 
   add() {
-    this.dialog.open(AddUserDialogComponent, {
-      width: '450px', maxHeight: '95vh'
-    })
-    .afterClosed()
-    .subscribe((alta: AltaUsuarioDto) => {
-      if (alta) {
-        this.userService.create(alta)
-          .then(() => this.onSearch())
-          .catch(console.error);
-      }
-    });
+    this.dialog.open(AddUserDialogComponent, { width: '450px', maxHeight: '95vh' })
+      .afterClosed()
+      .subscribe((alta: AltaUsuarioDto) => {
+        if (alta) {
+          this.userService.create(alta)
+            .then(() => this.onSearch())
+            .catch(console.error);
+        }
+      });
   }
 
   edit(u: UsuarioDto) {
-    this.dialog.open(EditUserDialogComponent, {
-      width: '400px', data: u
-    })
-    .afterClosed()
-    .subscribe((updated: UsuarioDto) => {
-      if (updated) {
-        this.userService.update(updated)
-          .then(() => this.onSearch())
-          .catch(console.error);
-      }
-    });
+    this.dialog.open(EditUserDialogComponent, { width: '400px', data: u })
+      .afterClosed()
+      .subscribe((updated: UsuarioDto) => {
+        if (updated) {
+          this.userService.update(updated)
+            .then(() => this.onSearch())
+            .catch(console.error);
+        }
+      });
   }
 
   remove(u: UsuarioDto) {
@@ -163,13 +155,13 @@ export class UsersPageComponent implements OnInit, AfterViewInit {
       width: '400px',
       data: { title: 'Confirmar eliminación', message: `¿Eliminar a ${u.nombre}?` }
     })
-    .afterClosed()
-    .subscribe(ok => {
-      if (ok) {
-        this.userService.delete(u.id)
-          .then(() => this.onSearch())
-          .catch(console.error);
-      }
-    });
+      .afterClosed()
+      .subscribe(ok => {
+        if (ok) {
+          this.userService.delete(u.id)
+            .then(() => this.onSearch())
+            .catch(console.error);
+        }
+      });
   }
 }

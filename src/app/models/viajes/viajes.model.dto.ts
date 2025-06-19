@@ -1,5 +1,5 @@
 export interface ViajeDisponibleDto {
-  idViaje: number;
+  id: number;
   nombreLocalidadOrigen: string;
   nombreLocalidadDestino: string;
   fechaHoraSalida: string;
@@ -48,6 +48,10 @@ export interface DetalleViajeDto {
   fechaHoraSalida: string; 
   fechaHoraLlegada: string;
   precio: number;
+  nombreLocalidadOrigen: string;
+  nombreLocalidadDestino: string;
+  localidadOrigenId: string;
+  localidadDestinoId: string;
   cantidadPasajesVendibles: number;
   cantidadAsientosVendidos: number;
   cantidadAsientosDisponibles: number;

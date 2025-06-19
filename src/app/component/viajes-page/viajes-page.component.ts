@@ -125,11 +125,16 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
     });
   }
   verDetallesViaje(viaje: ViajeDisponibleDto): void {
-    this.dialog.open(ViajeDetalleDialogComponent, {
-      width: '700px',
-      data: { viaje }
-    }).afterClosed().subscribe((cerrado) => {
-      if (cerrado) this.buscar();
+    this.viajeService.getDetalleViaje(viaje.id).then((detalle) => {
+      this.dialog.open(ViajeDetalleDialogComponent, {
+        width: '700px',
+        data: { viaje: detalle }
+      }).afterClosed().subscribe((resultado) => {
+        if (resultado?.reasignado) {
+          this.buscar(); 
+        }
+      });
     });
   }
+
 }

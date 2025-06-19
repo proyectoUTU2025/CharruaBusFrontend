@@ -79,9 +79,11 @@ export class ViajeService {
       });
   }
   reasignar(viajeId: number, body: { nuevoOmnibusId: number, confirm: boolean }): Promise<void> {
-    return firstValueFrom(this.http.put<void>(`${this.baseUrl}/${viajeId}/reasignar`, body));
+    return firstValueFrom(this.http.post<void>(`${this.baseUrl}/${viajeId}/reasignar`, body));
   }
   getDetalleViaje(idViaje: number): Promise<DetalleViajeDto> {
-    return firstValueFrom(this.http.get<DetalleViajeDto>(`${this.baseUrl}/${idViaje}`));
+    return firstValueFrom(
+      this.http.get<{ data: DetalleViajeDto }>(`${this.baseUrl}/${idViaje}`)
+    ).then(resp => resp.data);
   }
 }

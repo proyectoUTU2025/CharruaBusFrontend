@@ -4,12 +4,13 @@ import { DetalleViajeDto } from '../../../../models/viajes';
 import { BusService } from '../../../../services/bus.service';
 import { ViajeService } from '../../../../services/viaje.service';
 import { WarningDialogComponent } from '../warning-dialog/warning-dialog/warning-dialog.component';
-import { OmnibusDisponibleDto } from '../../../../models';
+import { FiltroDisponibilidadOmnibusDto, FiltroDisponibilidadReasOmnibusDto, OmnibusDisponibleDto } from '../../../../models';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
+import { MatRadioModule } from '@angular/material/radio';
 
 
 @Component({
@@ -24,7 +25,8 @@ import { FormsModule } from '@angular/forms';
     MatIconModule,
     MatListModule,
     FormsModule,
-    WarningDialogComponent
+    WarningDialogComponent,
+    MatRadioModule 
   ]
 })
 export class ReasignarOmnibusDialogComponent implements OnInit {
@@ -40,12 +42,22 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const { id } = this.data.viaje;
+    const viaje = this.data.viaje;
 
-    this.busService.getDisponiblesParaReasignar(id).then(buses => {
+    const filtro: FiltroDisponibilidadReasOmnibusDto = {
+      origenId: viaje.paradas[0].localidadId,
+      destinoId: viaje.paradas[viaje.paradas.length - 1].localidadId,
+      fechaHoraSalida: viaje.fechaHoraSalida,
+      fechaHoraLlegada: viaje.fechaHoraLlegada,
+      minAsientos: viaje.cantidadAsientosVendidos + viaje.cantidadAsientosReservados
+    };
+
+    this.busService.getDisponiblesParaReasignacion(filtro).then(buses => {
       this.busesDisponibles = buses;
     });
   }
+
+
 
   confirmarReasignacion(): void {
     if (!this.omnibusSeleccionadoId) return;

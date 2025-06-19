@@ -3,14 +3,16 @@
 </h2>
 
 <mat-dialog-content class="dialog-content">
-  <div class="section">
-    <mat-icon class="section-icon">place</mat-icon>
-    <span><strong>Origen:</strong> {{ data.viaje.nombreLocalidadOrigen }}</span>
-  </div>
+  <div *ngIf="tieneParadas()">
+    <div class="section">
+      <mat-icon class="section-icon">place</mat-icon>
+      <span><strong>Origen:</strong> {{ data.viaje.nombreLocalidadOrigen }}</span>
+    </div>
 
-  <div class="section">
-    <mat-icon class="section-icon">flag</mat-icon>
-    <span><strong>Destino:</strong> {{ data.viaje.nombreLocalidadDestino }}</span>
+    <div class="section">
+      <mat-icon class="section-icon">flag</mat-icon>
+      <span><strong>Destino:</strong> {{ data.viaje.nombreLocalidadDestino }}</span>
+    </div>
   </div>
 
   <div class="section">
@@ -25,12 +27,17 @@
 
   <div class="section">
     <mat-icon class="section-icon">confirmation_number</mat-icon>
-    <span><strong>Asientos disponibles:</strong> {{ data.viaje.asientosDisponibles }}</span>
+    <span><strong>Pasajes disponibles:</strong> {{ pasajesDisponibles }}</span>
   </div>
 
   <div class="section">
     <mat-icon class="section-icon">attach_money</mat-icon>
     <span><strong>Precio por tramo:</strong> {{ data.viaje.precioPorTramo | currency:'USD' }}</span>
+  </div>
+
+  <div class="section">
+    <mat-icon class="section-icon">directions_bus</mat-icon>
+    <span><strong>Ómnibus:</strong> {{ data.viaje.omnibusMatricula }}</span>
   </div>
 </mat-dialog-content>
 

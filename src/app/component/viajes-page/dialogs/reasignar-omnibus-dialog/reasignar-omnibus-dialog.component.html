@@ -5,8 +5,8 @@
 <mat-dialog-content class="dialog-content">
   <p class="subtitle">Seleccione un nuevo ómnibus para el viaje:</p>
 
-  <mat-selection-list [(ngModel)]="omnibusSeleccionadoId" class="bus-list">
-    <mat-list-option *ngFor="let bus of busesDisponibles" [value]="bus.id">
+  <mat-radio-group [(ngModel)]="omnibusSeleccionadoId" class="bus-list">
+    <mat-radio-button *ngFor="let bus of busesDisponibles" [value]="bus.id" class="bus-radio">
       <div class="bus-item">
         <mat-icon class="bus-icon">directions_bus</mat-icon>
         <div class="bus-info">
@@ -14,8 +14,8 @@
           <span class="capacidad">{{ bus.capacidad }} asientos</span>
         </div>
       </div>
-    </mat-list-option>
-  </mat-selection-list>
+    </mat-radio-button>
+  </mat-radio-group>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="dialog-actions">

@@ -153,6 +153,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       destinoId: this.destinoId,
       fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
       fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada)
+      
     };
 
     this.busService.getDisponibles(filtro).then(buses => {

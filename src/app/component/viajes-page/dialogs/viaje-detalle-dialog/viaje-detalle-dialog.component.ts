@@ -3,8 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule, MatDialog } from '@angu
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { OmnibusDisponibleDto } from '../../../../models';
-import { ViajeDisponibleDto } from '../../../../models/viajes';
+import { DetalleViajeDto } from '../../../../models/viajes';
 import { ReasignarOmnibusDialogComponent } from '../reasignar-omnibus-dialog/reasignar-omnibus-dialog.component';
 
 @Component({
@@ -15,10 +14,22 @@ import { ReasignarOmnibusDialogComponent } from '../reasignar-omnibus-dialog/rea
 })
 export class ViajeDetalleDialogComponent {
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { viaje: ViajeDisponibleDto },
+    @Inject(MAT_DIALOG_DATA) public data: { viaje: DetalleViajeDto },
     private dialogRef: MatDialogRef<ViajeDetalleDialogComponent>,
     private dialog: MatDialog
   ) {}
+
+  tieneParadas(): boolean {
+    return this.data.viaje.paradas && this.data.viaje.paradas.length >= 2;
+  }
+
+  get pasajesDisponibles(): number {
+    const v = this.data.viaje;
+    const vendibles = v.cantidadPasajesVendibles ?? 0;
+    const vendidos = v.cantidadAsientosVendidos ?? 0;
+    const reservados = v.cantidadAsientosReservados ?? 0;
+    return vendibles - (vendidos + reservados);
+  }
 
   cerrar() {
     this.dialogRef.close();
@@ -29,7 +40,7 @@ export class ViajeDetalleDialogComponent {
       data: { viaje: this.data.viaje },
       width: '600px'
     }).afterClosed().subscribe(reasignado => {
-      if (reasignado) this.cerrar();
+      if (reasignado) this.dialogRef.close({ reasignado: true });
     });
   }
 }

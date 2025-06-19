@@ -10,16 +10,14 @@ import {
 import { FormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/auth/auth.interceptor';
-import { LoginService } from './services/login.service';
+import { AuthService } from './services/auth.service';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { SpanishPaginatorIntl } from './shared/spanish-paginator-intl';
-
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    importProvidersFrom(BrowserAnimationsModule),
-    importProvidersFrom(FormsModule),
+    importProvidersFrom(BrowserAnimationsModule, FormsModule),
     provideHttpClient(withInterceptorsFromDi()),
     CookieService,
     {
@@ -27,7 +25,7 @@ export const appConfig: ApplicationConfig = {
       useClass: AuthInterceptor,
       multi: true
     },
-    LoginService,
+    AuthService,
     {
       provide: MatPaginatorIntl,
       useValue: SpanishPaginatorIntl

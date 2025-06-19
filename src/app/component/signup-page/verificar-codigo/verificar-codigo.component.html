@@ -4,8 +4,11 @@
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <input type="email" formControlName="email" class="fadeIn first" placeholder="Email" />
-      <input type="text" formControlName="code" class="fadeIn second" placeholder="Código recibido por mail" />
-      <button type="submit" class="login-button fadeIn fourth">Validar</button>
+      <input type="text" formControlName="verificationCode" class="fadeIn second"
+        placeholder="Código recibido por mail" />
+      <button type="submit" class="login-button fadeIn fourth">
+        Validar
+      </button>
     </form>
 
     <div *ngIf="error" class="fadeIn fourth" style="color: red; margin-top: 10px;">

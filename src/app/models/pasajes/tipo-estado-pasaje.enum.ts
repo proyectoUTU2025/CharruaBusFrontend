@@ -1,0 +1,6 @@
+export enum TipoEstadoPasaje {
+    PENDIENTE = 'PENDIENTE',
+    CONFIRMADO = 'CONFIRMADO',
+    CANCELADO = 'CANCELADO',
+    DEVUELTO = 'DEVUELTO'
+}

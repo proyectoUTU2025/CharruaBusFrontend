@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>
+  <mat-icon class="icon">swap_horiz</mat-icon> Reasignar Ómnibus
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p class="subtitle">Seleccione un nuevo ómnibus para el viaje:</p>
+
+  <mat-selection-list [(ngModel)]="omnibusSeleccionadoId" class="bus-list">
+    <mat-list-option *ngFor="let bus of busesDisponibles" [value]="bus.id">
+      <div class="bus-item">
+        <mat-icon class="bus-icon">directions_bus</mat-icon>
+        <div class="bus-info">
+          <span class="matricula">{{ bus.matricula }}</span>
+          <span class="capacidad">{{ bus.capacidad }} asientos</span>
+        </div>
+      </div>
+    </mat-list-option>
+  </mat-selection-list>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="confirmarReasignacion()" [disabled]="!omnibusSeleccionadoId">
+    Confirmar
+  </button>
+</mat-dialog-actions>

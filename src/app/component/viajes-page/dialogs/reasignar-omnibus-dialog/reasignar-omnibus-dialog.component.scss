@@ -1,0 +1,69 @@
+.dialog-content {
+  padding-top: 8px;
+
+  .subtitle {
+    font-size: 16px;
+    margin-bottom: 12px;
+    font-weight: 500;
+    color: #555;
+  }
+
+  .bus-list {
+    max-height: 250px;
+    overflow: auto;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+
+    .mat-list-option {
+      margin-bottom: 4px;
+      border-radius: 6px;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      &.mat-list-item-selected {
+        background-color: #e0d7f3;
+      }
+    }
+
+    .bus-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .bus-icon {
+        color: #675992;
+      }
+
+      .bus-info {
+        display: flex;
+        flex-direction: column;
+
+        .matricula {
+          font-weight: 600;
+        }
+
+        .capacidad {
+          font-size: 12px;
+          color: #777;
+        }
+      }
+    }
+  }
+}
+
+.dialog-actions {
+  margin-top: 16px;
+
+  button {
+    min-width: 100px;
+  }
+}
+
+.icon {
+  vertical-align: middle;
+  margin-right: 8px;
+  color: #675992;
+}

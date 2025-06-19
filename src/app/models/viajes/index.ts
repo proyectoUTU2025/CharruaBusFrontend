@@ -1,1 +1,1 @@
-export * from './viajes';
+export * from './viajes.model.dto';

@@ -24,7 +24,8 @@ export const routes: Routes = [
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },      
       { path: 'compras/exito', component: StripeRedirectComponent},
-      { path: 'compras/cancelada', component: StripeRedirectComponent}
+      { path: 'compras/cancelada', component: StripeRedirectComponent},
+      { path: 'comprar', component:CompraPageComponent}
     ]
   },
   { path: '**', redirectTo: '' }

@@ -56,5 +56,9 @@ export class BusService {
       this.http.get<Page<OmnibusDisponibleDto>>(`${this.base}/disponibles`, { params })
     ).then(resp => resp.content);
   }
-
+  getDisponiblesParaReasignar(idViaje: number): Promise<OmnibusDisponibleDto[]> {
+    return firstValueFrom(
+      this.http.get<OmnibusDisponibleDto[]>(`${this.base}/disponibles/reasignar/${idViaje}`)
+    );
+  } 
 }

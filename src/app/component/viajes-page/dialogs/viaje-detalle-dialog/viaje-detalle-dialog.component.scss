@@ -1,0 +1,38 @@
+.dialog-content {
+  padding-top: 8px;
+
+  .section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+
+    .section-icon {
+      margin-right: 8px;
+      color: #675992;
+    }
+
+    strong {
+      margin-right: 4px;
+      font-weight: 600;
+    }
+  }
+}
+
+.dialog-actions {
+  margin-top: 16px;
+
+  button {
+    min-width: 120px;
+
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}
+
+.icon {
+  vertical-align: middle;
+  margin-right: 8px;
+  color: #675992;
+}

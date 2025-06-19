@@ -14,14 +14,14 @@
     <mat-form-field appearance="fill">
       <mat-label>Origen</mat-label>
       <mat-select [(ngModel)]="origenId">
-        <mat-option *ngFor="let loc of localidades" [value]="loc.id">{{ loc.nombre }}</mat-option>
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id">{{ loc.nombreConDepartamento }}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Destino</mat-label>
       <mat-select [(ngModel)]="destinoId">
-        <mat-option *ngFor="let loc of localidades" [value]="loc.id">{{ loc.nombre }}</mat-option>
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id">{{ loc.nombreConDepartamento }}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -64,7 +64,7 @@
         <mat-option *ngFor="let loc of localidades"
                     [value]="loc.id"
                     [disabled]="loc.id === origenId || loc.id === destinoId || paradasIntermedias.includes(loc.id)">
-          {{ loc.nombre }}
+          {{ loc.nombreConDepartamento }}
         </mat-option>
       </mat-select>
     </mat-form-field>

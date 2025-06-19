@@ -139,8 +139,6 @@
     </mat-card>
   </ng-container>
 
-
-
   <div class="info-asientos">
     Asientos seleccionados: {{ selectedSeats?.join(', ') || 'Ninguno' }}
   </div>
@@ -149,7 +147,6 @@
     <button mat-stroked-button class="outline-btn" (click)="abrirDialogPasajeros()">Seleccionar Asientos</button>
   </div>
 </mat-card>
-
 
 <!-- Paso 3: Selección de viaje vuelta (IDA_Y_VUELTA) -->
 <mat-card class="viajes-card" *ngIf="step === 3 && tipoViaje === 'IDA_Y_VUELTA'">

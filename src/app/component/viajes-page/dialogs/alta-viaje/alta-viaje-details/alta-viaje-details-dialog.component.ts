@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -15,13 +19,14 @@ import { firstValueFrom } from 'rxjs';
 import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
 import { ViajeService } from '../../../../../services/viaje.service';
+import { LocalidadDto } from '../../../../../models/localidades/localidades-dto.model';
 import { FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../../../../../models/buses';
 import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warning-dialog.component';
 import { LocalidadNombreDepartamentoDto } from '../../../../../models/localidades/localidad-nombre-departamento-dto.model';
 
 @Component({
-  selector: 'app-alta-viaje-details-dialog',
   standalone: true,
+  selector: 'app-alta-viaje-details-dialog',
   templateUrl: './alta-viaje-details-dialog.component.html',
   styleUrls: ['./alta-viaje-details-dialog.component.scss'],
   imports: [
@@ -63,7 +68,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     private localidadesService: LocalidadService,
     private viajeService: ViajeService,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   async ngOnInit(): Promise<void> {
     this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
@@ -85,7 +90,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   agregarParadaIntermedia(): void {
     if (
-      this.paradaIntermediaId &&
+      this.paradaIntermediaId != null &&
       !this.paradasIntermedias.includes(this.paradaIntermediaId) &&
       this.paradaIntermediaId !== this.origenId &&
       this.paradaIntermediaId !== this.destinoId
@@ -107,8 +112,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const llegada = new Date(this.formatFecha(this.fechaLlegada, this.horaLlegada));
     const intervalo = (llegada.getTime() - salida.getTime()) / (total - 1);
 
-    const localidades = [this.origenId, ...this.paradasIntermedias, this.destinoId];
-    const paradas = localidades.map((id, idx) => ({
+    const localidadesIds = [this.origenId, ...this.paradasIntermedias, this.destinoId];
+    const paradas = localidadesIds.map((id, idx) => ({
       localidadId: id,
       orden: idx + 1,
       fechaHoraLlegada: new Date(salida.getTime() + idx * intervalo).toISOString()
@@ -125,24 +130,22 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       confirm: false
     };
 
-    this.viajeService.altaViaje(alta).then(() => {
-      this.dialogRef.close(alta);
-    }).catch(mensaje => {
-      this.dialog.open(WarningDialogComponent, {
-        data: { message: mensaje }
-      }).afterClosed().subscribe((confirmado: boolean) => {
-        if (confirmado) {
-          this.viajeService.altaViaje({ ...alta, confirm: true }).then(() => {
-            this.dialogRef.close(alta);
-          }).catch(err => {
-            const fallback = typeof err === 'string' ? err : (err?.message || 'Error al confirmar el viaje');
-            this.dialog.open(WarningDialogComponent, {
-              data: { message: fallback }
-            });
+    this.viajeService.altaViaje(alta)
+      .then(() => this.dialogRef.close(alta))
+      .catch(mensaje => {
+        this.dialog.open(WarningDialogComponent, { data: { message: mensaje } })
+          .afterClosed().subscribe((confirmado: boolean) => {
+            if (!confirmado) return;
+            this.viajeService.altaViaje({ ...alta, confirm: true })
+              .then(() => this.dialogRef.close(alta))
+              .catch(err => {
+                const fallback = typeof err === 'string'
+                  ? err
+                  : (err?.message || 'Error al confirmar el viaje');
+                this.dialog.open(WarningDialogComponent, { data: { message: fallback } });
+              });
           });
-        }
       });
-    });
   }
 
   cargarBuses(): void {
@@ -152,60 +155,50 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       origenId: this.origenId,
       destinoId: this.destinoId,
       fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
-      fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada)
+      fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada),
+      minAsientos: 1
     };
 
-    this.busService.getDisponibles(filtro).then(buses => {
-      this.buses = buses;
-    }).catch(() => {
-      this.buses = [];
-    });
+    this.busService.getDisponibles(filtro)
+      .then(buses => this.buses = buses)
+      .catch(() => this.buses = []);
   }
 
-  localidadNombre(id: number): string {
-    return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
-  }
-
-  deberiaDeshabilitarSiguiente(): boolean {
-    if (this.step === 0) return !this.origenId || !this.destinoId || !this.fechaSalida || !this.horaSalida || !this.fechaLlegada || !this.horaLlegada || this.precio <= 0;
-    if (this.step === 2) return !this.busSeleccionado;
-    return false;
-  }
 
   onBusSeleccionadoChange(): void {
     this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
   }
 
-  private formatFecha(fecha: Date | null, hora: string = ''): string {
-    if (!fecha) return '';
-    const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
-    const fechaConHora = new Date(fecha);
-    fechaConHora.setHours(Number(hh));
-    fechaConHora.setMinutes(Number(mm));
-    fechaConHora.setSeconds(0);
-    const y = fechaConHora.getFullYear();
-    const m = (fechaConHora.getMonth() + 1).toString().padStart(2, '0');
-    const d = fechaConHora.getDate().toString().padStart(2, '0');
-    const h = fechaConHora.getHours().toString().padStart(2, '0');
-    const min = fechaConHora.getMinutes().toString().padStart(2, '0');
-    return `${y}-${m}-${d}T${h}:${min}:00`;
+  localidadNombre(id: number): string {
+    return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
+
   }
 
-  ngAfterViewChecked(): void {
-    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
-    headers.forEach((header, index) => {
-      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
-      const label = header.querySelector('.mat-step-label') as HTMLElement;
-      if (index < this.step) {
-        icon.style.backgroundColor = '#3e5f3c';
-        label.style.color = '#3e5f3c';
-      } else if (index === this.step) {
-        icon.style.backgroundColor = '#675992';
-        label.style.color = '#675992';
-      } else {
-        icon.style.backgroundColor = '#ccc';
-        label.style.color = '#444';
-      }
-    });
+  deberiaDeshabilitarSiguiente(): boolean {
+    if (this.step === 0) {
+      return !this.origenId
+        || !this.destinoId
+        || !this.fechaSalida
+        || !this.horaSalida
+        || !this.fechaLlegada
+        || !this.horaLlegada
+        || this.precio <= 0;
+    }
+    if (this.step === 2) {
+      return !this.busSeleccionado;
+    }
+    return false;
+  }
+
+  private formatFecha(fecha: Date, hora: string = ''): string {
+    const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
+    const dt = new Date(fecha);
+    dt.setHours(Number(hh), Number(mm), 0, 0);
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const d = String(dt.getDate()).padStart(2, '0');
+    const H = String(dt.getHours()).padStart(2, '0');
+    const M = String(dt.getMinutes()).padStart(2, '0');
+    return `${y}-${m}-${d}T${H}:${M}:00`;
   }
 }

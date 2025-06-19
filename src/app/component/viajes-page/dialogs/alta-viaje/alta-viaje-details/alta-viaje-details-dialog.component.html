@@ -1,9 +1,9 @@
 <h2 mat-dialog-title>Alta de Viaje</h2>
 
 <mat-horizontal-stepper [selectedIndex]="step" linear class="stepper">
-  <mat-step label="Datos del viaje" [completed]="true"></mat-step>
-  <mat-step label="Paradas" [completed]="true"></mat-step>
-  <mat-step label="Seleccionar ómnibus" [completed]="true"></mat-step>
+  <mat-step label="Datos del viaje" [completed]="step>0"></mat-step>
+  <mat-step label="Paradas" [completed]="step>1"></mat-step>
+  <mat-step label="Seleccionar ómnibus" [completed]="step>2"></mat-step>
   <mat-step label="Confirmación"></mat-step>
 </mat-horizontal-stepper>
 
@@ -104,7 +104,8 @@
     <ng-container *ngIf="buses.length > 0; else sinBuses">
       <mat-selection-list [(ngModel)]="busSeleccionadoArray" (selectionChange)="onBusSeleccionadoChange()">
         <mat-list-option *ngFor="let bus of buses" [value]="bus">
-          {{ bus.matricula }} - {{ bus.capacidad }} asientos ({{ bus.ubicacionActual }})
+          {{ bus.matricula }} - {{ bus.capacidad }} asientos
+          ({{ bus.origenNombre }} → {{ bus.destinoNombre }})
         </mat-list-option>
       </mat-selection-list>
     </ng-container>
@@ -113,18 +114,12 @@
     </ng-template>
   </div>
 
-  <div *ngIf="step === 3" class="step">
-    <h3>4. Confirmación</h3>
-    <p><strong>Salida:</strong> {{ fechaSalida | date:'short' }} {{ horaSalida }}</p>
-    <p><strong>Llegada:</strong> {{ fechaLlegada | date:'short' }} {{ horaLlegada }}</p>
-    <p><strong>Precio:</strong> {{ precio | currency }}</p>
-    <p><strong>Ómnibus:</strong> {{ busSeleccionado?.matricula }}</p>
-  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-stroked-button color="primary" (click)="cancelar()">Cancelar</button>
   <button mat-stroked-button color="primary" *ngIf="step > 0" (click)="anterior()">Anterior</button>
-  <button mat-flat-button class="create-btn" *ngIf="step < 3" (click)="siguiente()" [disabled]="deberiaDeshabilitarSiguiente()">Siguiente</button>
+  <button mat-flat-button class="create-btn" *ngIf="step < 3" (click)="siguiente()"
+    [disabled]="deberiaDeshabilitarSiguiente()">Siguiente</button>
   <button mat-flat-button class="create-btn" *ngIf="step === 3" (click)="confirmar()">Confirmar</button>
 </mat-dialog-actions>

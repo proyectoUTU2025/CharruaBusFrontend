@@ -1,0 +1,19 @@
+<div class="generic-list-container">
+    <table mat-table [dataSource]="data" class="mat-elevation-z8">
+        <ng-container *ngFor="let col of columns" [matColumnDef]="col">
+            <th mat-header-cell *matHeaderCellDef>
+                {{ col | titlecase }}
+            </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element[col] }}
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+
+    <mat-paginator [length]="totalElements" [pageIndex]="pageIndex" [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)">
+    </mat-paginator>
+</div>

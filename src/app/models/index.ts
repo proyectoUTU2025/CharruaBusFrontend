@@ -1,5 +1,12 @@
-export * from './users';         
-export * from './viajes/';
-export * from './buses';
-export * from './api';  
-export * from './compra'; 
+export * from './users';
+export * from './viajes';
+export * from './api';
+export * from './compra';
+
+export type {
+    BusDto,
+    AltaBusDto,
+    FiltroBusquedaBusDto,
+    OmnibusDisponibleDto,
+    FiltroDisponibilidadOmnibusDto
+} from './buses';

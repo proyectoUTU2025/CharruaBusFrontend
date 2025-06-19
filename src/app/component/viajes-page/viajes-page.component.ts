@@ -15,6 +15,11 @@ import { AltaViajeDetailsDialogComponent } from './dialogs/alta-viaje/alta-viaje
 import { FiltroBusquedaViajeDto, ViajeDisponibleDto, AltaViajeDto} from '../../models/viajes';
 import { ViajeService } from '../../services/viaje.service';
 import { Page } from '../../models';
+import { LocalidadService } from '../../services/localidades.service';
+import { LocalidadDto } from '../../models/localidades/localidades-dto.model';
+import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
+
+
 @Component({
   selector: 'app-viajes-page',
   standalone: true,
@@ -38,8 +43,8 @@ import { Page } from '../../models';
 export class ViajesPageComponent implements OnInit, AfterViewInit {
   columns = ['nombreLocalidadOrigen', 'nombreLocalidadDestino','fechaHoraSalida', 'fechaHoraLlegada', 'precioPorTramo', 'asientosDisponibles'];
   dataSource = new MatTableDataSource<ViajeDisponibleDto>();
-  totalElements = 0;
-
+  totalElements = 0;  
+  localidades: LocalidadNombreDepartamentoDto[] = [];
   filtro: {
   localidadOrigenId: number | null;
   localidadDestinoId: number | null;
@@ -49,14 +54,21 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
   localidadOrigenId: null,
   localidadDestinoId: null,
   fechaDesde: '',
-  fechaHasta: ''
+  fechaHasta: ''  
 };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private viajeService: ViajeService, private dialog: MatDialog) {}
+  constructor(
+    private viajeService: ViajeService, 
+    private dialog: MatDialog, 
+    private localidadService: LocalidadService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.localidadService.getAllFlat().subscribe(localidades => {
+      this.localidades = localidades
+    });
+  }
 
   ngAfterViewInit(): void {
     this.paginator.page.subscribe(() => this.buscar());

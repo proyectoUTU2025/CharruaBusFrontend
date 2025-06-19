@@ -6,13 +6,23 @@
 <div class="content-card">
   <div class="filters-container">
     <mat-form-field appearance="fill">
-      <mat-label>Origen (ID)</mat-label>
-      <input matInput type="number" [(ngModel)]="filtro.localidadOrigenId" />
+      <mat-label>Origen</mat-label>
+      <mat-select [(ngModel)]="filtro.localidadOrigenId">
+        <mat-option [value]="null">Todos</mat-option>
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id">
+          {{ loc.nombreConDepartamento }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-      <mat-label>Destino (ID)</mat-label>
-      <input matInput type="number" [(ngModel)]="filtro.localidadDestinoId" />
+      <mat-label>Destino</mat-label>
+      <mat-select [(ngModel)]="filtro.localidadDestinoId">
+        <mat-option [value]="null">Todos</mat-option>
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id">
+          {{ loc.nombreConDepartamento }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="fill">

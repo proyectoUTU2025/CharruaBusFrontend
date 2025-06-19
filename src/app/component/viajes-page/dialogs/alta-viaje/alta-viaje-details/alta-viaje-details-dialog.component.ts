@@ -20,9 +20,9 @@ import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
 import { ViajeService } from '../../../../../services/viaje.service';
 import { LocalidadDto } from '../../../../../models/localidades/localidades-dto.model';
-import { OmnibusDisponibleDto } from '../../../../../models/buses/omnibus-disponible.dto';
-import { FiltroDisponibilidadOmnibusDto } from '../../../../../models/buses/filtro-disponibilidad-omnibus.dto';
+import { FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../../../../../models/buses';
 import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warning-dialog.component';
+import { LocalidadNombreDepartamentoDto } from '../../../../../models/localidades/localidad-nombre-departamento-dto.model';
 
 @Component({
   standalone: true,
@@ -47,8 +47,8 @@ import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warn
 })
 export class AltaViajeDetailsDialogComponent implements OnInit {
   step = 0;
-  completedSteps: boolean[] = [false, false, false];
-  localidades: LocalidadDto[] = [];
+  completedSteps: boolean[] = [false, false, false];  
+  localidades: LocalidadNombreDepartamentoDto[] = [];
   buses: OmnibusDisponibleDto[] = [];
   origenId = 0;
   destinoId = 0;
@@ -71,8 +71,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    const page = await firstValueFrom(this.localidadesService.getAll({}, 0, 1000));
-    this.localidades = page.content;
+    this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
   }
 
   siguiente(): void {
@@ -165,8 +164,14 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       .catch(() => this.buses = []);
   }
 
+
   onBusSeleccionadoChange(): void {
     this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
+  }
+
+  localidadNombre(id: number): string {
+    return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
+
   }
 
   deberiaDeshabilitarSiguiente(): boolean {

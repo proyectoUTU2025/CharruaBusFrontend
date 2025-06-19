@@ -46,15 +46,15 @@ export class PasajeHistoryComponent implements OnInit {
 
     columns = [
         { field: 'fecha', header: 'Fecha Salida' },
+        { field: 'numeroAsiento', header: 'Asiento' },
         { field: 'paradaOrigen', header: 'Origen' },
         { field: 'paradaDestino', header: 'Destino' },
-        { field: 'numeroAsiento', header: 'Asiento' },
         { field: 'estadoPasaje', header: 'Estado' },
         { field: 'subtotal', header: 'Subtotal' },
         { field: 'acciones', header: 'Acciones' }
     ];
 
-    clienteId: number | null = null;
+    private clienteId!: number;
 
     constructor(
         private pasajeService: PasajeService,
@@ -64,7 +64,7 @@ export class PasajeHistoryComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.clienteId = this.auth.userId;
+        this.clienteId = this.auth.userId!;
         this.localidadService.getLocalidadesOrigenValidas()
             .subscribe(list => this.localidadesOrigen = list);
         this.loadPasajes();
@@ -98,26 +98,32 @@ export class PasajeHistoryComponent implements OnInit {
         this.loadPasajes();
     }
 
-    openDetalle(id: number): void {
+    openDetalle(pasajeId: number): void {
         this.dialog.open(DetallePasajeDialogComponent, {
             width: '600px',
-            data: { pasajeId: id }
+            data: { pasajeId }
+        });
+    }
+
+    devolver(pasajeId: number): void {
+        if (!confirm('¿Confirmas la devolución de este pasaje?')) return;
+        this.pasajeService.reembolsarPasaje(pasajeId).subscribe({
+            next: msg => {
+                alert(msg);
+                this.loadPasajes();
+            },
+            error: () => alert('Error al procesar la devolución')
         });
     }
 
     private loadPasajes(): void {
-        if (this.clienteId == null) return;
         this.loading = true;
         this.error = null;
 
         const filtroEnv = {
             ...this.filtro,
-            fechaDesde: this.filtro.fechaDesde
-                ? new Date(this.filtro.fechaDesde).toISOString()
-                : undefined,
-            fechaHasta: this.filtro.fechaHasta
-                ? new Date(this.filtro.fechaHasta).toISOString()
-                : undefined
+            fechaDesde: this.filtro.fechaDesde ? new Date(this.filtro.fechaDesde).toISOString() : undefined,
+            fechaHasta: this.filtro.fechaHasta ? new Date(this.filtro.fechaHasta).toISOString() : undefined
         };
 
         this.pasajeService

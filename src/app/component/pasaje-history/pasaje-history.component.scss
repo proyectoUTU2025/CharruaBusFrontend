@@ -7,10 +7,31 @@
     label {
         display: flex;
         flex-direction: column;
+        font-weight: 500;
+
+        input,
+        select {
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
     }
 
     button {
         align-self: flex-end;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        border: none;
+        background-color: #675992;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
     }
 }
 

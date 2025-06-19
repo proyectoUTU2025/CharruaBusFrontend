@@ -15,8 +15,9 @@ export class GenericListComponent {
     @Input() pageSize = 20;
     @Input() pageIndex = 0;
 
-    @Output() action = new EventEmitter<number>();
     @Output() pageChange = new EventEmitter<number>();
+    @Output() action = new EventEmitter<number>();
+    @Output() refund = new EventEmitter<number>();
 
     get totalPages(): number {
         return Math.ceil(this.totalElements / this.pageSize);

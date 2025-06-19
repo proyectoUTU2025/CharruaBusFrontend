@@ -11,8 +11,11 @@ import { ViajesPageComponent } from './component/viajes-page/viajes-page.compone
 import { ConfiguracionDelSistemaComponent } from './component/configuracion-del-sistema/configuracion-del-sistema.component';
 import { AuthGuard } from './core/auth/auth.guard';
 import { BusDetailComponent } from './component/transport/buses-page/bus-detail/bus-detail.component';
+import { ProfilePageComponent } from './component/profile-page/profile-page.component';
+
 
 export const routes: Routes = [
+
   { path: 'login', component: LoginPageComponent },
   { path: 'verificar-codigo', component: VerificarCodigoComponent },
   { path: 'registro', component: SignupPageComponent },
@@ -29,7 +32,9 @@ export const routes: Routes = [
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },
       { path: 'compras/exito', component: StripeRedirectComponent },
-      { path: 'compras/cancelada', component: StripeRedirectComponent }
+      { path: 'compras/cancelada', component: StripeRedirectComponent },
+      { path: 'comprar', component: CompraPageComponent },
+      { path: 'perfil', component: ProfilePageComponent },
     ]
   },
 

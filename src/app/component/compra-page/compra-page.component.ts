@@ -72,20 +72,16 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   selectedSeatsVuelta: number[] = [];
   viajeIdaSeleccionado: CompraViajeDto | null = null;
   viajeVueltaSeleccionado: CompraViajeDto | null = null;
-  searchTerm: string = '';
+  searchTerm = '';
   clientesFiltrados: UsuarioDto[] = [];
   userInfo: UsuarioDto | null = null;
-  searchEmail = '';
   totalElements = 0;
   pageSize = 5;
   pageIndex = 0;
+  estadoCompra: 'exito' | 'cancelado' | 'error' | null = null;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('auto') auto!: MatAutocomplete;
-
-  origenError = '';
-  destinoError = '';
-  fechaError = '';
-  estadoCompra: 'exito' | 'cancelado' | 'error' | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -115,14 +111,8 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     });
     if (this.authService.rol === 'CLIENTE') {
       const id = this.authService.id;
-
-    if (this.loginService.rol === 'CLIENTE') {
-      const id = this.loginService.id;
       if (id) {
-        this.userService.getById(id).then(data => {
-        this.userService.getById(id).then(data => {
-          this.userInfo = data;
-        }).catch(() => this.userInfo = null);
+        this.userService.getById(id).then(data => this.userInfo = data).catch(() => this.userInfo = null);
       }
     }
   }
@@ -130,21 +120,36 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   ngAfterViewInit(): void {
     const url = this.route.snapshot.url.map(s => s.path).join('/');
     const estado = this.route.snapshot.queryParamMap.get('estado');
-
     if (url.includes('compras/exito') && estado === 'exito') {
       this.estadoCompra = 'exito';
       this.step = 5;
     }
-
     if (url.includes('compras/cancelada') && estado === 'cancelado') {
       this.estadoCompra = 'cancelado';
       this.step = 5;
     }
-
     if (url.includes('compras/cancelada') && estado === 'error') {
       this.estadoCompra = 'error';
       this.step = 5;
     }
+  }
+
+  ngAfterViewChecked(): void {
+    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
+    headers.forEach((header, index) => {
+      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
+      const label = header.querySelector('.mat-step-label') as HTMLElement;
+      if (index < this.step) {
+        icon.style.backgroundColor = '#3e5f3c';
+        label.style.color = '#3e5f3c';
+      } else if (index === this.step) {
+        icon.style.backgroundColor = '#675992';
+        label.style.color = '#675992';
+      } else {
+        icon.style.backgroundColor = '#ccc';
+        label.style.color = '#444';
+      }
+    });
   }
 
   get pasajeros(): FormArray {
@@ -174,38 +179,36 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   }
 
   buscar(): void {
+    this.searchForm.markAllAsTouched();
     this.origenError = '';
     this.destinoError = '';
     this.fechaError = '';
     const f = this.searchForm.value;
-
     if (!f.localidadOrigenId) this.origenError = 'Debe seleccionar un origen.';
     if (!f.localidadDestinoId) this.destinoError = 'Debe seleccionar un destino.';
-    if (!f.fechaDesde) this.fechaError = 'Debe seleccionar una fecha de ida.';
-
+    if (!f.fechaDesde) this.fechaError = 'Debe seleccionar fecha de ida.';
     if (this.origenError || this.destinoError || this.fechaError) return;
     this.pageIndex = 0;
     this.buscarConPaginacion();
   }
 
-  buscarConPaginacion(): void {
+  private buscarConPaginacion(): void {
     const f = this.searchForm.value;
-    if (!f.fechaDesde) return;
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,
       fechaViaje: this.formatFecha(f.fechaDesde),
       cantidadPasajes: f.pasajeros
     };
-
-    this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize).then(page => {
-      this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
-      this.totalElements = page.totalElements;
-      this.step = 1;
-    });
+    this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize)
+      .then(page => {
+        this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
+        this.totalElements = page.totalElements;
+        this.step = 1;
+      });
   }
 
-  buscarViajesVuelta(): void {
+  private buscarViajesVuelta(): void {
     const f = this.searchForm.value;
     const filtro = {
       idLocalidadOrigen: f.localidadDestinoId,
@@ -213,9 +216,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       fechaViaje: this.formatFecha(f.fechaVuelta),
       cantidadPasajes: f.pasajeros
     };
-
     const fechaLlegadaIda = new Date(this.viajeIdaSeleccionado?.fechaHoraLlegada || '');
-
     this.viajeService.buscarDisponibles(filtro, 0, 10).then(page => {
       this.viajesVuelta = page.content
         .filter(v => new Date(v.fechaHoraSalida) > fechaLlegadaIda)
@@ -223,7 +224,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       this.step = 3;
     });
   }
-
 
   cambiarPagina(event: any): void {
     this.pageIndex = event.pageIndex;
@@ -244,41 +244,37 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.completedSteps = Array(this.tipoViaje === 'IDA' ? 5 : 7).fill(false);
   }
 
-  seleccionarViaje(v: CompraViajeSeleccionable, esVuelta: boolean = false): void {
+  seleccionarViaje(v: CompraViajeSeleccionable, esVuelta = false): void {
     if (esVuelta) {
-      this.viajesVuelta.forEach(viaje => viaje.seleccionado = false);
+      this.viajesVuelta.forEach(x => x.seleccionado = false);
       v.seleccionado = true;
       this.viajeVueltaSeleccionado = v;
       this.completedSteps[3] = true;
     } else {
-      this.viajes.forEach(viaje => viaje.seleccionado = false);
+      this.viajes.forEach(x => x.seleccionado = false);
       v.seleccionado = true;
       this.viajeIdaSeleccionado = v;
       this.completedSteps[1] = true;
     }
   }
 
-  abrirDialogPasajeros(esVuelta: boolean = false): void {
+  abrirDialogPasajeros(esVuelta = false): void {
     const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
     if (!viaje) return;
-
     const pasajeros = this.searchForm.value.pasajeros;
-    const viajeId = this.viajeSeleccionado.idViaje;
-    const cantidadAsientos = this.viajeSeleccionado.asientosDisponibles;
-    if (!viajeId || !cantidadAsientos) return;
+    const { idViaje, asientosDisponibles, precioEstimado } = viaje;
     const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
       width: '600px',
-      data: { pasajeros, viajeId, cantidadAsientos, precio: this.viajeSeleccionado.precioEstimado }
+      data: { pasajeros, viajeId: idViaje!, cantidadAsientos: asientosDisponibles!, precio: precioEstimado! }
     });
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (esVuelta) {
-          this.selectedSeatsVuelta = result.asientos;
-          this.completedSteps[4] = true;
-        } else {
-          this.selectedSeats = result.asientos;
-          this.completedSteps[2] = true;
-        }
+      if (!result) return;
+      if (esVuelta) {
+        this.selectedSeatsVuelta = result.asientos;
+        this.completedSteps[4] = true;
+      } else {
+        this.selectedSeats = result.asientos;
+        this.completedSteps[2] = true;
       }
     });
   }
@@ -286,7 +282,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   confirmarCompra(): void {
     const f = this.searchForm.value;
     const clienteId = this.userInfo?.id || 0;
-
     const dto: CompraRequestDto = {
       viajeIdaId: this.viajeIdaSeleccionado?.idViaje || 0,
       viajeVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? this.viajeVueltaSeleccionado?.idViaje : null,
@@ -298,22 +293,16 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       paradaOrigenVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadDestinoId : null,
       paradaDestinoVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadOrigenId : null
     };
-
-    console.log('DTO enviado al backend:', dto);
     this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
   }
 
-
- siguientePaso(): void {
+  siguientePaso(): void {
     if (this.step === 4 && this.tipoViaje === 'IDA') return;
-
     if (this.puedeAvanzar()) {
       this.completedSteps[this.step] = true;
-
-      // Si es viaje de ida y vuelta y estamos por entrar al paso 3 (viaje vuelta)
       if (this.tipoViaje === 'IDA_Y_VUELTA' && this.step === 2) {
-        this.step++; // avanzamos al paso 3
-        this.buscarViajesVuelta(); // y ahora sí hacemos la búsqueda
+        this.step++;
+        this.buscarViajesVuelta();
       } else {
         this.step++;
       }
@@ -321,75 +310,34 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   }
 
   anteriorPaso(): void {
-    if (this.step > 0 && this.step < 6) {
-      this.step--;
-    }
+    if (this.step > 0 && this.step < 6) this.step--;
   }
 
   puedeAvanzar(): boolean {
     if (this.step === 0) return this.searchForm.valid;
-    if (this.step === 1) return this.viajeIdaSeleccionado !== null;
+    if (this.step === 1) return !!this.viajeIdaSeleccionado;
     if (this.step === 2) return this.selectedSeats.length > 0;
     if (this.tipoViaje === 'IDA_Y_VUELTA') {
-      if (this.step === 3) return this.viajeVueltaSeleccionado !== null;
+      if (this.step === 3) return !!this.viajeVueltaSeleccionado;
       if (this.step === 4) return this.selectedSeatsVuelta.length > 0;
       if (this.step === 5) return false;
     }
-    if (this.tipoViaje === 'IDA') {
-      if (this.step === 3) return false;
-    }
+    if (this.tipoViaje === 'IDA' && this.step === 3) return false;
     return true;
   }
 
-  ngAfterViewChecked(): void {
-    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
-    headers.forEach((header, index) => {
-      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
-      const label = header.querySelector('.mat-step-label') as HTMLElement;
-      if (index < this.step) {
-        icon.style.backgroundColor = '#3e5f3c';
-        label.style.color = '#3e5f3c';
-      } else if (index === this.step) {
-        icon.style.backgroundColor = '#675992';
-        label.style.color = '#675992';
-      } else {
-        icon.style.backgroundColor = '#ccc';
-        label.style.color = '#444';
-      }
-    });
-  }
-
-  private formatFecha(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
-  calcularDuracion(inicio: string, fin: string): string {
-    const d1 = new Date(inicio);
-    const d2 = new Date(fin);
-    const diffMs = d2.getTime() - d1.getTime();
-    const minutos = Math.floor(diffMs / 60000);
-    const horas = Math.floor(minutos / 60);
-    const mins = minutos % 60;
-    return `${horas}h ${mins}m`;
-  }
-
   buscarClientes(): void {
-    const query = this.searchTerm.trim();
-    if (query.length < 2) return;
-
-    this.userService.buscarClientes(query, 0, 5).subscribe({
-      next: (clientes) => {
-        this.clientesFiltrados = clientes;
-      },
-      error: () => {
-        this.clientesFiltrados = [];
-      }
+    const q = this.searchTerm.trim();
+    if (q.length < 2) return;
+    this.userService.getAll({ nombre: q } as any, 0, 5).then(page => {
+      this.clientesFiltrados = page.content;
+    }).catch(() => {
+      this.clientesFiltrados = [];
     });
   }
 
   displayCliente(cliente: UsuarioDto): string {
-    if (!cliente) return '';
-    return `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.trim();
+    return cliente ? `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.trim() : '';
   }
 
   seleccionarCliente(cliente: UsuarioDto): void {
@@ -397,4 +345,18 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.searchTerm = this.displayCliente(cliente);
     this.clientesFiltrados = [];
   }
+
+  private formatFecha(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  calcularDuracion(inicio: string, fin: string): string {
+    const diff = new Date(fin).getTime() - new Date(inicio).getTime();
+    const mins = Math.floor(diff / 60000);
+    return `${Math.floor(mins / 60)}h ${mins % 60}m`;
+  }
+
+  origenError = '';
+  destinoError = '';
+  fechaError = '';
 }

@@ -1,0 +1,44 @@
+<div class="filter-container">
+  <label>
+    Fecha Desde:
+    <input type="datetime-local" [(ngModel)]="filtro.fechaDesde" name="fechaDesde" />
+  </label>
+
+  <label>
+    Fecha Hasta:
+    <input type="datetime-local" [(ngModel)]="filtro.fechaHasta" name="fechaHasta" />
+  </label>
+
+  <label>
+    Origen:
+    <select [(ngModel)]="filtro.origenId" (ngModelChange)="onOrigenChange($event)" name="origenId">
+      <option [ngValue]="undefined">Todos</option>
+      <option *ngFor="let o of localidadesOrigen" [ngValue]="o.id">{{ o.nombre }}</option>
+    </select>
+  </label>
+
+  <label>
+    Destino:
+    <select [(ngModel)]="filtro.destinoId" name="destinoId">
+      <option [ngValue]="undefined">Todos</option>
+      <option *ngFor="let d of localidadesDestino" [ngValue]="d.id">{{ d.nombre }}</option>
+    </select>
+  </label>
+
+  <label>
+    Estados:
+    <select [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoChange()" name="estado">
+      <option value="">Todos</option>
+      <option *ngFor="let e of estadosOpts" [value]="e">{{ e }}</option>
+    </select>
+  </label>
+
+  <button (click)="onFilter()" [disabled]="loading">Filtrar</button>
+</div>
+
+<div *ngIf="loading" class="loading">Cargando...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<app-generic-list *ngIf="!loading && !error" [columns]="columns" [data]="pasajes" [totalElements]="totalElements"
+  [pageSize]="pageSize" [pageIndex]="pageIndex" (pageChange)="onPageChange($event)" (action)="openDetalle($event)">
+</app-generic-list>

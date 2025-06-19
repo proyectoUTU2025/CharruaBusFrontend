@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Detalle de Pasaje #{{ data.pasajeId }}</h2>
+
+<mat-dialog-content *ngIf="pasaje$ | async as p; else cargando">
+    <p><strong>Fecha salida:</strong> {{ p.fecha | date:'short' }}</p>
+    <p><strong>Origen:</strong> {{ p.paradaOrigen }}</p>
+    <p><strong>Destino:</strong> {{ p.paradaDestino }}</p>
+    <p><strong>Asiento:</strong> {{ p.numeroAsiento }}</p>
+    <p><strong>Estado:</strong> {{ p.estadoPasaje }}</p>
+    <p><strong>Subtotal:</strong> {{ p.subtotal | currency }}</p>
+</mat-dialog-content>
+
+<ng-template #cargando>
+    <div class="loading">Cargando detalle…</div>
+</ng-template>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="descargarPdf()">Descargar PDF</button>
+    <button mat-button (click)="close()">Cerrar</button>
+</mat-dialog-actions>

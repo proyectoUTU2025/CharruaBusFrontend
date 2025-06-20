@@ -1,0 +1,15 @@
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+table {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+mat-paginator {
+    display: flex;
+    justify-content: center;
+}

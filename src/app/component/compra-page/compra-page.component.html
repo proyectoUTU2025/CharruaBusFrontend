@@ -1,122 +1,270 @@
-<mat-horizontal-stepper [selectedIndex]="step" linear>
-  <mat-step label="Búsqueda"></mat-step>
-  <mat-step label="Seleccionar viaje"></mat-step>
-  <mat-step label="Pasajeros"></mat-step>
+<mat-horizontal-stepper [selectedIndex]="step" linear class="stepper">
+  <mat-step label="Búsqueda" [completed]="step > 0"></mat-step>
+  <mat-step label="Seleccionar viaje" [completed]="step > 1"></mat-step>
+  <mat-step label="Pasajeros" [completed]="step > 2"></mat-step>
   <ng-container *ngIf="tipoViaje === 'IDA'">
-    <mat-step label="Resumen"></mat-step>
+    <mat-step label="Resumen" [completed]="step > 3"></mat-step>
   </ng-container>
   <ng-container *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
-    <mat-step label="Viaje vuelta"></mat-step>
-    <mat-step label="Asientos vuelta"></mat-step>
-    <mat-step label="Resumen"></mat-step>
+    <mat-step label="Viaje vuelta" [completed]="step > 3"></mat-step>
+    <mat-step label="Asientos vuelta" [completed]="step > 4"></mat-step>
+    <mat-step label="Resumen" [completed]="step > 5"></mat-step>
   </ng-container>
 </mat-horizontal-stepper>
 
-<mat-tab-group [selectedIndex]="tipoViaje==='IDA'?0:1" (selectedIndexChange)="cambiarTipoViaje($event)">
+<mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="cambiarTipoViaje($event)" class="tabs">
   <mat-tab label="Ida"></mat-tab>
   <mat-tab label="Ida y Vuelta"></mat-tab>
 </mat-tab-group>
 
-<mat-card *ngIf="step===0">
-  <form [formGroup]="searchForm">
-    <div class="form-row">
+<mat-card class="compra-card" *ngIf="step === 0">
+  <form [formGroup]="searchForm" class="filters">
+    <div class="field-container">
       <mat-form-field appearance="fill">
         <mat-label>Origen</mat-label>
         <mat-select formControlName="localidadOrigenId">
-          <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombre }}</mat-option>
+          <mat-option *ngFor="let o of localidades" [value]="o.id">{{ o.nombreConDepartamento }}</mat-option>
         </mat-select>
       </mat-form-field>
+      <div class="error-text" *ngIf="origenError">Debe ingresar un origen.</div>
+    </div>
+
+    <div class="field-container">
       <mat-form-field appearance="fill">
         <mat-label>Destino</mat-label>
         <mat-select formControlName="localidadDestinoId">
-          <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombre }}</mat-option>
+          <mat-option *ngFor="let d of destinos" [value]="d.id">{{ d.nombreConDepartamento }}</mat-option>
         </mat-select>
       </mat-form-field>
+      <div class="error-text" *ngIf="destinoError">Debe ingresar un destino.</div>
     </div>
-    <div class="form-row">
+
+    <div class="field-container">
       <mat-form-field appearance="fill">
         <mat-label>Fecha Ida</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fechaDesde">
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
+        <input matInput [matDatepicker]="picker" formControlName="fechaDesde" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
-      <mat-form-field *ngIf="tipoViaje==='IDA_Y_VUELTA'" appearance="fill">
-        <mat-label>Fecha Vuelta</mat-label>
-        <input matInput [matDatepicker]="picker2" formControlName="fechaVuelta">
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Pasajeros</mat-label>
-        <input matInput type="number" formControlName="pasajeros">
-      </mat-form-field>
+      <div class="error-text" *ngIf="fechaError">{{ fechaError }}</div>
     </div>
-    <div class="actions">
-      <button mat-raised-button color="primary" (click)="buscar()" [disabled]="searchForm.invalid">
-        Buscar
-      </button>
+
+    <mat-form-field appearance="fill" *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
+      <mat-label>Fecha Vuelta</mat-label>
+      <input matInput [matDatepicker]="pickerVuelta" formControlName="fechaVuelta" />
+      <mat-datepicker-toggle matSuffix [for]="pickerVuelta"></mat-datepicker-toggle>
+      <mat-datepicker #pickerVuelta></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Pasajeros</mat-label>
+      <mat-select formControlName="pasajeros">
+        <mat-option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="filters-actions">
+      <button mat-raised-button class="buscar-btn" (click)="buscar()">Buscar</button>
+      <button mat-stroked-button class="outline-btn" (click)="limpiarFiltros()">Limpiar filtros</button>
     </div>
   </form>
 </mat-card>
 
-<mat-card *ngIf="step===1">
-  <table mat-table [dataSource]="dataSource">
-    <ng-container matColumnDef="origen">
-      <th mat-header-cell *matHeaderCellDef>Origen</th>
-      <td mat-cell *matCellDef="let v">{{ v.origen }}</td>
-    </ng-container>
-    <ng-container matColumnDef="destino">
-      <th mat-header-cell *matHeaderCellDef>Destino</th>
-      <td mat-cell *matCellDef="let v">{{ v.destino }}</td>
-    </ng-container>
-    <ng-container matColumnDef="precio">
-      <th mat-header-cell *matHeaderCellDef>Precio</th>
-      <td mat-cell *matCellDef="let v">{{ v.precioEstimado }}</td>
-    </ng-container>
-    <ng-container matColumnDef="seleccionar">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let v">
-        <button mat-button (click)="seleccionarViaje(v)">Seleccionar</button>
-      </td>
-    </ng-container>
+<mat-card class="viajes-card" *ngIf="step === 1">  
+  <div *ngFor="let v of viajes"
+       class="viaje-item"
+       [class.selected]="v.seleccionado"
+       (click)="seleccionarViaje(v)">
+    <div class="ruta"><strong>{{ v.origen }}</strong> → <strong>{{ v.destino }}</strong></div>
+    <div class="horario">
+      <mat-icon>schedule</mat-icon>
+      {{ v.fechaHoraSalida | date:'shortTime' }} - {{ v.fechaHoraLlegada | date:'shortTime' }}
+      · {{ calcularDuracion(v.fechaHoraSalida, v.fechaHoraLlegada) }}
+    </div>
+    <div class="info">{{ v.asientosDisponibles }} asientos disponibles · ${{ v.precioEstimado }}</div>
+  </div>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-
-  <mat-paginator [length]="totalElements" [pageSize]="pageSize" (page)="pageChanged($event)">
+  <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="pageIndex"
+                 [pageSizeOptions]="[5, 10]" (page)="cambiarPagina($event)">
   </mat-paginator>
 </mat-card>
 
-<mat-card *ngIf="step===2">
-  <button mat-stroked-button (click)="abrirDialogPasajeros()">
-    Seleccionar Asientos
-  </button>
-  <div class="info">
-    Asientos seleccionados: {{ selectedSeats.join(', ') || 'Ninguno' }}
+<mat-card class="viajes-card" *ngIf="step === 2">
+  <ng-container *ngIf="authService.rol === 'CLIENTE' && userInfo">
+    <h3>Datos del Cliente</h3>
+    <div class="datos-cliente">
+      <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+      <p><strong>Email:</strong> {{ userInfo.email }}</p>
+      <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+    </div>
+  </ng-container>
+
+  <!-- VENDEDOR -->
+  <ng-container *ngIf="authService.rol === 'VENDEDOR'">
+    <h3>Buscar Cliente</h3>
+
+    <mat-form-field appearance="fill" class="autocomplete-field">
+      <mat-label>Buscar cliente</mat-label>
+      <input
+        type="text"
+        matInput
+        [(ngModel)]="searchTerm"
+        (input)="buscarClientes()"
+        [matAutocomplete]="auto"
+        autocomplete="off"
+      />
+    </mat-form-field>
+
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayCliente"
+      (optionSelected)="seleccionarCliente($event.option.value)"
+    >
+      <mat-option *ngFor="let c of clientesFiltrados" [value]="c">
+        <div class="autocomplete-option">
+          <mat-icon>person</mat-icon>
+          {{ c.nombre }} {{ c.apellido }} ({{ c.documento }})
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+
+    <mat-card class="ficha-cliente" *ngIf="userInfo">
+      <mat-card-title>{{ userInfo.nombre }} {{ userInfo.apellido }}</mat-card-title>
+      <mat-card-content>
+        <p><strong>Email:</strong> {{ userInfo.email }}</p>
+        <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+        <p><strong>Tipo:</strong> {{ userInfo.tipoDocumento }}</p>
+        <p><strong>Categoría:</strong> {{ userInfo.situacionLaboral || 'No especificada' }}</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <div class="info-asientos">
+    Asientos seleccionados: {{ selectedSeats?.join(', ') || 'Ninguno' }}
+  </div>
+
+  <div class="filters-actions">
+    <button mat-stroked-button class="outline-btn" (click)="abrirDialogPasajeros()">Seleccionar Asientos</button>
   </div>
 </mat-card>
 
-<app-purchase-summary-dialog *ngIf="step===3 && tipoViaje==='IDA'"
-  [data]="{ seats: selectedSeats, total: selectedSeats.length * (viajeIdaSeleccionado?.precioEstimado || 0) }"
-  (confirm)="confirmarCompra()" (cancel)="step=2">
-</app-purchase-summary-dialog>
-
-<mat-card *ngIf="step===4">
-  <p>Redirigiendo a pasarela de pago...</p>
+<!-- Paso 3: Selección de viaje vuelta (IDA_Y_VUELTA) -->
+<mat-card class="viajes-card" *ngIf="step === 3 && tipoViaje === 'IDA_Y_VUELTA'">
+  <h3>Seleccione viaje de vuelta</h3>
+  <div *ngFor="let v of viajesVuelta"
+       class="viaje-item"
+       [class.selected]="v.seleccionado"
+       (click)="seleccionarViaje(v, true)">
+    <div class="ruta"><strong>{{ v.origen }}</strong> → <strong>{{ v.destino }}</strong></div>
+    <div class="horario">
+      <mat-icon>schedule</mat-icon>
+      {{ v.fechaHoraSalida | date:'shortTime' }} - {{ v.fechaHoraLlegada | date:'shortTime' }}
+      · {{ calcularDuracion(v.fechaHoraSalida, v.fechaHoraLlegada) }}
+    </div>
+    <div class="info">{{ v.asientosDisponibles }} asientos disponibles · ${{ v.precioEstimado }}</div>
+  </div>
 </mat-card>
 
-<mat-card *ngIf="step===5">
-  <p *ngIf="estadoCompra==='exito'">Compra exitosa.</p>
-  <p *ngIf="estadoCompra==='cancelado'">Compra cancelada.</p>
-  <p *ngIf="estadoCompra==='error'">Error en la compra.</p>
+<!-- Paso 3: Resumen (IDA) -->
+<mat-card class="viajes-card" *ngIf="step === 3 && tipoViaje === 'IDA'">
+  <div class="info-cliente" *ngIf="userInfo">
+    <h4>Información del Cliente</h4>
+    <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+    <p><strong>Email:</strong> {{ userInfo.email }}</p>
+    <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+    <p><strong>Tipo:</strong> {{ userInfo.rol }}</p>
+  </div>
+
+  <div class="info-asientos">
+    <h4>Asientos Seleccionados</h4>
+    <ul>
+      <li *ngFor="let asiento of selectedSeats">Asiento {{ asiento }}</li>
+    </ul>
+  </div>
+
+  <div class="info-pago">
+    <h4>Detalle del Pago</h4>
+    <p><strong>Ruta:</strong> {{ viajeIdaSeleccionado?.origen }} → {{ viajeIdaSeleccionado?.destino }}</p>
+    <p><strong>Pasaje:</strong> ${{ viajeIdaSeleccionado?.precioEstimado }}</p>
+    <p><strong>Total:</strong> ${{ selectedSeats.length * (viajeIdaSeleccionado?.precioEstimado || 0) }}</p>
+  </div>
+
+  <div class="filters-actions">
+    <button mat-raised-button class="outline-btn" (click)="confirmarCompra()">Proceder al Pago</button>
+  </div>
 </mat-card>
 
-<div class="step-controls">
-  <button mat-flat-button (click)="anteriorPaso()" [disabled]="step===0">
-    Anterior
-  </button>
-  <button mat-flat-button color="primary" (click)="siguientePaso()" [disabled]="step === (tipoViaje==='IDA'?3:4)">
-    Siguiente
-  </button>
+<!-- Paso 4: Asientos vuelta (IDA_Y_VUELTA) -->
+<mat-card class="viajes-card" *ngIf="step === 4 && tipoViaje === 'IDA_Y_VUELTA'">
+  <div class="info-asientos">
+    <h4>Asientos viaje de vuelta</h4>
+    Asientos seleccionados: {{ selectedSeatsVuelta?.join(', ') || 'Ninguno' }}
+  </div>
+  <div class="filters-actions">
+    <button mat-stroked-button class="outline-btn" (click)="abrirDialogPasajeros(true)">Seleccionar Asientos</button>
+  </div>
+</mat-card>
+
+<!-- Paso 5: Resumen (IDA_Y_VUELTA) -->
+<mat-card class="viajes-card" *ngIf="step === 5 && tipoViaje === 'IDA_Y_VUELTA'">
+  <div class="info-cliente" *ngIf="userInfo">
+    <h4>Información del Cliente</h4>
+    <p><strong>Nombre:</strong> {{ userInfo.nombre }} {{ userInfo.apellido }}</p>
+    <p><strong>Email:</strong> {{ userInfo.email }}</p>
+    <p><strong>Documento:</strong> {{ userInfo.documento }}</p>
+    <p><strong>Tipo:</strong> {{ userInfo.rol }}</p>
+  </div>
+
+  <div class="info-asientos">
+    <h4>Asientos Seleccionados</h4>
+    <ul>
+      <li *ngFor="let a of selectedSeats">Asiento Ida {{ a }}</li>
+      <li *ngFor="let a of selectedSeatsVuelta">Asiento Vuelta {{ a }}</li>
+    </ul>
+  </div>
+
+  <div class="info-pago">
+    <h4>Detalle del Pago</h4>
+    <p><strong>Ruta Ida:</strong> {{ viajeIdaSeleccionado?.origen }} → {{ viajeIdaSeleccionado?.destino }}</p>
+    <p><strong>Ruta Vuelta:</strong> {{ viajeVueltaSeleccionado?.origen }} → {{ viajeVueltaSeleccionado?.destino }}</p>
+    <p><strong>Total:</strong>
+      ${{ (viajeIdaSeleccionado?.precioEstimado || 0) * selectedSeats.length +
+          (viajeVueltaSeleccionado?.precioEstimado || 0) * selectedSeatsVuelta.length }}
+    </p>
+  </div>
+
+  <div class="filters-actions">
+    <button mat-raised-button class="outline-btn" (click)="confirmarCompra()">Proceder al Pago</button>
+  </div>
+</mat-card>
+
+<!-- Paso 6: Resultado final (IDA_Y_VUELTA) -->
+<mat-card class="redirect-card" *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 6">
+  <div *ngIf="estadoCompra === 'exito'" class="success-box">
+    <h2>✅ ¡Compra Realizada con Éxito!</h2>
+    <p>Tu pago fue procesado. Recibirás el ticket por correo.</p>
+    <p>Gracias por elegir CharruaBus 🚍</p>
+  </div>
+
+  <div *ngIf="estadoCompra === 'cancelado'" class="cancel-box">
+    <h2>❌ Compra Cancelada</h2>
+    <p>Puedes volver atrás y modificar datos si fue un error.</p>
+  </div>
+
+  <div *ngIf="estadoCompra === 'error'" class="error-box">
+    <h2>⚠️ Hubo un error</h2>
+    <p>No se pudo procesar el pago. Intenta de nuevo.</p>
+  </div>
+
+  <div class="step-buttons" style="margin-top: 20px; text-align: center;">
+    <button mat-flat-button color="primary" routerLink="/comprar">Realizar nueva compra</button>
+    <button mat-stroked-button color="accent" routerLink="/mis-compras">Ver mis compras</button>
+  </div>
+</mat-card>
+
+<!-- Botones de paso -->
+<div class="step-buttons"
+     *ngIf="(tipoViaje === 'IDA' && step < 4) || (tipoViaje === 'IDA_Y_VUELTA' && step < 6)">
+  <button mat-flat-button (click)="anteriorPaso()" [disabled]="step === 0">Anterior</button>
+  <button mat-flat-button color="primary" (click)="siguientePaso()" [disabled]="!puedeAvanzar()">Siguiente</button>
 </div>

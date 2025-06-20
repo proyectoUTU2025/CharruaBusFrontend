@@ -22,7 +22,7 @@ export class DetalleCompraDialogComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.detalle$ = this.compraService.getDetalle(this.data.compraId);
+       // this.detalle$ = this.compraService.getDetalle(this.data.compraId);
     }
 
     close() {

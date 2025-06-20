@@ -24,14 +24,12 @@ export interface AltaViajeDto {
   paradas?: AltaParadaDto[];
   confirm: boolean;
 }
-
 export interface FiltroBusquedaViajeDto {
   localidadOrigenId?: number | null;
   localidadDestinoId?: number | null;
   fechaDesde: string;
   fechaHasta?: string;
 }
-
   export interface CompraViajeDto {
   idViaje: number;
   origen: string;
@@ -48,6 +46,10 @@ export interface DetalleViajeDto {
   fechaHoraSalida: string; 
   fechaHoraLlegada: string;
   precio: number;
+  nombreLocalidadOrigen: string;
+  nombreLocalidadDestino: string;
+  localidadOrigenId: string;
+  localidadDestinoId: string;
   cantidadPasajesVendibles: number;
   cantidadAsientosVendidos: number;
   cantidadAsientosDisponibles: number;

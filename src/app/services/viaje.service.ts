@@ -6,7 +6,8 @@ import {
   AltaViajeDto,
   ViajeDisponibleDto,
   FiltroBusquedaViajeDto,
-  CompraViajeDto
+  CompraViajeDto,
+  DetalleViajeDto
 } from '../models/viajes';
 import { Page } from '../models';
 
@@ -83,5 +84,13 @@ export class ViajeService {
         const message = err?.error?.message || 'Error desconocido al registrar el viaje';
         throw message;
       });
+  }
+  reasignar(viajeId: number, body: { nuevoOmnibusId: number, confirm: boolean }): Promise<void> {
+    return firstValueFrom(this.http.post<void>(`${this.baseUrl}/${viajeId}/reasignar`, body));
+  }
+  getDetalleViaje(idViaje: number): Promise<DetalleViajeDto> {
+    return firstValueFrom(
+      this.http.get<{ data: DetalleViajeDto }>(`${this.baseUrl}/${idViaje}`)
+    ).then(resp => resp.data);
   }
 }

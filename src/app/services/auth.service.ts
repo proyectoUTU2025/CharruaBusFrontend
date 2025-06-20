@@ -58,9 +58,6 @@ export class AuthService {
       )
     );
   }
-
-
-
   requestPasswordReset(email: string): Promise<void> {
     return firstValueFrom(
       this.http.post<void>(
@@ -110,8 +107,6 @@ export class AuthService {
     );
   }
 
-
-
   private setToken(token: string) {
     this.cookies.set(this.tokenKey, token, { path: '/' });
   }
@@ -134,14 +129,12 @@ export class AuthService {
     return !!this.token;
   }
 
-
   get id(): number | null {
     return this.decoded?.id ? +this.decoded.id : null;
   }
   get rol(): string | null {
     return this.decoded?.role || null;
   }
-
 
   get userId(): number | null {
     return this.id;

@@ -1,0 +1,29 @@
+<form class="filtros">
+    <mat-form-field><mat-label>Fecha inicio</mat-label><input matInput [formControl]="fechaInicio"
+            type="date"></mat-form-field>
+    <mat-form-field><mat-label>Fecha fin</mat-label><input matInput [formControl]="fechaFin"
+            type="date"></mat-form-field>
+    <mat-form-field><mat-label>Origen</mat-label>
+        <mat-select [formControl]="origen"><mat-option *ngFor="let d of departamentos"
+                [value]="d">{{d}}</mat-option></mat-select>
+    </mat-form-field>
+    <mat-form-field><mat-label>Destino</mat-label>
+        <mat-select [formControl]="destino"><mat-option *ngFor="let d of departamentos"
+                [value]="d">{{d}}</mat-option></mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="load()">Filtrar</button>
+    <button mat-button (click)="exportCsv()">CSV</button>
+</form>
+<table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="departamento">
+        <th mat-header-cell *matHeaderCellDef>Departamento</th>
+        <td mat-cell *matCellDef="let e">{{e.departamento}}</td>
+    </ng-container>
+    <ng-container matColumnDef="cantidadViajes">
+        <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+        <td mat-cell *matCellDef="let e">{{e.cantidadViajes}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)"></mat-paginator>

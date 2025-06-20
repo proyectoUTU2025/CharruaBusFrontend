@@ -1,0 +1,26 @@
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  
+  mat-form-field {
+    width: 180px;
+  }
+  
+  button {
+    align-self: flex-end;
+  }
+  
+  table {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  mat-paginator {
+    display: flex;
+    justify-content: center;
+  }
+  

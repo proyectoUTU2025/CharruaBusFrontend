@@ -8,7 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Bus } from '../../../../models/bus';
+import { BusDto } from '../../../../models/buses/bus.model.dto';
+
 
 
 @Component({
@@ -35,14 +36,14 @@ export class EditBusDialogComponent {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditBusDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Bus
+    @Inject(MAT_DIALOG_DATA) public data: BusDto
   ) {
     this.form = this.fb.group({
       id: [data.id],
       matricula: [data.matricula, Validators.required],
-      localidad: [data.localidad, Validators.required],
-      cantidadAsientos: [data.cantidadAsientos, [Validators.required, Validators.min(1)]],
-      estado: [data.estado]
+      localidad: [data.ubicacionActual, Validators.required],
+      cantidadAsientos: [data.capacidad, [Validators.required, Validators.min(1)]],
+      estado: [data.activo]
     });
   }
 

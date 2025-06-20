@@ -1,0 +1,26 @@
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-end;
+}
+
+mat-form-field {
+    width: 180px;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+table {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+mat-paginator {
+    display: flex;
+    justify-content: center;
+}

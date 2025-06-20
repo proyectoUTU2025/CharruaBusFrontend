@@ -1,0 +1,30 @@
+<div class="filters">
+    <mat-form-field appearance="fill">
+        <mat-label>Fecha Inicio</mat-label>
+        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaInicio" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Fecha Fin</mat-label>
+        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaFin" />
+    </mat-form-field>
+    <button mat-button (click)="load()">Filtrar</button>
+    <button mat-raised-button color="primary" (click)="exportCsv()">Exportar CSV</button>
+</div>
+
+<table mat-table [dataSource]="data">
+    <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let x">{{ x.email }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="cantidadLogueos">
+        <th mat-header-cell *matHeaderCellDef>Logueos</th>
+        <td mat-cell *matCellDef="let x">{{ x.cantidadLogueos }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['email','cantidadLogueos']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['email','cantidadLogueos']"></tr>
+</table>
+
+<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="pageChanged($event)">
+</mat-paginator>

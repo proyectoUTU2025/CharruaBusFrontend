@@ -48,6 +48,10 @@
   </div>
 </form>
 
+<div class="bulk-errors" *ngIf="bulkErrors.length">
+  <div *ngFor="let err of bulkErrors" class="error-line">{{ err }}</div>
+</div>
+
 <div class="users-card">
   <div class="table-header">
     <span class="card-title">Lista de Usuarios</span>
@@ -60,7 +64,8 @@
       </button>
     </div>
   </div>
-  <table mat-table [dataSource]="usuarios" class="mat-elevation-z1">
+
+  <table mat-table [dataSource]="dataSource.data" class="mat-elevation-z1">
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef>ID</th>
       <td mat-cell *matCellDef="let u">{{ u.id }}</td>
@@ -117,10 +122,13 @@
     <tr mat-header-row *matHeaderRowDef="columns"></tr>
     <tr mat-row *matRowDef="let row; columns: columns;"></tr>
   </table>
+
   <mat-paginator
     [length]="totalElements"
-    [pageSize]="5"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
     [pageSizeOptions]="[5, 10, 25]"
+    (page)="onPaginate($event)"
     showFirstLastButtons>
   </mat-paginator>
 </div>

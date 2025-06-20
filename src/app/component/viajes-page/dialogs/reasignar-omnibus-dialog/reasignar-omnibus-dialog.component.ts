@@ -4,7 +4,7 @@ import { DetalleViajeDto } from '../../../../models/viajes';
 import { BusService } from '../../../../services/bus.service';
 import { ViajeService } from '../../../../services/viaje.service';
 import { WarningDialogComponent } from '../warning-dialog/warning-dialog/warning-dialog.component';
-import { FiltroDisponibilidadOmnibusDto, FiltroDisponibilidadReasOmnibusDto, OmnibusDisponibleDto } from '../../../../models';
+import { FiltroDisponibilidadReasOmnibusDto, OmnibusDisponibleDto } from '../../../../models';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -56,9 +56,6 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
       this.busesDisponibles = buses;
     });
   }
-
-
-
   confirmarReasignacion(): void {
     if (!this.omnibusSeleccionadoId) return;
 

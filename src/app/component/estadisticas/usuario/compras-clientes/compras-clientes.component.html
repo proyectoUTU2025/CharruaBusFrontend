@@ -1,0 +1,36 @@
+<div class="filters">
+    <mat-form-field appearance="fill">
+        <mat-label>Fecha Inicio</mat-label>
+        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaInicio" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Fecha Fin</mat-label>
+        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaFin" />
+    </mat-form-field>
+    <button mat-button (click)="load()">Filtrar</button>
+    <button mat-raised-button color="primary" (click)="exportCsv()">Exportar CSV</button>
+    <button mat-button (click)="toggleSort()">Orden {{ ascendente ? '↑' : '↓' }}</button>
+</div>
+
+<table mat-table [dataSource]="data">
+    <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let x">{{ x.email }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="cantidadPasajes">
+        <th mat-header-cell *matHeaderCellDef>Pasajes</th>
+        <td mat-cell *matCellDef="let x">{{ x.cantidadPasajes }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalGastado">
+        <th mat-header-cell *matHeaderCellDef>Total Gastado</th>
+        <td mat-cell *matCellDef="let x">{{ x.totalGastado }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['email','cantidadPasajes','totalGastado']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
+</table>
+
+<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="pageChanged($event)">
+</mat-paginator>

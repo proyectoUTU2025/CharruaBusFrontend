@@ -8,15 +8,15 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-stripe-redirect',
-  templateUrl: './stripe-redirect.component.html',
-  styleUrls: ['./stripe-redirect.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
     MatCardModule,
     MatProgressSpinnerModule,
     MatProgressBarModule
-  ]
+  ],
+  templateUrl: './stripe-redirect.component.html',
+  styleUrls: ['./stripe-redirect.component.scss']
 })
 export class StripeRedirectComponent implements OnInit {
   mensaje = '';
@@ -26,11 +26,12 @@ export class StripeRedirectComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private compraService: CompraService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const url = this.router.url;
-    const sessionId = this.getSessionIdFromUrl();
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
 
     if (!sessionId) {
       this.mensaje = 'Error: sesión de pago no encontrada.';
@@ -76,10 +77,5 @@ export class StripeRedirectComponent implements OnInit {
     setTimeout(() => {
       this.router.navigate(['/comprar']);
     }, 3000);
-  }
-
-  private getSessionIdFromUrl(): string | null {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('session_id');
   }
 }

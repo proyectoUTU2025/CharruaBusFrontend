@@ -1,6 +1,6 @@
-import { Component, OnInit, AfterViewChecked, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,22 +13,18 @@ import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { CompraRequestDto } from '../../models/compra';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { CompraService } from '../../services/compra.service';
 import { ViajeService } from '../../services/viaje.service';
+import { CompraRequestDto } from '../../models/compra/compra.dto.model';
 import { CompraViajeDto } from '../../models/viajes';
 import { SeatsComponent } from '../seats/seats.component';
 import { PurchaseSummaryDialogComponent } from './dialogs/purchase-summary-dialog/purchase-summary-dialog.component';
-import { LocalidadService } from '../../services/localidades.service';
-import { CompraService } from '../../services/compra.service';
 import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UsuarioDto } from '../../models';
 import { ActivatedRoute } from '@angular/router';
-import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
-
-type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
 
 @Component({
   selector: 'app-compra-page',
@@ -50,42 +46,34 @@ type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
     MatIconModule,
     MatTabsModule,
     MatPaginatorModule,
+    MatTableModule,
     SeatsComponent,
     PurchaseSummaryDialogComponent,
-    MatAutocompleteModule
+    SelectSeatsDialogComponent
   ],
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
 })
 export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChecked {
   step = 0;
-  completedSteps: boolean[] = [false, false, false, false, false];
   tipoViaje: 'IDA' | 'IDA_Y_VUELTA' = 'IDA';
-  selectedTabIndex = 0;
   searchForm!: FormGroup;
-  pasajerosForm!: FormGroup;
   localidades: any[] = [];
   destinos: any[] = [];
-  viajes: CompraViajeSeleccionable[] = [];
-  viajesVuelta: CompraViajeSeleccionable[] = [];
-  selectedSeats: number[] = [];
-  selectedSeatsVuelta: number[] = [];
-  viajeIdaSeleccionado: CompraViajeDto | null = null;
-  viajeVueltaSeleccionado: CompraViajeDto | null = null;
-  searchTerm = '';
-  clientesFiltrados: UsuarioDto[] = [];
-  userInfo: UsuarioDto | null = null;
+  dataSource = new MatTableDataSource<CompraViajeDto>([]);
+  displayedColumns = ['origen', 'destino', 'precio', 'seleccionar'];
   totalElements = 0;
   pageSize = 5;
   pageIndex = 0;
+
+  selectedSeats: number[] = [];
+  viajeIdaSeleccionado: CompraViajeDto | null = null;
   estadoCompra: 'exito' | 'cancelado' | 'error' | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild('auto') auto!: MatAutocomplete;
 
   constructor(
     private fb: FormBuilder,
-    private localidadService: LocalidadService,
     private viajeService: ViajeService,
     private compraService: CompraService,
     private dialog: MatDialog,
@@ -102,97 +90,35 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       fechaVuelta: [null],
       pasajeros: [1, [Validators.min(1), Validators.max(5)]]
     });
-    this.pasajerosForm = this.fb.group({ pasajeros: this.fb.array([]) });
-    this.generarFormularioPasajeros(this.searchForm.value.pasajeros);
-    this.searchForm.get('pasajeros')!.valueChanges.subscribe(n => this.generarFormularioPasajeros(n));
-    this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
-    this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(id => {
-      this.localidadService.getDestinosPosibles(id).subscribe(d => this.destinos = d);
-    });
-    if (this.authService.rol === 'CLIENTE') {
-      const id = this.authService.id;
-      if (id) {
-        this.userService.getById(id).then(data => this.userInfo = data).catch(() => this.userInfo = null);
-      }
-    }
   }
 
   ngAfterViewInit(): void {
-    const url = this.route.snapshot.url.map(s => s.path).join('/');
     const estado = this.route.snapshot.queryParamMap.get('estado');
-    if (url.includes('compras/exito') && estado === 'exito') {
-      this.estadoCompra = 'exito';
-      this.step = 5;
-    }
-    if (url.includes('compras/cancelada') && estado === 'cancelado') {
-      this.estadoCompra = 'cancelado';
-      this.step = 5;
-    }
-    if (url.includes('compras/cancelada') && estado === 'error') {
-      this.estadoCompra = 'error';
+    if (estado) {
+      this.estadoCompra = estado as any;
       this.step = 5;
     }
   }
 
   ngAfterViewChecked(): void {
-    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
-    headers.forEach((header, index) => {
-      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
-      const label = header.querySelector('.mat-step-label') as HTMLElement;
-      if (index < this.step) {
-        icon.style.backgroundColor = '#3e5f3c';
-        label.style.color = '#3e5f3c';
-      } else if (index === this.step) {
-        icon.style.backgroundColor = '#675992';
-        label.style.color = '#675992';
-      } else {
-        icon.style.backgroundColor = '#ccc';
-        label.style.color = '#444';
-      }
-    });
-  }
-
-  get pasajeros(): FormArray {
-    return this.pasajerosForm.get('pasajeros') as FormArray;
-  }
-
-  private generarFormularioPasajeros(cantidad: number): void {
-    const array = this.fb.array<FormGroup>([]);
-    for (let i = 0; i < cantidad; i++) {
-      array.push(this.fb.group({
-        nombre: ['', Validators.required],
-        documento: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        telefono: ['', Validators.required],
-        direccion: ['', Validators.required]
-      }));
-    }
-    this.pasajerosForm.setControl('pasajeros', array);
   }
 
   cambiarTipoViaje(index: number): void {
     this.tipoViaje = index === 0 ? 'IDA' : 'IDA_Y_VUELTA';
-    this.selectedTabIndex = index;
-    this.searchForm.get('fechaVuelta')?.reset();
     this.step = 0;
-    this.completedSteps = Array(this.tipoViaje === 'IDA' ? 5 : 7).fill(false);
   }
 
   buscar(): void {
-    this.searchForm.markAllAsTouched();
-    this.origenError = '';
-    this.destinoError = '';
-    this.fechaError = '';
-    const f = this.searchForm.value;
-    if (!f.localidadOrigenId) this.origenError = 'Debe seleccionar un origen.';
-    if (!f.localidadDestinoId) this.destinoError = 'Debe seleccionar un destino.';
-    if (!f.fechaDesde) this.fechaError = 'Debe seleccionar fecha de ida.';
-    if (this.origenError || this.destinoError || this.fechaError) return;
+    if (this.searchForm.invalid) return;
     this.pageIndex = 0;
     this.buscarConPaginacion();
   }
 
-  private buscarConPaginacion(): void {
+  private formatFecha(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  buscarConPaginacion(): void {
     const f = this.searchForm.value;
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
@@ -200,163 +126,62 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       fechaViaje: this.formatFecha(f.fechaDesde),
       cantidadPasajes: f.pasajeros
     };
-    this.viajeService.buscarDisponibles(filtro, this.pageIndex, this.pageSize)
-      .then(page => {
-        this.viajes = page.content.map(v => ({ ...v, seleccionado: false }));
+
+    this.viajeService
+      .buscarDisponibles(filtro, this.pageIndex, this.pageSize)
+      .then((page: { content: CompraViajeDto[]; totalElements: number }) => {
+        this.dataSource.data = page.content;
         this.totalElements = page.totalElements;
         this.step = 1;
+      })
+      .catch((err: any) => {
+        console.error('Error al buscar viajes:', err);
       });
   }
 
-  private buscarViajesVuelta(): void {
-    const f = this.searchForm.value;
-    const filtro = {
-      idLocalidadOrigen: f.localidadDestinoId,
-      idLocalidadDestino: f.localidadOrigenId,
-      fechaViaje: this.formatFecha(f.fechaVuelta),
-      cantidadPasajes: f.pasajeros
-    };
-    const fechaLlegadaIda = new Date(this.viajeIdaSeleccionado?.fechaHoraLlegada || '');
-    this.viajeService.buscarDisponibles(filtro, 0, 10).then(page => {
-      this.viajesVuelta = page.content
-        .filter(v => new Date(v.fechaHoraSalida) > fechaLlegadaIda)
-        .map(v => ({ ...v, seleccionado: false }));
-      this.step = 3;
-    });
-  }
-
-  cambiarPagina(event: any): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
+  pageChanged(e: PageEvent): void {
+    this.pageIndex = e.pageIndex;
+    this.pageSize = e.pageSize;
     this.buscarConPaginacion();
   }
 
-  limpiarFiltros(): void {
-    this.searchForm.reset({ pasajeros: 1 });
-    this.destinos = this.localidades;
-    this.viajes = [];
-    this.viajesVuelta = [];
-    this.selectedSeats = [];
-    this.selectedSeatsVuelta = [];
-    this.viajeIdaSeleccionado = null;
-    this.viajeVueltaSeleccionado = null;
-    this.step = 0;
-    this.completedSteps = Array(this.tipoViaje === 'IDA' ? 5 : 7).fill(false);
+  seleccionarViaje(v: CompraViajeDto): void {
+    this.viajeIdaSeleccionado = v;
+    this.step = 2;
   }
 
-  seleccionarViaje(v: CompraViajeSeleccionable, esVuelta = false): void {
-    if (esVuelta) {
-      this.viajesVuelta.forEach(x => x.seleccionado = false);
-      v.seleccionado = true;
-      this.viajeVueltaSeleccionado = v;
-      this.completedSteps[3] = true;
-    } else {
-      this.viajes.forEach(x => x.seleccionado = false);
-      v.seleccionado = true;
-      this.viajeIdaSeleccionado = v;
-      this.completedSteps[1] = true;
-    }
-  }
-
-  abrirDialogPasajeros(esVuelta = false): void {
-    const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
-    if (!viaje) return;
-    const pasajeros = this.searchForm.value.pasajeros;
-    const { idViaje, asientosDisponibles, precioEstimado } = viaje;
+  abrirDialogPasajeros(): void {
+    if (!this.viajeIdaSeleccionado) return;
     const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
       width: '600px',
-      data: { pasajeros, viajeId: idViaje!, cantidadAsientos: asientosDisponibles!, precio: precioEstimado! }
+      data: { pasajeros: this.searchForm.value.pasajeros, viajeId: this.viajeIdaSeleccionado.idViaje }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
-      if (esVuelta) {
-        this.selectedSeatsVuelta = result.asientos;
-        this.completedSteps[4] = true;
-      } else {
+    dialogRef.afterClosed().subscribe((result: { asientos: number[] } | undefined) => {
+      if (result) {
         this.selectedSeats = result.asientos;
-        this.completedSteps[2] = true;
+        this.step = 3;
       }
     });
   }
 
   confirmarCompra(): void {
-    const f = this.searchForm.value;
-    const clienteId = this.userInfo?.id || 0;
     const dto: CompraRequestDto = {
       viajeIdaId: this.viajeIdaSeleccionado?.idViaje || 0,
-      viajeVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? this.viajeVueltaSeleccionado?.idViaje : null,
       asientosIda: this.selectedSeats,
-      asientosVuelta: this.tipoViaje === 'IDA_Y_VUELTA' ? this.selectedSeatsVuelta : undefined,
-      clienteId,
-      localidadOrigenId: f.localidadOrigenId,
-      localidadDestinoId: f.localidadDestinoId,
-      paradaOrigenVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadDestinoId : null,
-      paradaDestinoVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadOrigenId : null
+      clienteId: this.authService.id || 0,
+      localidadOrigenId: this.searchForm.value.localidadOrigenId,
+      localidadDestinoId: this.searchForm.value.localidadDestinoId,
+      viajeVueltaId: null,
+      asientosVuelta: []
     };
-    this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
-  }
-
-  siguientePaso(): void {
-    if (this.step === 4 && this.tipoViaje === 'IDA') return;
-    if (this.puedeAvanzar()) {
-      this.completedSteps[this.step] = true;
-      if (this.tipoViaje === 'IDA_Y_VUELTA' && this.step === 2) {
-        this.step++;
-        this.buscarViajesVuelta();
-      } else {
-        this.step++;
-      }
-    }
+    this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.sessionUrl);
   }
 
   anteriorPaso(): void {
-    if (this.step > 0 && this.step < 6) this.step--;
+    if (this.step > 0) this.step--;
   }
 
-  puedeAvanzar(): boolean {
-    if (this.step === 0) return this.searchForm.valid;
-    if (this.step === 1) return !!this.viajeIdaSeleccionado;
-    if (this.step === 2) return this.selectedSeats.length > 0;
-    if (this.tipoViaje === 'IDA_Y_VUELTA') {
-      if (this.step === 3) return !!this.viajeVueltaSeleccionado;
-      if (this.step === 4) return this.selectedSeatsVuelta.length > 0;
-      if (this.step === 5) return false;
-    }
-    if (this.tipoViaje === 'IDA' && this.step === 3) return false;
-    return true;
+  siguientePaso(): void {
+    if (this.step < 5) this.step++;
   }
-
-  buscarClientes(): void {
-    const q = this.searchTerm.trim();
-    if (q.length < 2) return;
-    this.userService.getAll({ nombre: q } as any, 0, 5).then(page => {
-      this.clientesFiltrados = page.content;
-    }).catch(() => {
-      this.clientesFiltrados = [];
-    });
-  }
-
-  displayCliente(cliente: UsuarioDto): string {
-    return cliente ? `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.trim() : '';
-  }
-
-  seleccionarCliente(cliente: UsuarioDto): void {
-    this.userInfo = cliente;
-    this.searchTerm = this.displayCliente(cliente);
-    this.clientesFiltrados = [];
-  }
-
-  private formatFecha(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
-  calcularDuracion(inicio: string, fin: string): string {
-    const diff = new Date(fin).getTime() - new Date(inicio).getTime();
-    const mins = Math.floor(diff / 60000);
-    return `${Math.floor(mins / 60)}h ${mins % 60}m`;
-  }
-
-  origenError = '';
-  destinoError = '';
-  fechaError = '';
 }

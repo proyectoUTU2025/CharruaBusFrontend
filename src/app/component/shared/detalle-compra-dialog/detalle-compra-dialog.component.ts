@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { CompraService } from '../../../services/compra.service';
 import { DetalleCompraDto } from '../../../models/compra/compra.dto.model';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators'; 
 
 @Component({
     standalone: true,
@@ -23,9 +22,7 @@ export class DetalleCompraDialogComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.detalle$ = this.compraService
-            .getDetalle(this.data.compraId)
-            .pipe(map(resp => resp.data));
+        this.detalle$ = this.compraService.getDetalle(this.data.compraId);
     }
 
     close() {

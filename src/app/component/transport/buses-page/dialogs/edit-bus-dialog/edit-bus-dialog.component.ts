@@ -17,7 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { BusDto } from '../../../../../models/buses/bus-dto.model';
+import { BusDto } from '../../../../../models/buses/bus.model.dto';
 
 @Component({
     standalone: true,

@@ -1,0 +1,60 @@
+.dialog-content {
+  padding-top: 12px;
+}
+
+.subtitle {
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.bus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bus-radio {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.bus-radio.mat-radio-checked {
+  border-color: #675992;
+  background-color: #f3f0f8;
+}
+
+.bus-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.bus-icon {
+  font-size: 24px;
+  color: #675992;
+}
+
+.bus-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.matricula {
+  font-weight: bold;
+}
+
+.capacidad {
+  font-size: 12px;
+  color: #666;
+}
+
+.dialog-actions {
+  margin-top: 16px;
+}

@@ -10,6 +10,7 @@ import { ResetPasswordRequestDto } from '../models/auth/reset-password-request.d
 import { LoginRequestDto } from '../models/auth/login-request.dto';
 import { RegisterRequestDto } from '../models/auth/register-request.dto';
 import { AuthenticationResponseDto } from '../models/auth/authentication-response.dto';
+import { Router } from '@angular/router';
 
 interface DecodedToken extends JwtPayload {
   name?: string;
@@ -25,30 +26,61 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private cookies: CookieService
+    private cookies: CookieService,
+    private router: Router
   ) { }
 
-
-
-  async login(email: string, password: string): Promise<void> {
-    const resp = await firstValueFrom(
-      this.http.post<{ data: AuthenticationResponseDto }>(
-        `${this.base}/login`,
-        { email, password } as LoginRequestDto
-      )
-    );
-    this.setToken(resp.data.token);
-  }
-
-  logout(): void {
-    this.cookies.delete(this.tokenKey, '/');
-  }
-
-  register(dto: RegisterRequestDto): Promise<void> {
+  login(credentials: { email: string; password: string }) {
     return firstValueFrom(
-      this.http.post<void>(`${this.base}/registrar`, dto)
-    );
+      this.http.post<{ data: { token: string } }>(
+        `${environment.apiBaseUrl}/auth/login`,
+        credentials
+      )
+    ).then(response => {
+      const token = response.data.token;
+      this.cookies.set('access_token', token, { path: '/' });
+    }).catch(error => {
+      console.error('Error during login:', error);
+    });
   }
+  
+  validateCode(email: string, code: string) {
+    return firstValueFrom(
+      this.http.post(`${environment.apiBaseUrl}/auth/verify-email`, {
+        email,
+        verificationCode: code
+      })
+    ).catch(error => {
+      console.error('Error during email verification:', error);
+      throw error;
+    });
+  }
+   registrarCliente(data: any) {
+    return firstValueFrom(
+      this.http.post(`${environment.apiBaseUrl}/auth/registrar`, data)
+    ).catch(error => {
+      console.error('Error durante el registro:', error);
+      throw error;
+    });
+  }
+   private get decoded(): DecodedToken | null {
+    const token = this.token;
+    if (!token) return null;
+    try {
+      return jwtDecode(token);
+    } catch {
+      return null;
+    }
+  }
+
+  logout() {
+    firstValueFrom(this.http.post(`${environment.apiBaseUrl}/auth/logout`, {}))
+      .finally(() => {
+        this.cookies.delete('access_token', '/');
+        this.router.navigate(['/login']);
+      });
+  } 
+  
 
   verifyEmail(email: string, verificationCode: string): Promise<void> {
     return firstValueFrom(
@@ -58,6 +90,7 @@ export class AuthService {
       )
     );
   }
+
   requestPasswordReset(email: string): Promise<void> {
     return firstValueFrom(
       this.http.post<void>(
@@ -114,27 +147,30 @@ export class AuthService {
   get token(): string | null {
     return this.cookies.get(this.tokenKey) || null;
   }
+  
+  get nombre(): string | null {
+    return this.decoded?.name || null;
+  }
 
-  get decoded(): DecodedToken | null {
-    const t = this.token;
-    if (!t) return null;
-    try {
-      return jwtDecode<DecodedToken>(t);
-    } catch {
-      return null;
-    }
+  get email(): string | null {
+    return this.decoded?.sub || null;
+  }
+
+   get rol(): string | null {
+    return this.decoded?.role || null;
+  }
+  
+  get id(): number | null {
+    return this.decoded?.id ? +this.decoded.id : null;
+  }
+
+  estaLogueado(): boolean {
+    return !!this.token;
   }
 
   get isLoggedIn(): boolean {
     return !!this.token;
-  }
-
-  get id(): number | null {
-    return this.decoded?.id ? +this.decoded.id : null;
-  }
-  get rol(): string | null {
-    return this.decoded?.role || null;
-  }
+  } 
 
   get userId(): number | null {
     return this.id;

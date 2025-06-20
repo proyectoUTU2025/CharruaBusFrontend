@@ -14,6 +14,7 @@ import { ApiResponse } from '../models/api';
 import { FiltroDisponibilidadOmnibusDto } from '../models/buses/filtro-disponibilidad-omnibus.dto';
 import { FiltroViajeOmnibus } from '../models/movimiento-omnibus/filtro-viaje-omnibus.model';
 import { OmnibusDisponibleDto } from '../models/buses/omnibus-disponible.dto';
+import { FiltroDisponibilidadReasOmnibusDto } from '../models/buses/bus.model.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -118,4 +119,18 @@ export class BusService {
       message: res?.message || 'Estado actualizado correctamente'
     }));
   }
-}
+  getDisponiblesParaReasignacion(filtro: FiltroDisponibilidadReasOmnibusDto): Promise<OmnibusDisponibleDto[]> {
+      let params = new HttpParams();
+
+      Object.entries(filtro).forEach(([k, v]) => {
+        if (v != null && v !== '') {
+          params = params.set(k, v.toString());
+        }
+      });
+
+      return firstValueFrom(
+        this.http.get<Page<OmnibusDisponibleDto>>(`${this.base}/disponibles`, { params })
+      ).then(resp => resp.content);
+    }
+
+  }

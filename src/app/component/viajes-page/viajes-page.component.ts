@@ -18,6 +18,8 @@ import { Page } from '../../models';
 import { LocalidadService } from '../../services/localidades.service';
 import { LocalidadDto } from '../../models/localidades/localidades-dto.model';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
+import { ViajeDetalleDialogComponent } from './dialogs/viaje-detalle-dialog/viaje-detalle-dialog.component';
+
 
 
 @Component({
@@ -35,13 +37,14 @@ import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localid
     MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    ViajeDetalleDialogComponent
   ],
   templateUrl: './viajes-page.component.html',
   styleUrls: ['./viajes-page.component.scss']
 })
 export class ViajesPageComponent implements OnInit, AfterViewInit {
-  columns = ['nombreLocalidadOrigen', 'nombreLocalidadDestino','fechaHoraSalida', 'fechaHoraLlegada', 'precioPorTramo', 'asientosDisponibles'];
+  columns = ['nombreLocalidadOrigen', 'nombreLocalidadDestino','fechaHoraSalida', 'fechaHoraLlegada', 'precioPorTramo', 'asientosDisponibles', 'acciones'];
   dataSource = new MatTableDataSource<ViajeDisponibleDto>();
   totalElements = 0;  
   localidades: LocalidadNombreDepartamentoDto[] = [];
@@ -122,4 +125,17 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
       this.buscar();
     });
   }
+  verDetallesViaje(viaje: ViajeDisponibleDto): void {
+    this.viajeService.getDetalleViaje(viaje.id).then((detalle) => {
+      this.dialog.open(ViajeDetalleDialogComponent, {
+        width: '700px',
+        data: { viaje: detalle }
+      }).afterClosed().subscribe((resultado) => {
+        if (resultado?.reasignado) {
+          this.buscar(); 
+        }
+      });
+    });
+  }
+
 }

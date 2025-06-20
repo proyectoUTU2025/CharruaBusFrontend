@@ -65,7 +65,6 @@ export class ViajeService {
   );
 }
 
-
   getAllViajes(page = 0, size = 5): Promise<Page<CompraViajeDto>> {
     let params = new HttpParams()
       .set('page', page.toString())

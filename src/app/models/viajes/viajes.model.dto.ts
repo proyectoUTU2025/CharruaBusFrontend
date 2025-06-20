@@ -1,5 +1,5 @@
 export interface ViajeDisponibleDto {
-  idViaje: number;
+  id: number;
   nombreLocalidadOrigen: string;
   nombreLocalidadDestino: string;
   fechaHoraSalida: string;

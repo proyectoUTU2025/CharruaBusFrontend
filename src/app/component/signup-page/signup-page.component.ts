@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
+
 @Component({
   selector: 'app-signup-page',
   standalone: true,
@@ -54,7 +55,7 @@ export class SignupPageComponent {
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) return;
     try {
-      await this.authService.register(this.signupForm.value);
+      await this.authService.registrarCliente(this.signupForm.value);
       this.router.navigate(['/verificar-codigo']);
     } catch (error) {
       this.error = 'Error al registrar. Verificá los datos.';

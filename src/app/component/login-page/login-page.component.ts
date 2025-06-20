@@ -5,8 +5,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -27,11 +27,7 @@ export class LoginPageComponent {
   hidePassword = true;
   error: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private loginService: AuthService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -40,11 +36,8 @@ export class LoginPageComponent {
 
   async onSubmit(): Promise<void> {
     if (this.loginForm.invalid) return;
-    this.error = null;
-
-    const { email, password } = this.loginForm.value;
     try {
-      await this.loginService.login(email, password);
+      await this.authService.login(this.loginForm.value);
       this.router.navigate(['/']);
     } catch {
       this.error = 'Credenciales inválidas';
@@ -52,7 +45,7 @@ export class LoginPageComponent {
   }
 
   forgotPassword(): void {
-    this.router.navigate(['/forgot-password']);
+    console.log('Recuperar contraseña');
   }
 
   goToSignup(): void {

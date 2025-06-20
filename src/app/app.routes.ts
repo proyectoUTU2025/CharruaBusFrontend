@@ -19,6 +19,16 @@ import { PasajeHistoryComponent } from './component/pasaje-history/pasaje-histor
 import { ChangePasswordComponent } from './component/change-password/change-password.component';
 import { EditUserDialogComponent } from './component/users-page/dialogs/edit-user-dialog/edit-user-dialog.component';
 
+import { UsuariosPorTipoComponent } from './component/estadisticas/usuario/usuarios-por-tipo/usuarios-por-tipo.component';
+import { ComprasClientesComponent } from './component/estadisticas/usuario/compras-clientes/compras-clientes.component';
+import { LogueosUsuariosComponent } from './component/estadisticas/usuario/logueos-usuarios/logueos-usuarios.component';
+
+import { ViajesDepartamentoComponent } from './component/estadisticas/transporte/viajes-departamento/viajes-departamento.component';
+import { ViajesPorOmnibusComponent } from './component/estadisticas/transporte/viajes-por-omnibus/viajes-por-omnibus.component';
+import { MantenimientosPorOmnibusComponent } from './component/estadisticas/transporte/mantenimientos-por-omnibus/mantenimientos-por-omnibus.component';
+import { EstadisticasPasajesComponent } from './component/estadisticas/transporte/estadisticas-pasajes/estadisticas-pasajes.component';
+import { PasajesAgrupadosComponent } from './component/estadisticas/transporte/pasajes-agrupados/pasajes-agrupados.component';
+
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
   { path: 'registro', component: SignupPageComponent },
@@ -45,6 +55,14 @@ export const routes: Routes = [
       { path: 'perfil/editar', component: EditUserDialogComponent },
       { path: 'pasajes', component: PasajeHistoryComponent },
       { path: 'change-password', component: ChangePasswordComponent },
+      { path: 'estadisticas/usuarios-por-tipo', component: UsuariosPorTipoComponent },
+      { path: 'estadisticas/compras-clientes', component: ComprasClientesComponent },
+      { path: 'estadisticas/logueos-usuarios', component: LogueosUsuariosComponent },
+      { path: 'estadisticas/viajes-departamento', component: ViajesDepartamentoComponent },
+      { path: 'estadisticas/viajes-por-omnibus', component: ViajesPorOmnibusComponent },
+      { path: 'estadisticas/mantenimientos-por-omnibus', component: MantenimientosPorOmnibusComponent },
+      { path: 'estadisticas/estadisticas-pasajes', component: EstadisticasPasajesComponent },
+      { path: 'estadisticas/pasajes-agrupados', component: PasajesAgrupadosComponent },
     ]
   },
 

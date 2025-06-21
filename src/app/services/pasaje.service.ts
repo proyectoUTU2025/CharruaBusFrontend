@@ -53,9 +53,7 @@ export class PasajeService {
     getDetallePasaje(pasajeId: number): Observable<PasajeDto> {
         return this.http
             .get<ApiResponse<PasajeDto>>(`${this.base}/${pasajeId}`)
-            .pipe(
-                map((resp: ApiResponse<PasajeDto>) => resp.data)
-            );
+            .pipe(map(resp => resp.data));
     }
 
     descargarPdf(pasajeId: number): Observable<Blob> {

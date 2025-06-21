@@ -210,7 +210,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     });
   }
 
-  /** Devuelve un Date que combina fechaSalida + horaSalida */
   get salidaCompleta(): Date | null {
     if (!this.fechaSalida || !this.horaSalida) return null;
     const [hh, mm] = this.horaSalida.split(':').map(n => Number(n));
@@ -219,7 +218,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     return d;
   }
 
-  /** Devuelve un Date que combina fechaLlegada + horaLlegada */
   get llegadaCompleta(): Date | null {
     if (!this.fechaLlegada || !this.horaLlegada) return null;
     const [hh, mm] = this.horaLlegada.split(':').map(n => Number(n));

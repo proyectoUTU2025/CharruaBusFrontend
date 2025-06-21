@@ -6,7 +6,7 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { AuthService } from '../../../../services/auth.service';
 import { UserService } from '../../../../services/user.service';
 import { EditarUsuarioRequestDto } from '../../../../models/users/editar-usuario-request.dto';
@@ -86,12 +86,12 @@ export class EditUserDialogComponent implements OnInit {
     const id = this.auth.userId!;
     const dto: EditarUsuarioRequestDto = this.form.value;
     this.userService.editProfile(id, dto)
-      .then(() => this.dialogRef.close())
+      .then(() => this.dialogRef.close(true))
       .catch(err => this.error = err.error?.message || 'Error al guardar')
       .finally(() => this.loading = false);
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(false);
   }
 }

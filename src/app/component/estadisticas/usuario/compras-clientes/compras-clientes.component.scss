@@ -1,20 +1,17 @@
-.filters {
+:host {
+    display: block;
+    padding: 16px;
+}
+
+.controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-mat-form-field {
-    width: 150px;
-}
-
-table {
+table.mat-elevation-z1 {
     width: 100%;
-    margin-bottom: 1rem;
-}
-
-mat-paginator {
-    display: flex;
-    justify-content: center;
+    margin-bottom: 16px;
 }

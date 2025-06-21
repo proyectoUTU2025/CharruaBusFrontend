@@ -1,9 +1,11 @@
-<h2 mat-dialog-title>Editar Configuración</h2>
+<h2 mat-dialog-title>
+    {{ config.id ? 'Editar Configuración' : 'Nueva Configuración' }}
+</h2>
 
 <mat-dialog-content [formGroup]="form">
     <mat-form-field class="full-width">
         <mat-label>Parámetro</mat-label>
-        <input matInput formControlName="nombre" [disabled]="true" />
+        <input matInput formControlName="nombre" />
     </mat-form-field>
 
     <mat-form-field class="full-width">

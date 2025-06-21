@@ -12,7 +12,6 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-
 import { Configuracion } from '../../../models/configuracion';
 
 @Component({
@@ -35,15 +34,14 @@ export class EditConfiguracionDialogComponent {
     constructor(
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<EditConfiguracionDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public config: Configuracion
+        @Inject(MAT_DIALOG_DATA) public config: Configuracion & { id: number | null }
     ) {
         this.form = this.fb.group({
             id: [config.id],
-            nombre: [{ value: config.nombre, disabled: true }, Validators.required],
-            valorInt: [config.valorInt],
-            valor: [config.valor]
+            nombre: [{ value: config.nombre || '', disabled: config.id != null }, Validators.required],
+            valorInt: [config.valorInt ?? null],
+            valor: [config.valor ?? null]
         }, { validators: [this.oneOfTwo('valorInt', 'valor')] });
-
     }
 
     oneOfTwo(a: string, b: string) {

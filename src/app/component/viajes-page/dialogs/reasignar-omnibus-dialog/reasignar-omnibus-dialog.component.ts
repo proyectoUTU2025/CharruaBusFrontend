@@ -26,7 +26,6 @@ import { FiltroDisponibilidadReasOmnibusDto } from '../../../../models/buses/bus
     MatIconModule,
     MatListModule,
     FormsModule,
-    WarningDialogComponent,
     MatRadioModule 
   ]
 })

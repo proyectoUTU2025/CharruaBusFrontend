@@ -70,8 +70,12 @@ export class UserService {
   }
 
   changePassword(dto: ChangePasswordRequestDto): Promise<void> {
-    return firstValueFrom(this.http.post<ApiResponse<void>>(`${this.base}/change-password`, dto))
-      .then(() => { });
+    return firstValueFrom(
+      this.http.post<void>(
+        `${environment.apiBaseUrl}/auth/change-password`,
+        dto
+      )
+    );
   }
 
   editProfile(id: number, dto: EditarUsuarioRequestDto): Promise<UsuarioDto> {

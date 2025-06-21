@@ -2,25 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import { CompraService } from '../../services/compra.service';
 import { AuthService } from '../../services/auth.service';
-import {
-    CompraDto,
-    FiltroBusquedaCompraDto
-} from '../../models/compra/compra.dto.model';
+import { CompraDto, FiltroBusquedaCompraDto } from '../../models/compra/compra.dto.model';
 import { TipoEstadoCompra } from '../../models/tipo-estado-compra';
 import { GenericListComponent } from '../shared/generic-list/generic-list.component';
 import { DetalleCompraDialogComponent } from '../shared/detalle-compra-dialog/detalle-compra-dialog.component';
+import { EditUserDialogComponent } from '../users-page/dialogs/edit-user-dialog/edit-user-dialog.component';
 
 @Component({
     standalone: true,
+    selector: 'app-profile-page',
     imports: [
         CommonModule,
         FormsModule,
         MatDialogModule,
+        MatButtonModule,
         GenericListComponent
     ],
-    selector: 'app-profile-page',
     templateUrl: './profile-page.component.html',
     styleUrls: ['./profile-page.component.scss']
 })
@@ -64,7 +64,7 @@ export class ProfilePageComponent implements OnInit {
         }
     }
 
-    private loadCompras(clienteId: number) {
+    private loadCompras(clienteId: number): void {
         this.loading = true;
         this.error = null;
 
@@ -120,10 +120,23 @@ export class ProfilePageComponent implements OnInit {
         if (id != null) this.loadCompras(id);
     }
 
-    openDetalle(compraId: number) {
+    openDetalle(compraId: number): void {
         this.dialog.open(DetalleCompraDialogComponent, {
             width: '600px',
             data: { compraId }
+        });
+    }
+
+    editProfile(): void {
+        const userId = this.auth.userId!;
+        const ref = this.dialog.open(EditUserDialogComponent, {
+            width: '400px',
+            data: { id: userId }
+        });
+        ref.afterClosed().subscribe(updated => {
+            if (updated) {
+                this.ngOnInit();
+            }
         });
     }
 }

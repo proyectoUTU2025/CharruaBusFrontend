@@ -22,10 +22,15 @@ export class ConfiguracionDelSistemaService {
         return this.http.get<Paged<Configuracion>>(this.baseUrl, { params });
     }
 
+    create(dto: { nombre: string; valorInt?: number; valor?: string }): Observable<Configuracion> {
+        return this.http.post<Configuracion>(this.baseUrl, dto);
+    }
+
     update(config: Configuracion): Observable<Configuracion> {
-        return this.http.put<Configuracion>(
-            `${this.baseUrl}/${config.id}`,
-            config
-        );
+        return this.http.put<Configuracion>(`${this.baseUrl}/${config.id}`, config);
+    }
+
+    delete(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`);
     }
 }

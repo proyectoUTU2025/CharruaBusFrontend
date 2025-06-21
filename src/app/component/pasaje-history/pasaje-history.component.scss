@@ -1,43 +1,35 @@
 .filter-container {
     display: flex;
-    gap: 16px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
+    gap: 16px;
+    margin-bottom: 24px;
 
     label {
         display: flex;
         flex-direction: column;
-        font-weight: 500;
+        font-size: 0.9rem;
+    }
 
-        input,
-        select {
-            padding: 4px 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
+    input,
+    select {
+        padding: 4px 8px;
+        font-size: 1rem;
     }
 
     button {
         align-self: flex-end;
-        padding: 6px 12px;
-        font-size: 0.9rem;
-        border: none;
-        background-color: #675992;
-        color: white;
-        border-radius: 4px;
-        cursor: pointer;
-
-        &:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
+        height: 36px;
     }
 }
 
 .loading,
 .error {
     text-align: center;
-    margin: 1rem 0;
-    font-weight: bold;
+    margin: 16px 0;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.error {
+    color: #c00;
 }

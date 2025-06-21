@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { PasajeService } from '../../services/pasaje.service';
 import { AuthService } from '../../services/auth.service';
 import { LocalidadService } from '../../services/localidades.service';
@@ -17,6 +18,7 @@ import { DetallePasajeDialogComponent } from '../shared/detalle-pasaje-dialog/de
         CommonModule,
         FormsModule,
         MatDialogModule,
+        MatSnackBarModule,
         GenericListComponent
     ],
     selector: 'app-pasaje-history',
@@ -60,7 +62,8 @@ export class PasajeHistoryComponent implements OnInit {
         private pasajeService: PasajeService,
         private auth: AuthService,
         private localidadService: LocalidadService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private snackBar: MatSnackBar
     ) { }
 
     ngOnInit(): void {
@@ -96,7 +99,7 @@ export class PasajeHistoryComponent implements OnInit {
     onPageChange(page: number): void {
         this.pageIndex = page;
         this.loadPasajes();
-    }
+}
 
     openDetalle(pasajeId: number): void {
         this.dialog.open(DetallePasajeDialogComponent, {
@@ -109,10 +112,13 @@ export class PasajeHistoryComponent implements OnInit {
         if (!confirm('¿Confirmas la devolución de este pasaje?')) return;
         this.pasajeService.reembolsarPasaje(pasajeId).subscribe({
             next: msg => {
-                alert(msg);
+                this.snackBar.open(msg, 'Cerrar', { duration: 3000 });
                 this.loadPasajes();
             },
-            error: () => alert('Error al procesar la devolución')
+            error: err => {
+                const m = err.error?.message || 'Error al procesar la devolución';
+                this.snackBar.open(m, 'Cerrar', { duration: 3000 });
+            }
         });
     }
 
@@ -122,8 +128,12 @@ export class PasajeHistoryComponent implements OnInit {
 
         const filtroEnv = {
             ...this.filtro,
-            fechaDesde: this.filtro.fechaDesde ? new Date(this.filtro.fechaDesde).toISOString() : undefined,
-            fechaHasta: this.filtro.fechaHasta ? new Date(this.filtro.fechaHasta).toISOString() : undefined
+            fechaDesde: this.filtro.fechaDesde
+                ? new Date(this.filtro.fechaDesde).toISOString()
+                : undefined,
+            fechaHasta: this.filtro.fechaHasta
+                ? new Date(this.filtro.fechaHasta).toISOString()
+                : undefined
         };
 
         this.pasajeService

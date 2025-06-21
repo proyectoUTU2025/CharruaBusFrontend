@@ -28,6 +28,7 @@ import { ViajesPorOmnibusComponent } from './component/estadisticas/transporte/v
 import { MantenimientosPorOmnibusComponent } from './component/estadisticas/transporte/mantenimientos-por-omnibus/mantenimientos-por-omnibus.component';
 import { EstadisticasPasajesComponent } from './component/estadisticas/transporte/estadisticas-pasajes/estadisticas-pasajes.component';
 import { PasajesAgrupadosComponent } from './component/estadisticas/transporte/pasajes-agrupados/pasajes-agrupados.component';
+import { PasajesPorViajeComponent } from './component/pasajes-por-viaje/pasajes-por-viaje.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -48,6 +49,11 @@ export const routes: Routes = [
       { path: 'omnibus/:id', component: BusDetailComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },
+      {
+        path: 'viajes/:id/pasajes',
+        component: PasajesPorViajeComponent,
+        data: { roles: ['VENDEDOR'] }
+      },
       { path: 'compras/exito', component: StripeRedirectComponent },
       { path: 'compras/cancelada', component: StripeRedirectComponent },
       { path: 'comprar', component: CompraPageComponent },

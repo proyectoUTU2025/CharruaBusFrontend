@@ -115,10 +115,22 @@
 
   <div *ngIf="step === 3" class="step">
     <h3>4. Confirmación</h3>
-    <p><strong>Salida:</strong> {{ fechaSalida | date:'short' }} {{ horaSalida }}</p>
-    <p><strong>Llegada:</strong> {{ fechaLlegada | date:'short' }} {{ horaLlegada }}</p>
-    <p><strong>Precio:</strong> {{ precio | currency }}</p>
-    <p><strong>Ómnibus:</strong> {{ busSeleccionado?.matricula }}</p>
+    <p>
+      <strong>Salida:</strong>
+      {{ salidaCompleta ? (salidaCompleta | date:'short') : '—' }}
+    </p>
+    <p>
+      <strong>Llegada:</strong>
+      {{ llegadaCompleta ? (llegadaCompleta | date:'short') : '—' }}
+    </p>
+    <p>
+      <strong>Precio:</strong>
+      {{ precio | currency }}
+    </p>
+    <p>
+      <strong>Ómnibus:</strong>
+      {{ busSeleccionado?.matricula }}
+    </p>
   </div>
 </mat-dialog-content>
 

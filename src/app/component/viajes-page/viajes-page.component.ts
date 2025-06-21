@@ -66,7 +66,7 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
     fechaHasta: ''
   };
   pageIndex = 0;
-  pageSize = 5;
+  pageSize = 5;  
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(

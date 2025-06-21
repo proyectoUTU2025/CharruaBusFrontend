@@ -42,8 +42,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button (click)="cerrar()">Cerrar</button>
-  <button mat-flat-button color="primary" (click)="abrirReasignarOmnibus()">
-    <mat-icon>swap_horiz</mat-icon> Reasignar Ómnibus
-  </button>
+  <button mat-button class="acciones-btn" (click)="cerrar()">Cerrar</button>
+  <button *ngIf="puedeReasignar" mat-flat-button color="primary" class="acciones-btn" (click)="abrirReasignarOmnibus()"><mat-icon>swap_horiz</mat-icon>Reasignar Ómnibus</button>
 </mat-dialog-actions>

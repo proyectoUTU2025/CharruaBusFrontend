@@ -102,7 +102,7 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
         this.dataSource.data     = res.content;
         this.totalElements       = res.page.totalElements;
         this.pageIndex           = res.page.number;
-        // sincronizar paginador
+        
         this.paginator.length    = res.page.totalElements;
         this.paginator.pageIndex = res.page.number;
       })
@@ -114,8 +114,6 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
     this.pageSize  = e.pageSize;
     this.buscar();
   }
-
-
 
   limpiarFiltros(): void {
     this.filtro = {

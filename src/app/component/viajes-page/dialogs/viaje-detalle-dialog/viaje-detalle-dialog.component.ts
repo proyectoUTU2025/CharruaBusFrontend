@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,7 @@ import { ReasignarOmnibusDialogComponent } from '../reasignar-omnibus-dialog/rea
 @Component({
   selector: 'app-viaje-detalle-dialog',
   standalone: true,
-  templateUrl: './viaje-detalle-dialog.component.html',
+  templateUrl: './viaje-detalle-dialog.component.html',  
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
 })
 export class ViajeDetalleDialogComponent {
@@ -42,5 +42,9 @@ export class ViajeDetalleDialogComponent {
     }).afterClosed().subscribe(reasignado => {
       if (reasignado) this.dialogRef.close({ reasignado: true });
     });
+  }
+  get puedeReasignar(): boolean {
+    const salida = new Date(this.data.viaje.fechaHoraSalida);
+    return salida >= new Date();
   }
 }

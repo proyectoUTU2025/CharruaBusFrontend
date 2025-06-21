@@ -58,3 +58,25 @@
 .dialog-actions {
   margin-top: 16px;
 }
+.acciones-btn {
+  background-color: #675992 !important;
+  color: white !important;
+  border-radius: 18px;
+  text-transform: none;
+  border: none;
+  padding: 6px 16px;
+  font-weight: 500;
+
+  mat-icon {
+    margin-right: 4px;
+  }
+
+  &:hover {
+    background-color: #5c4d84 !important;
+  }
+
+  &:disabled {
+    background-color: #b9b1cf !important;
+    color: white !important;
+  }
+}

@@ -19,8 +19,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button (click)="cancelar()">Cancelar</button>
-  <button mat-flat-button color="primary" (click)="confirmarReasignacion()" [disabled]="!omnibusSeleccionadoId">
+  <button mat-button class="acciones-btn" (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button class="acciones-btn" (click)="confirmarReasignacion()" [disabled]="!omnibusSeleccionadoId">
     Confirmar
   </button>
 </mat-dialog-actions>

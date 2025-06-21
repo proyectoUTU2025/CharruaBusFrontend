@@ -33,20 +33,30 @@ export class AuthService {
   login(credentials: { email: string; password: string }) {
     return firstValueFrom(
       this.http.post<{ data: { token: string } }>(
-        `${environment.apiBaseUrl}/auth/login`,
+        `${this.base}/login`,
         credentials
       )
     ).then(response => {
       const token = response.data.token;
-      this.cookies.set('access_token', token, { path: '/' });
+      this.cookies.set(this.tokenKey, token, { path: '/' });
     }).catch(error => {
       console.error('Error during login:', error);
+      throw error;
     });
   }
-  
+
+  changePassword(payload: { currentPassword: string; newPassword: string }): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(
+        `${this.base}/change-password`,
+        payload
+      )
+    );
+  }
+
   validateCode(email: string, code: string) {
     return firstValueFrom(
-      this.http.post(`${environment.apiBaseUrl}/auth/verify-email`, {
+      this.http.post(`${this.base}/verify-email`, {
         email,
         verificationCode: code
       })
@@ -55,32 +65,23 @@ export class AuthService {
       throw error;
     });
   }
-   registrarCliente(data: any) {
+
+  registrarCliente(data: any) {
     return firstValueFrom(
-      this.http.post(`${environment.apiBaseUrl}/auth/registrar`, data)
+      this.http.post(`${this.base}/registrar`, data)
     ).catch(error => {
       console.error('Error durante el registro:', error);
       throw error;
     });
   }
-   private get decoded(): DecodedToken | null {
-    const token = this.token;
-    if (!token) return null;
-    try {
-      return jwtDecode(token);
-    } catch {
-      return null;
-    }
-  }
 
   logout() {
-    firstValueFrom(this.http.post(`${environment.apiBaseUrl}/auth/logout`, {}))
+    firstValueFrom(this.http.post(`${this.base}/logout`, {}))
       .finally(() => {
-        this.cookies.delete('access_token', '/');
+        this.cookies.delete(this.tokenKey, '/');
         this.router.navigate(['/login']);
       });
-  } 
-  
+  }
 
   verifyEmail(email: string, verificationCode: string): Promise<void> {
     return firstValueFrom(
@@ -147,7 +148,17 @@ export class AuthService {
   get token(): string | null {
     return this.cookies.get(this.tokenKey) || null;
   }
-  
+
+  private get decoded(): DecodedToken | null {
+    const token = this.token;
+    if (!token) return null;
+    try {
+      return jwtDecode(token);
+    } catch {
+      return null;
+    }
+  }
+
   get nombre(): string | null {
     return this.decoded?.name || null;
   }
@@ -156,10 +167,10 @@ export class AuthService {
     return this.decoded?.sub || null;
   }
 
-   get rol(): string | null {
+  get rol(): string | null {
     return this.decoded?.role || null;
   }
-  
+
   get id(): number | null {
     return this.decoded?.id ? +this.decoded.id : null;
   }
@@ -170,11 +181,12 @@ export class AuthService {
 
   get isLoggedIn(): boolean {
     return !!this.token;
-  } 
+  }
 
   get userId(): number | null {
     return this.id;
   }
+
   get userName(): string | null {
     return this.decoded?.name || null;
   }

@@ -51,8 +51,6 @@ type CompraViajeSeleccionable = CompraViajeDto & { seleccionado?: boolean };
     MatIconModule,
     MatTabsModule,
     MatPaginatorModule,
-    SeatsComponent,
-    PurchaseSummaryDialogComponent,
     MatAutocompleteModule
   ],
   templateUrl: './compra-page.component.html',
@@ -99,7 +97,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     public authService: AuthService,
     public userService: UserService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.searchForm = this.fb.group({
@@ -303,12 +301,13 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       localidadDestinoId: f.localidadDestinoId,
       paradaOrigenVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadDestinoId : null,
       paradaDestinoVueltaId: this.tipoViaje === 'IDA_Y_VUELTA' ? f.localidadOrigenId : null
-    };    
-    this.compraService.iniciarCompra(dto).subscribe(res => window.location.href = res.data.sessionUrl);
+    };
+    this.compraService.iniciarCompra(dto)
+      .subscribe(res => window.location.href = res.sessionUrl);
   }
 
 
- siguientePaso(): void {
+  siguientePaso(): void {
     if (this.step === 4 && this.tipoViaje === 'IDA') return;
 
     if (this.puedeAvanzar()) {

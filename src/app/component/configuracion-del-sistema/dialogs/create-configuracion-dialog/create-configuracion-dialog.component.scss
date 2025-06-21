@@ -1,0 +1,27 @@
+:host {
+    display: block;
+    padding: 16px;
+    min-width: 360px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.error {
+    color: #d32f2f;
+    margin-top: 8px;
+    font-size: 0.875rem;
+}
+
+mat-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

@@ -35,10 +35,6 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    AddUserDialogComponent,
-    EditUserDialogComponent,
-    ConfirmDialogComponent,
-    BulkUploadDialogComponent,
     MatCardModule
   ],
   templateUrl: './users-page.component.html',

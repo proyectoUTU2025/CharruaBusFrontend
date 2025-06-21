@@ -34,9 +34,6 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    AddBusDialogComponent,
-    BulkUploadBusDialogComponent,
-    BulkErrorsDialogComponent,
     MatCardModule
   ],
   templateUrl: './buses-page.component.html',
@@ -64,7 +61,7 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   ngAfterViewInit() {
     this.paginator.page.subscribe(() => this.loadBuses());
@@ -122,13 +119,19 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     this.dialog.open(AddBusDialogComponent, {
       width: '450px', maxHeight: '95vh'
     })
-    .afterClosed()
-    .subscribe((alta: AltaBusDto) => {
-      if (alta) {
-        this.busService.create(alta)
-          .then(() => this.onSearch())
-          .catch(console.error);
-      }
-    });
+      .afterClosed()
+      .subscribe((alta: AltaBusDto) => {
+        if (alta) {
+          this.busService.create(alta)
+            .then(() => this.onSearch())
+            .catch(console.error);
+        }
+      });
+  }
+
+  toggleActive(bus: BusDto) {
+    this.busService.cambiarEstado(bus.id, !bus.activo)
+      .then(() => this.loadBuses())
+      .catch(console.error);
   }
 }

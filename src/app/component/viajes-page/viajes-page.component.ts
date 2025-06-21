@@ -38,7 +38,6 @@ import { ViajeDetalleDialogComponent } from './dialogs/viaje-detalle-dialog/viaj
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    ViajeDetalleDialogComponent
   ],
   templateUrl: './viajes-page.component.html',
   styleUrls: ['./viajes-page.component.scss']

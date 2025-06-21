@@ -1,4 +1,7 @@
-<div class="filters">
+<app-chart-card [title]="'Compras por Cliente'" [labels]="chartLabels" [data]="chartData">
+</app-chart-card>
+
+<div class="controls">
     <mat-form-field appearance="fill">
         <mat-label>Fecha Inicio</mat-label>
         <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaInicio" />
@@ -8,26 +11,33 @@
         <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaFin" />
     </mat-form-field>
     <button mat-button (click)="load()">Filtrar</button>
-    <button mat-raised-button color="primary" (click)="exportCsv()">Exportar CSV</button>
-    <button mat-button (click)="toggleSort()">Orden {{ ascendente ? '↑' : '↓' }}</button>
+    <button mat-raised-button color="primary" (click)="exportCsv()" [disabled]="isExporting">
+        <ng-container *ngIf="!isExporting; else exportingTpl">
+            Exportar CSV
+        </ng-container>
+        <ng-template #exportingTpl>
+            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+            &nbsp;Descargando...
+        </ng-template>
+    </button>
+    <button mat-button (click)="toggleSort()">
+        Orden {{ ascendente ? '↑' : '↓' }}
+    </button>
 </div>
 
-<table mat-table [dataSource]="data">
+<table mat-table [dataSource]="data" class="mat-elevation-z1">
     <ng-container matColumnDef="email">
         <th mat-header-cell *matHeaderCellDef>Email</th>
         <td mat-cell *matCellDef="let x">{{ x.email }}</td>
     </ng-container>
-
     <ng-container matColumnDef="cantidadPasajes">
         <th mat-header-cell *matHeaderCellDef>Pasajes</th>
         <td mat-cell *matCellDef="let x">{{ x.cantidadPasajes }}</td>
     </ng-container>
-
     <ng-container matColumnDef="totalGastado">
         <th mat-header-cell *matHeaderCellDef>Total Gastado</th>
         <td mat-cell *matCellDef="let x">{{ x.totalGastado }}</td>
     </ng-container>
-
     <tr mat-header-row *matHeaderRowDef="['email','cantidadPasajes','totalGastado']"></tr>
     <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
 </table>

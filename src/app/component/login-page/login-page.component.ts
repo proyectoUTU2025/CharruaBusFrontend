@@ -27,7 +27,11 @@ export class LoginPageComponent {
   hidePassword = true;
   error: string | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -35,17 +39,16 @@ export class LoginPageComponent {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.loginForm.invalid) return;
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
     try {
       await this.authService.login(this.loginForm.value);
       this.router.navigate(['/']);
     } catch {
       this.error = 'Credenciales inválidas';
     }
-  }
-
-  forgotPassword(): void {
-    console.log('Recuperar contraseña');
   }
 
   goToSignup(): void {

@@ -1,38 +1,43 @@
 <div class="page-header">
     <h1>Configuración del Sistema</h1>
+    <button mat-flat-button color="primary" (click)="create()">+ Nueva Configuración</button>
     <p>Editar parámetros globales: plazos, penalizaciones, mensajes, etc.</p>
 </div>
 
 <div class="filtro-nombre">
     <mat-form-field appearance="outline">
         <mat-label>Buscar por nombre</mat-label>
-        <input matInput [(ngModel)]="filtroNombre" placeholder="Ej: Plazo devolución">
+        <input matInput [(ngModel)]="filtroNombre" placeholder="Ej: Plazo devolución" />
     </mat-form-field>
     <button mat-stroked-button color="primary" (click)="aplicarFiltro()">Buscar</button>
     <button mat-button (click)="limpiarFiltro()" *ngIf="filtroNombre">Limpiar</button>
 </div>
 
-<div class="card">
+<div *ngIf="isLoading" class="spinner-container">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<div *ngIf="!isLoading" class="card">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
 
         <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef> ID </th>
-            <td mat-cell *matCellDef="let c"> {{c.id}} </td>
+            <td mat-cell *matCellDef="let c"> {{ c.id }} </td>
         </ng-container>
 
         <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef> Parámetro </th>
-            <td mat-cell *matCellDef="let c"> {{c.nombre}} </td>
+            <td mat-cell *matCellDef="let c"> {{ c.nombre }} </td>
         </ng-container>
 
         <ng-container matColumnDef="valorInt">
             <th mat-header-cell *matHeaderCellDef> Valor (número) </th>
-            <td mat-cell *matCellDef="let c"> {{c.valorInt ?? '-'}} </td>
+            <td mat-cell *matCellDef="let c"> {{ c.valorInt ?? '-' }} </td>
         </ng-container>
 
         <ng-container matColumnDef="valor">
             <th mat-header-cell *matHeaderCellDef> Valor (texto) </th>
-            <td mat-cell *matCellDef="let c"> {{c.valor ?? '-'}} </td>
+            <td mat-cell *matCellDef="let c"> {{ c.valor ?? '-' }} </td>
         </ng-container>
 
         <ng-container matColumnDef="acciones">
@@ -40,6 +45,9 @@
             <td mat-cell *matCellDef="let c">
                 <button mat-icon-button (click)="edit(c)">
                     <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="delete(c)">
+                    <mat-icon>delete</mat-icon>
                 </button>
             </td>
         </ng-container>
@@ -51,4 +59,4 @@
     <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]"
         (page)="pageChange($event)">
     </mat-paginator>
-</div>
+</div>pasemos

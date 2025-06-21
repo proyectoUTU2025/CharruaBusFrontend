@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EstadisticaService } from '../../../../services/estadistica-usuario.service';
 import { EstadisticaUsuario } from '../../../../models/estadisticas/usuario/estadistica-usuario';
+import { ChartCardComponent } from '../../../shared/chart-card/chart-card.component';
 
 @Component({
     selector: 'app-usuarios-por-tipo',
@@ -13,7 +15,9 @@ import { EstadisticaUsuario } from '../../../../models/estadisticas/usuario/esta
         CommonModule,
         MatTableModule,
         MatPaginatorModule,
-        MatButtonModule
+        MatButtonModule,
+        MatProgressSpinnerModule,
+        ChartCardComponent
     ],
     templateUrl: './usuarios-por-tipo.component.html',
     styleUrls: ['./usuarios-por-tipo.component.scss']
@@ -23,8 +27,12 @@ export class UsuariosPorTipoComponent implements OnInit {
     total = 0;
     pageSize = 10;
     pageIndex = 0;
-    ordenarPor = 'tipo';
     ascendente = true;
+    isExporting = false;
+
+    // Datos para la gráfica
+    chartLabels: string[] = [];
+    chartData: number[] = [];
 
     constructor(private svc: EstadisticaService) { }
 
@@ -34,10 +42,12 @@ export class UsuariosPorTipoComponent implements OnInit {
 
     load() {
         this.svc.getUsuariosPorTipo(
-            this.pageIndex, this.pageSize, this.ordenarPor, this.ascendente
+            this.pageIndex, this.pageSize, 'tipo', this.ascendente
         ).subscribe(res => {
             this.data = res.content;
             this.total = res.totalElements;
+            this.chartLabels = this.data.map(x => x.tipo);
+            this.chartData = this.data.map(x => x.cantidad);
         });
     }
 
@@ -53,13 +63,18 @@ export class UsuariosPorTipoComponent implements OnInit {
     }
 
     exportCsv() {
-        this.svc.exportUsuariosPorTipoCsv().subscribe(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'usuarios_por_tipo.csv';
-            a.click();
-            window.URL.revokeObjectURL(url);
+        this.isExporting = true;
+        this.svc.exportUsuariosPorTipoCsv().subscribe({
+            next: blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'usuarios_por_tipo.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            },
+            complete: () => this.isExporting = false,
+            error: () => this.isExporting = false
         });
     }
 }

@@ -1,15 +1,16 @@
-.filters {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+:host {
+    display: block;
+    padding: 16px;
 }
 
-table {
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+table.mat-elevation-z1 {
     width: 100%;
-    margin-bottom: 1rem;
-}
-
-mat-paginator {
-    display: flex;
-    justify-content: center;
+    margin-bottom: 16px;
 }

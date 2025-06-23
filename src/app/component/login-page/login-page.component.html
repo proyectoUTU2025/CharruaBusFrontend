@@ -39,13 +39,11 @@
       Iniciar sesión
     </button>
 
-    <div class="links">
-      <a routerLink="/registro" class="link">
-        ¿No tienes cuenta? Registrarse
-      </a>
-      <a routerLink="/forgot-password" class="link">
-        ¿Olvidaste tu contraseña? Recupérala
-      </a>
+   <div class="forgot-password">
+      <a (click)="goToSignup()">¿No tienes cuenta? Registrarse</a>
+    </div>
+    <div class="forgot-password">
+      <a >Olvidaste tu password? Recuperalo</a>
     </div>
 
     <div *ngIf="error" class="error-message">

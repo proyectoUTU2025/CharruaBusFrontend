@@ -53,5 +53,5 @@ export class LoginPageComponent {
 
   goToSignup(): void {
     this.router.navigate(['/registro']);
-  }
+  }  
 }

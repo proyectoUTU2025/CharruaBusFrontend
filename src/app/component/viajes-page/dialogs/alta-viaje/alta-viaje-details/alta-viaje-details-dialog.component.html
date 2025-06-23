@@ -61,17 +61,14 @@
     <mat-form-field appearance="fill" class="parada-select">
       <mat-label>Agregar parada</mat-label>
       <mat-select [(ngModel)]="paradaIntermediaId">
-        <mat-option *ngFor="let loc of localidades"
-                    [value]="loc.id"
-                    [disabled]="loc.id === origenId || loc.id === destinoId || paradasIntermedias.includes(loc.id)">
+        <mat-option *ngFor="let loc of localidades" [value]="loc.id"
+          [disabled]="loc.id === origenId || loc.id === destinoId || paradasIntermedias.includes(loc.id)">
           {{ loc.nombreConDepartamento }}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <button mat-stroked-button class="outline-btn"
-            (click)="agregarParadaIntermedia()"
-            [disabled]="!paradaIntermediaId">
+    <button mat-stroked-button class="outline-btn" (click)="agregarParadaIntermedia()" [disabled]="!paradaIntermediaId">
       Agregar parada
     </button>
 
@@ -114,6 +111,25 @@
     </ng-template>
   </div>
 
+  <div *ngIf="step === 3" class="step">
+    <h3>4. Confirmación</h3>
+    <p>
+      <strong>Salida:</strong>
+      {{ salidaCompleta ? (salidaCompleta | date:'short') : '—' }}
+    </p>
+    <p>
+      <strong>Llegada:</strong>
+      {{ llegadaCompleta ? (llegadaCompleta | date:'short') : '—' }}
+    </p>
+    <p>
+      <strong>Precio:</strong>
+      {{ precio | currency }}
+    </p>
+    <p>
+      <strong>Ómnibus:</strong>
+      {{ busSeleccionado?.matricula }}
+    </p>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

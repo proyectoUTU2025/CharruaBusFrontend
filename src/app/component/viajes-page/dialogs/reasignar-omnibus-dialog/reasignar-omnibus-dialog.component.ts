@@ -4,14 +4,13 @@ import { DetalleViajeDto } from '../../../../models/viajes';
 import { BusService } from '../../../../services/bus.service';
 import { ViajeService } from '../../../../services/viaje.service';
 import { WarningDialogComponent } from '../warning-dialog/warning-dialog/warning-dialog.component';
-import { OmnibusDisponibleDto } from '../../../../models';
+import { FiltroDisponibilidadReasOmnibusDto, OmnibusDisponibleDto } from '../../../../models';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
-import { FiltroDisponibilidadReasOmnibusDto } from '../../../../models/buses/bus.model.dto';
 
 
 @Component({
@@ -26,6 +25,7 @@ import { FiltroDisponibilidadReasOmnibusDto } from '../../../../models/buses/bus
     MatIconModule,
     MatListModule,
     FormsModule,
+    WarningDialogComponent,
     MatRadioModule 
   ]
 })
@@ -57,32 +57,39 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
     });
   }
   confirmarReasignacion(): void {
-    if (!this.omnibusSeleccionadoId) return;
+  if (!this.omnibusSeleccionadoId) return;
+  const body = { nuevoOmnibusId: this.omnibusSeleccionadoId, confirm: false };
 
-    const body = {
-      nuevoOmnibusId: this.omnibusSeleccionadoId,
-      confirm: false
-    };
-
-    this.viajeService.reasignar(this.data.viaje.id, body)
-      .then(() => this.dialogRef.close(true))
-      .catch(mensaje => {
-        this.dialog.open(WarningDialogComponent, {
-          data: { message: mensaje }
-        }).afterClosed().subscribe(confirmado => {
-          if (confirmado) {
-            this.viajeService.reasignar(this.data.viaje.id, { ...body, confirm: true })
-              .then(() => this.dialogRef.close(true))
-              .catch(error => {
-                this.dialog.open(WarningDialogComponent, {
-                  data: { message: typeof error === 'string' ? error : 'Error al confirmar reasignación' }
-                });
+  this.viajeService
+    .reasignar(this.data.viaje.id, body)
+    .then(() => this.dialogRef.close(true))
+    .catch((err: any) => {
+      const resp = err.error || {};
+      const message =
+        typeof resp === 'string'
+          ? resp
+          : resp.message || 'Error inesperado al reasignar';
+      this.dialog
+        .open(WarningDialogComponent, { data: { message } })
+        .afterClosed()
+        .subscribe((confirmed) => {
+          if (!confirmed) return;
+          this.viajeService
+            .reasignar(this.data.viaje.id, { ...body, confirm: true })
+            .then(() => this.dialogRef.close(true))
+            .catch((err2: any) => {
+              const resp2 = err2.error || {};
+              const message2 =
+                typeof resp2 === 'string'
+                  ? resp2
+                  : resp2.message || 'Error al confirmar reasignación';
+              this.dialog.open(WarningDialogComponent, {
+                data: { message: message2 },
               });
-          }
+            });
         });
-      });
+    });
   }
-
   cancelar(): void {
     this.dialogRef.close();
   }

@@ -35,8 +35,10 @@ export interface FiltroDisponibilidadOmnibusDto {
   origenId: number;
   destinoId: number;
   fechaHoraSalida: string;
-  fechaHoraLlegada: string;  
+  fechaHoraLlegada: string;
+  
 }
+
 export interface FiltroDisponibilidadReasOmnibusDto {
   origenId: number;
   destinoId: number;

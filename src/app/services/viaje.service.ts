@@ -3,11 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 import {
-  AltaViajeDto,
-  ViajeDisponibleDto,
-  FiltroBusquedaViajeDto,
-  CompraViajeDto,
-  DetalleViajeDto
+  AltaViajeDto, ViajeDisponibleDto, FiltroBusquedaViajeDto, CompraViajeDto,
+  DetalleViajeDto,
 } from '../models/viajes';
 import { Page } from '../models';
 
@@ -15,7 +12,7 @@ import { Page } from '../models';
 export class ViajeService {
   private baseUrl = `${environment.apiBaseUrl}/viajes`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   buscar(filtro: FiltroBusquedaViajeDto, page = 0, size = 5): Promise<Page<ViajeDisponibleDto>> {
     let params = new HttpParams()
@@ -42,29 +39,28 @@ export class ViajeService {
   }
 
   buscarDisponibles(
-  filtro: {
-    idLocalidadOrigen: number;
-    idLocalidadDestino: number;
-    fechaViaje: string;
-    cantidadPasajes: number;
-  },
-  page = 0,
-  size = 5
-): Promise<Page<CompraViajeDto>> {
-  let params = new HttpParams()
-    .set('page', page.toString())
-    .set('size', size.toString())
-    .set('sort', 'fechaHoraSalida,asc')
-    .set('idLocalidadOrigen', filtro.idLocalidadOrigen.toString())
-    .set('idLocalidadDestino', filtro.idLocalidadDestino.toString())
-    .set('fechaViaje', filtro.fechaViaje)
-    .set('cantidadPasajes', filtro.cantidadPasajes.toString());
+    filtro: {
+      idLocalidadOrigen: number;
+      idLocalidadDestino: number;
+      fechaViaje: string;
+      cantidadPasajes: number;
+    },
+    page = 0,
+    size = 5
+  ): Promise<Page<CompraViajeDto>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', 'fechaHoraSalida,asc')
+      .set('idLocalidadOrigen', filtro.idLocalidadOrigen.toString())
+      .set('idLocalidadDestino', filtro.idLocalidadDestino.toString())
+      .set('fechaViaje', filtro.fechaViaje)
+      .set('cantidadPasajes', filtro.cantidadPasajes.toString());
 
-  return firstValueFrom(
-    this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
-  );
-}
-
+    return firstValueFrom(
+      this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
+    );
+  }
   getAllViajes(page = 0, size = 5): Promise<Page<CompraViajeDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -78,7 +74,7 @@ export class ViajeService {
 
   altaViaje(dto: AltaViajeDto): Promise<void> {
     return firstValueFrom(this.http.post(`${this.baseUrl}`, dto))
-      .then(() => {})
+      .then(() => { })
       .catch(err => {
         const message = err?.error?.message || 'Error desconocido al registrar el viaje';
         throw message;

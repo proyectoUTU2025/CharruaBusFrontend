@@ -47,7 +47,7 @@ import { LocalidadNombreDepartamentoDto } from '../../../../../models/localidade
 })
 export class AltaViajeDetailsDialogComponent implements OnInit {
   step = 0;
-  completedSteps: boolean[] = [false, false, false];  
+  completedSteps: boolean[] = [false, false, false];
   localidades: LocalidadNombreDepartamentoDto[] = [];
   buses: OmnibusDisponibleDto[] = [];
   origenId = 0;
@@ -157,6 +157,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
       fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada),
       minAsientos: 1
+
     };
 
     this.busService.getDisponibles(filtro)
@@ -190,15 +191,53 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     return false;
   }
 
-  private formatFecha(fecha: Date, hora: string = ''): string {
+  private formatFecha(fecha: Date | null, hora: string = ''): string {
+    if (!fecha) return '';
     const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
-    const dt = new Date(fecha);
-    dt.setHours(Number(hh), Number(mm), 0, 0);
-    const y = dt.getFullYear();
-    const m = String(dt.getMonth() + 1).padStart(2, '0');
-    const d = String(dt.getDate()).padStart(2, '0');
-    const H = String(dt.getHours()).padStart(2, '0');
-    const M = String(dt.getMinutes()).padStart(2, '0');
-    return `${y}-${m}-${d}T${H}:${M}:00`;
+    const fechaConHora = new Date(fecha);
+    fechaConHora.setHours(Number(hh));
+    fechaConHora.setMinutes(Number(mm));
+    fechaConHora.setSeconds(0);
+    const y = fechaConHora.getFullYear();
+    const m = (fechaConHora.getMonth() + 1).toString().padStart(2, '0');
+    const d = fechaConHora.getDate().toString().padStart(2, '0');
+    const h = fechaConHora.getHours().toString().padStart(2, '0');
+    const min = fechaConHora.getMinutes().toString().padStart(2, '0');
+    return `${y}-${m}-${d}T${h}:${min}:00`;
+  }
+
+  ngAfterViewChecked(): void {
+    const headers = document.querySelectorAll('.mat-horizontal-stepper-header');
+    headers.forEach((header, index) => {
+      const icon = header.querySelector('.mat-step-icon') as HTMLElement;
+      const label = header.querySelector('.mat-step-label') as HTMLElement;
+      if (index < this.step) {
+        icon.style.backgroundColor = '#3e5f3c';
+        label.style.color = '#3e5f3c';
+      } else if (index === this.step) {
+        icon.style.backgroundColor = '#675992';
+        label.style.color = '#675992';
+      } else {
+        icon.style.backgroundColor = '#ccc';
+        label.style.color = '#444';
+      }
+    });
+  }
+
+  get salidaCompleta(): Date | null {
+    if (!this.fechaSalida || !this.horaSalida) return null;
+    const [hh, mm] = this.horaSalida.split(':').map(n => Number(n));
+    const d = new Date(this.fechaSalida);
+    d.setHours(hh, mm, 0, 0);
+    return d;
+  }
+
+  get llegadaCompleta(): Date | null {
+    if (!this.fechaLlegada || !this.horaLlegada) return null;
+    const [hh, mm] = this.horaLlegada.split(':').map(n => Number(n));
+    const d = new Date(this.fechaLlegada);
+    d.setHours(hh, mm, 0, 0);
+    return d;
   }
 }
+

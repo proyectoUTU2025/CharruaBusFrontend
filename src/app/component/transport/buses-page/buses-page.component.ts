@@ -33,10 +33,6 @@ import { MatDialog } from '@angular/material/dialog';
         ReactiveFormsModule,
         RouterModule,
         GenericListComponent,
-        AddBusDialogComponent,
-        BulkUploadBusDialogComponent,
-        BulkErrorsDialogComponent,
-        ConfirmDialogComponent
     ],
     templateUrl: './buses-page.component.html',
     styleUrls: ['./buses-page.component.scss']
@@ -81,7 +77,7 @@ export class BusesPageComponent implements OnInit {
         this.busService.getAll(filtro, pageIndex, pageSize)
             .then((resp: Page<BusDto>) => {
                 this.buses = resp.content;
-                this.totalElements = resp.totalElements;
+                this.totalElements = resp.page.totalElements;
                 this.pageIndex = pageIndex;
                 this.pageSize = pageSize;
             })

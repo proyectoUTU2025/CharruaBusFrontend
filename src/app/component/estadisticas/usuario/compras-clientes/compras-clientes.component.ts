@@ -55,7 +55,7 @@ export class ComprasClientesComponent implements OnInit {
             'totalGastado', this.ascendente
         ).subscribe(res => {
             this.data = res.content;
-            this.total = res.totalElements;
+            this.total = res.page.totalElements;
             this.chartLabels = this.data.map(x => x.email);
             this.chartData = this.data.map(x => x.totalGastado);
         });

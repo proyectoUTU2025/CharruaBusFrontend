@@ -48,7 +48,7 @@ export class MantenimientosPorOmnibusComponent implements OnInit {
             this.pageSize
         ).subscribe((p: Page<EstadisticaOmnibus>) => {
             this.dataSource = p.content;
-            this.total = p.totalElements;
+            //this.total = p.totalElements;
         });
     }
     exportCsv() {

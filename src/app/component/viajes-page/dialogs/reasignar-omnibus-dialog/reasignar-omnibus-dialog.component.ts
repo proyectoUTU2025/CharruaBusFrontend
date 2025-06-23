@@ -1,10 +1,11 @@
+import { FiltroDisponibilidadReasOmnibusDto } from './../../../../models/buses/bus.model.dto';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DetalleViajeDto } from '../../../../models/viajes';
 import { BusService } from '../../../../services/bus.service';
 import { ViajeService } from '../../../../services/viaje.service';
 import { WarningDialogComponent } from '../warning-dialog/warning-dialog/warning-dialog.component';
-import { FiltroDisponibilidadReasOmnibusDto, OmnibusDisponibleDto } from '../../../../models';
+import { OmnibusDisponibleDto } from '../../../../models';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';

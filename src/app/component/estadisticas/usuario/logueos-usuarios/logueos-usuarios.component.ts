@@ -47,7 +47,7 @@ export class LogueosUsuariosComponent implements OnInit {
             this.pageIndex, this.pageSize
         ).subscribe(res => {
             this.data = res.content;
-            this.total = res.totalElements;
+            this.total = res.page.totalElements;
         });
     }
 

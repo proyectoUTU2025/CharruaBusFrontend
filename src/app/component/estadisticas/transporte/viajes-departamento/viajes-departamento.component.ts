@@ -58,7 +58,7 @@ export class ViajesDepartamentoComponent implements OnInit {
             this.pageSize
         ).subscribe((p: Page<EstadisticaViajePorDepartamento>) => {
             this.dataSource = p.content;
-            this.total = p.totalElements;
+            this.total = p.page.totalElements;
         });
     }
     exportCsv() {

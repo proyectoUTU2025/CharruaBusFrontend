@@ -81,7 +81,7 @@ export class OmnibusHistoryComponent implements OnChanges {
         this.busService.getTrips(this.busId, filtros, page, size).subscribe({
             next: (resp: Page<MovimientoOmnibusDto>) => {
                 this.history = resp.content;
-                this.totalMovimientos = resp.totalElements;
+                this.totalMovimientos = resp.page.totalElements;
             },
             error: err => {
                 console.error('Error cargando historial de movimientos:', err);

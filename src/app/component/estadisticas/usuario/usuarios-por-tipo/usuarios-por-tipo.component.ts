@@ -45,7 +45,7 @@ export class UsuariosPorTipoComponent implements OnInit {
             this.pageIndex, this.pageSize, 'tipo', this.ascendente
         ).subscribe(res => {
             this.data = res.content;
-            this.total = res.totalElements;
+           // this.total = res.totalElements;
             this.chartLabels = this.data.map(x => x.tipo);
             this.chartData = this.data.map(x => x.cantidad);
         });

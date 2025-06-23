@@ -56,7 +56,7 @@ export class PasajesAgrupadosComponent implements OnInit {
             this.pageSize
         ).subscribe((p: Page<EstadisticaPasaje>) => {
             this.dataSource = p.content;
-            this.total = p.totalElements;
+            //this.total = p.totalElements;
         });
     }
     exportCsv() {

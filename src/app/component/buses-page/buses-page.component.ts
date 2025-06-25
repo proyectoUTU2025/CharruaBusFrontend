@@ -21,6 +21,8 @@ import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-err
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { LocalidadService } from '../../services/localidades.service';
 import { firstValueFrom } from 'rxjs';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-buses-page',
@@ -40,7 +42,9 @@ import { firstValueFrom } from 'rxjs';
     MatCardModule,
     AddBusDialogComponent,
     BulkUploadBusDialogComponent,
-    BulkErrorsDialogComponent
+    BulkErrorsDialogComponent,
+    MatNativeDateModule,
+    MatDatepickerModule
   ],
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
@@ -51,8 +55,12 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   totalElements = 0;
   pageIndex = 0;
   pageSize = 5;
-  columns = ['id', 'matricula', 'capacidad', 'activo', 'acciones'];
+  columns = ['id', 'matricula', 'capacidad','ubicacionActual', 'activo', 'acciones'];
   localidades: LocalidadNombreDepartamentoDto[] = [];
+  horaSalida = '';
+  horaLlegada = '';
+  fechaSalida: Date | null = null;
+  fechaLlegada: Date | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -67,7 +75,11 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       localidadId: [null],
       minAsientos: [null],
       maxAsientos: [null],
-      activo: [null]
+      activo: [null],
+      fechaSalida: [null],
+      fechaLlegada: [null],
+      horaSalida: [''],
+      horaLlegada: ['']
     });
   }
 
@@ -86,13 +98,21 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
 
   private loadBuses() {
     const f = this.filterForm.value;
+    const buildDateTime = (d: Date, h: string) => {
+    const [hh, mm] = h.split(':').map(Number);
+    const dt = new Date(d);
+    dt.setHours(hh, mm);
+    return dt.toISOString();
+    }
     const filtro: FiltroBusquedaBusDto = {
       matricula: f.matricula,
       localidadId: f.localidadId ?? undefined,
       minAsientos: f.minAsientos ?? undefined,
       maxAsientos: f.maxAsientos ?? undefined,
-      activo: f.activo ?? undefined
-    };
+      activo: f.activo ?? undefined,
+      fechaHoraSalida:   f.fechaSalida && f.horaSalida ? buildDateTime(f.fechaSalida, f.horaSalida): undefined,
+      fechaHoraLlegada:  f.fechaLlegada && f.horaLlegada ? buildDateTime(f.fechaLlegada, f.horaLlegada) : undefined
+      };
     this.busService.getAll(filtro, this.pageIndex, this.pageSize)
       .then((res: Page<BusDto>) => {
         this.buses = res.content;

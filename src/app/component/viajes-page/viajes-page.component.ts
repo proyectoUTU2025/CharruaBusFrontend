@@ -19,9 +19,6 @@ import { LocalidadService } from '../../services/localidades.service';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { Page } from '../../models';
 
-
-
-
 @Component({
   selector: 'app-viajes-page',
   standalone: true,

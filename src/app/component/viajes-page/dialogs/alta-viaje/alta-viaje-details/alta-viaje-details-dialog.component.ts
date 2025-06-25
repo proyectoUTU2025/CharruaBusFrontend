@@ -172,7 +172,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   localidadNombre(id: number): string {
     return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
-
   }
 
   deberiaDeshabilitarSiguiente(): boolean {

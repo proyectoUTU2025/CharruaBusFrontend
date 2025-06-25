@@ -1,77 +1,119 @@
-.page-header {
-  margin-bottom: 16px;
-
-  h1 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-
-  p {
-    color: #666;
-  }
+:host {
+  display: block;
+  padding: 24px;
+  background: #f5f5f5;
 }
 
 .filters-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.filter-field {
+  flex: 1 1 160px;
+}
+
+.filter-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.page-header {
   margin-bottom: 24px;
+}
 
-  .filter-field {
-    flex: 1 1 200px;
-  }
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+}
 
-  .filter-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-    }
-  }
+.page-header p {
+  margin: 0 0 16px;
+  color: #666;
 }
 
 .buses-card {
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 16px;
+}
 
-  .table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
 
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
-  }
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
 
-  .badge {
-    padding: 4px 8px;
-    border-radius: 4px;
+.actions {
+  display: flex;
+  gap: 8px;
+}
 
-    &.badge-active {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
+.massive-btn {
+  border-color: #675992;
+  color: #675992;
+  text-transform: none;
+  height: 36px;
+  border-radius: 18px;
+}
 
-    &.badge-inactive {
-      background: #ffebee;
-      color: #c62828;
-    }
-  }
+.create-btn {
+  background-color: #675992;
+  color: white;
+  text-transform: none;
+  height: 36px;
+  border-radius: 18px;
+}
 
-  table {
-    width: 100%;
-  }
+table.mat-table {
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+}
 
-  mat-paginator {
-    margin-top: 16px;
-    display: flex;
-    justify-content: flex-end;
-  }
+.mat-header-row {
+  background: #fafafa;
+}
+
+.mat-cell,
+.mat-header-cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ececec;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-active {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.badge-inactive {
+  background: #fdecea;
+  color: #c62828;
+}
+.button-group {
+  display: flex;
+  gap: 8px;
 }

@@ -12,13 +12,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { AltaBusDto, FiltroBusquedaBusDto, BusDto, Page } from '../../models';
-
 import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
 import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
 import { BusService } from '../../services/bus.service';
 import { AddBusDialogComponent } from './dialogs/add-bus-dialog/add-bus-dialog.component';
 import { BulkUploadBusDialogComponent } from './dialogs/bulk-upload-bus-dialog/bulk-upload-bus-dialog.component';
 import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-errors-dialog.component';
+import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
+import { LocalidadService } from '../../services/localidades.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-buses-page',
@@ -49,14 +51,16 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   totalElements = 0;
   pageIndex = 0;
   pageSize = 5;
-  columns = ['id', 'matricula', 'ubicacionActual', 'capacidad', 'activo', 'acciones'];
+  columns = ['id', 'matricula', 'capacidad', 'activo', 'acciones'];
+  localidades: LocalidadNombreDepartamentoDto[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private fb: FormBuilder,
     private busService: BusService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private localidadesService: LocalidadService,
   ) {
     this.filterForm = this.fb.group({
       matricula: [''],
@@ -67,7 +71,9 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit() { }
+  async ngOnInit() { 
+    this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
+  }
 
   ngAfterViewInit() {
     this.paginator.page.subscribe((e: PageEvent) => {
@@ -149,4 +155,8 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       .then(() => this.loadBuses())
       .catch(console.error);
   }
+  localidadNombre(id: number): string {
+    return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
+  }
+
 }

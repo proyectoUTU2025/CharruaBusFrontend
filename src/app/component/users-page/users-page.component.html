@@ -2,52 +2,52 @@
   <h1>Gestión de Usuarios</h1>
   <p>Crear y administrar usuarios del sistema.</p>
 </div>
-
-<form [formGroup]="filterForm" class="filters-container">
-  <div class="filter-field">
-    <mat-form-field appearance="fill">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="nombre" />
-    </mat-form-field>
-  </div>
-  <div class="filter-field">
-    <mat-form-field appearance="fill">
-      <mat-label>Apellido</mat-label>
-      <input matInput formControlName="apellido" />
-    </mat-form-field>
-  </div>
-  <div class="filter-field">
-    <mat-form-field appearance="fill">
-      <mat-label>Correo</mat-label>
-      <input matInput formControlName="email" />
-    </mat-form-field>
-  </div>
-  <div class="filter-field">
-    <mat-form-field appearance="fill">
-      <mat-label>Documento</mat-label>
-      <input matInput formControlName="documento" />
-    </mat-form-field>
-  </div>
-  <div class="filter-field">
-    <mat-form-field appearance="fill">
-      <mat-label>Rol</mat-label>
-      <mat-select formControlName="rol">
-        <mat-option value="">Todos</mat-option>
-        <mat-option value="ADMIN">ADMIN</mat-option>
-        <mat-option value="VENDEDOR">VENDEDOR</mat-option>
-        <mat-option value="CLIENTE">CLIENTE</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-  <div class="filter-actions">
-    <div class="action-buttons">
-      <button mat-flat-button class="create-btn" (click)="onSearch()">Buscar</button>
-      <button mat-stroked-button class="massive-btn" (click)="onClear()">Limpiar</button>
+<div class="content-card">
+  <form [formGroup]="filterForm" class="filters-container">
+    <div class="filter-field">
+      <mat-form-field appearance="fill">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" />
+      </mat-form-field>
     </div>
-    <mat-checkbox formControlName="activo">Activos</mat-checkbox>
-  </div>
-</form>
-
+    <div class="filter-field">
+      <mat-form-field appearance="fill">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="apellido" />
+      </mat-form-field>
+    </div>
+    <div class="filter-field">
+      <mat-form-field appearance="fill">
+        <mat-label>Correo</mat-label>
+        <input matInput formControlName="email" />
+      </mat-form-field>
+    </div>
+    <div class="filter-field">
+      <mat-form-field appearance="fill">
+        <mat-label>Documento</mat-label>
+        <input matInput formControlName="documento" />
+      </mat-form-field>
+    </div>
+    <div class="filter-field">
+      <mat-form-field appearance="fill">
+        <mat-label>Rol</mat-label>
+        <mat-select formControlName="rol">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="ADMIN">ADMIN</mat-option>
+          <mat-option value="VENDEDOR">VENDEDOR</mat-option>
+          <mat-option value="CLIENTE">CLIENTE</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="filter-actions">
+      <div class="action-buttons">
+        <button mat-flat-button class="create-btn" (click)="onSearch()">Buscar</button>
+        <button mat-stroked-button class="massive-btn" (click)="onClear()">Limpiar</button>
+      </div>
+      <mat-checkbox formControlName="activo">Activos</mat-checkbox>
+    </div>
+  </form>
+</div>
 <div class="bulk-errors" *ngIf="bulkErrors.length">
   <div *ngFor="let err of bulkErrors" class="error-line">{{ err }}</div>
 </div>

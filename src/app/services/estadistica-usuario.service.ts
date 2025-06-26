@@ -8,11 +8,12 @@ import { EstadisticaClienteCompras } from '../models/estadisticas/usuario/estadi
 import { EstadisticaLogueos } from '../models/estadisticas/usuario/estadistica-logueos';
 
 @Injectable({ providedIn: 'root' })
-export class EstadisticaService {
+export class EstadisticaUsuarioService {
     private readonly BASE = `${environment.apiBaseUrl}/usuarios/estadisticas`;
 
     constructor(private http: HttpClient) { }
 
+    /** Usuarios por tipo (paginado + ordenable) */
     getUsuariosPorTipo(
         page = 0,
         size = 10,
@@ -24,7 +25,6 @@ export class EstadisticaService {
             .set('size', size.toString())
             .set('ordenarPor', ordenarPor)
             .set('ascendente', ascendente.toString());
-
         return this.http.get<Page<EstadisticaUsuario>>(
             `${this.BASE}/tipo`,
             { params }
@@ -38,6 +38,14 @@ export class EstadisticaService {
         );
     }
 
+    exportUsuariosPorTipoPdf(): Observable<Blob> {
+        return this.http.get(
+            `${this.BASE}/tipo/export/pdf`,
+            { responseType: 'blob' }
+        );
+    }
+
+    /** Compras por cliente (paginado + ordenable) */
     getComprasClientes(
         fechaInicio?: string,
         fechaFin?: string,
@@ -51,10 +59,8 @@ export class EstadisticaService {
             .set('size', size.toString())
             .set('ordenarPor', ordenarPor)
             .set('ascendente', ascendente.toString());
-
         if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
         if (fechaFin) params = params.set('fechaFin', fechaFin);
-
         return this.http.get<Page<EstadisticaClienteCompras>>(
             `${this.BASE}/compras-clientes`,
             { params }
@@ -68,13 +74,26 @@ export class EstadisticaService {
         let params = new HttpParams();
         if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
         if (fechaFin) params = params.set('fechaFin', fechaFin);
-
         return this.http.get(
             `${this.BASE}/compras-clientes/export/csv`,
             { params, responseType: 'blob' }
         );
     }
 
+    exportComprasClientesPdf(
+        fechaInicio?: string,
+        fechaFin?: string
+    ): Observable<Blob> {
+        let params = new HttpParams();
+        if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
+        if (fechaFin) params = params.set('fechaFin', fechaFin);
+        return this.http.get(
+            `${this.BASE}/compras-clientes/export/pdf`,
+            { params, responseType: 'blob' }
+        );
+    }
+
+    /** Logueos de usuarios */
     getLogueosUsuarios(
         fechaInicio?: string,
         fechaFin?: string,
@@ -84,10 +103,8 @@ export class EstadisticaService {
         let params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString());
-
         if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
         if (fechaFin) params = params.set('fechaFin', fechaFin);
-
         return this.http.get<Page<EstadisticaLogueos>>(
             `${this.BASE}/logueos`,
             { params }
@@ -101,9 +118,21 @@ export class EstadisticaService {
         let params = new HttpParams();
         if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
         if (fechaFin) params = params.set('fechaFin', fechaFin);
-
         return this.http.get(
             `${this.BASE}/logueos/export/csv`,
+            { params, responseType: 'blob' }
+        );
+    }
+
+    exportLogueosPdf(
+        fechaInicio?: string,
+        fechaFin?: string
+    ): Observable<Blob> {
+        let params = new HttpParams();
+        if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
+        if (fechaFin) params = params.set('fechaFin', fechaFin);
+        return this.http.get(
+            `${this.BASE}/logueos/export/pdf`,
             { params, responseType: 'blob' }
         );
     }

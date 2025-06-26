@@ -18,11 +18,9 @@ import { ProfilePageComponent } from './component/profile-page/profile-page.comp
 import { PasajeHistoryComponent } from './component/pasaje-history/pasaje-history.component';
 import { ChangePasswordComponent } from './component/change-password/change-password.component';
 import { EditUserDialogComponent } from './component/users-page/dialogs/edit-user-dialog/edit-user-dialog.component';
-
 import { UsuariosPorTipoComponent } from './component/estadisticas/usuario/usuarios-por-tipo/usuarios-por-tipo.component';
 import { ComprasClientesComponent } from './component/estadisticas/usuario/compras-clientes/compras-clientes.component';
 import { LogueosUsuariosComponent } from './component/estadisticas/usuario/logueos-usuarios/logueos-usuarios.component';
-
 import { ViajesDepartamentoComponent } from './component/estadisticas/transporte/viajes-departamento/viajes-departamento.component';
 import { ViajesPorOmnibusComponent } from './component/estadisticas/transporte/viajes-por-omnibus/viajes-por-omnibus.component';
 import { MantenimientosPorOmnibusComponent } from './component/estadisticas/transporte/mantenimientos-por-omnibus/mantenimientos-por-omnibus.component';
@@ -42,18 +40,15 @@ export const routes: Routes = [
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: '', component: CompraPageComponent },
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+      { path: 'inicio', loadComponent: () => import('./component/home-page/home-page.component').then(m => m.HomePageComponent) },
       { path: 'configuracion', component: ConfiguracionDelSistemaComponent },
       { path: 'usuarios', component: UsersPageComponent, pathMatch: 'full' },
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'omnibus/:id', component: BusDetailComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },
-      {
-        path: 'viajes/:id/pasajes',
-        component: PasajesPorViajeComponent,
-        data: { roles: ['VENDEDOR'] }
-      },
+      { path: 'viajes/:id/pasajes', component: PasajesPorViajeComponent, data: { roles: ['VENDEDOR'] } },
       { path: 'compras/exito', component: StripeRedirectComponent },
       { path: 'compras/cancelada', component: StripeRedirectComponent },
       { path: 'comprar', component: CompraPageComponent },

@@ -7,7 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { EstadisticaService } from '../../../../services/estadistica-usuario.service';
+import { EstadisticaUsuarioService } from '../../../../services/estadistica-usuario.service';
 import { EstadisticaClienteCompras } from '../../../../models/estadisticas/usuario/estadistica-cliente-compras';
 import { ChartCardComponent } from '../../../shared/chart-card/chart-card.component';
 
@@ -36,13 +36,14 @@ export class ComprasClientesComponent implements OnInit {
     ascendente = false;
     fechaInicio = '';
     fechaFin = '';
-    isExporting = false;
+    isExportingCsv = false;
+    isExportingPdf = false;
 
     // Datos para la gráfica
     chartLabels: string[] = [];
     chartData: number[] = [];
 
-    constructor(private svc: EstadisticaService) { }
+    constructor(private svc: EstadisticaUsuarioService) { }
 
     ngOnInit() {
         this.load();
@@ -50,9 +51,12 @@ export class ComprasClientesComponent implements OnInit {
 
     load() {
         this.svc.getComprasClientes(
-            this.fechaInicio, this.fechaFin,
-            this.pageIndex, this.pageSize,
-            'totalGastado', this.ascendente
+            this.fechaInicio,
+            this.fechaFin,
+            this.pageIndex,
+            this.pageSize,
+            'totalGastado',
+            this.ascendente
         ).subscribe(res => {
             this.data = res.content;
             this.total = res.page.totalElements;
@@ -73,7 +77,7 @@ export class ComprasClientesComponent implements OnInit {
     }
 
     exportCsv() {
-        this.isExporting = true;
+        this.isExportingCsv = true;
         this.svc.exportComprasClientesCsv(this.fechaInicio, this.fechaFin).subscribe({
             next: blob => {
                 const url = window.URL.createObjectURL(blob);
@@ -83,8 +87,24 @@ export class ComprasClientesComponent implements OnInit {
                 a.click();
                 window.URL.revokeObjectURL(url);
             },
-            complete: () => this.isExporting = false,
-            error: () => this.isExporting = false
+            complete: () => this.isExportingCsv = false,
+            error: () => this.isExportingCsv = false
+        });
+    }
+
+    exportPdf() {
+        this.isExportingPdf = true;
+        this.svc.exportComprasClientesPdf(this.fechaInicio, this.fechaFin).subscribe({
+            next: blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'compras_clientes.pdf';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            },
+            complete: () => this.isExportingPdf = false,
+            error: () => this.isExportingPdf = false
         });
     }
 }

@@ -37,16 +37,16 @@ $primary-color: #675992;
 }
 
 .nav-button {
-  color: $primary-color;
-  background: none;
-  border: none;
-  text-transform: none;
-  display: flex;
-  align-items: center;
-  margin-right: 8px;
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
 
   mat-icon {
-    margin-right: 4px;
+    margin-right: 4px !important;
   }
 }
 
@@ -63,15 +63,6 @@ $primary-color: #675992;
   }
 }
 
-.nav-button,
-.nav-button:hover,
-.nav-button:focus,
-.nav-button:active {
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-}
-
 .logout-button,
 .logout-button:hover,
 .logout-button:focus,
@@ -84,37 +75,19 @@ $primary-color: #675992;
 .clickable {
   cursor: pointer;
 }
-.navbar .usuarios-button{
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-  text-transform: none !important;
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-  
-.localidades-button {
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-  text-transform: none !important;
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-}
-.viajes-button {
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-  text-transform: none !important;
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-}
-  mat-icon {
-    margin-right: 4px !important;
-  }
 
+.navbar .usuarios-button {
+  color: $primary-color !important;
+  background: none !important;
+  border: none !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
+}
+
+.localidades-button,
+.viajes-button,
 .login-button {
   color: $primary-color !important;
   background: none !important;
@@ -127,6 +100,4 @@ $primary-color: #675992;
   mat-icon {
     margin-right: 4px !important;
   }
-}
-
 }

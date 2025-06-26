@@ -7,8 +7,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { EstadisticaService } from '../../../../services/estadistica-usuario.service';
+import { EstadisticaUsuarioService } from '../../../../services/estadistica-usuario.service';
 import { EstadisticaLogueos } from '../../../../models/estadisticas/usuario/estadistica-logueos';
+import { Page } from '../../../../models';
 
 @Component({
     selector: 'app-logueos-usuarios',
@@ -35,20 +36,24 @@ export class LogueosUsuariosComponent implements OnInit {
     fechaFin = '';
     isExporting = false;
 
-    constructor(private svc: EstadisticaService) { }
+    constructor(private svc: EstadisticaUsuarioService) { }
 
     ngOnInit() {
         this.load();
     }
 
     load() {
-        this.svc.getLogueosUsuarios(
-            this.fechaInicio, this.fechaFin,
-            this.pageIndex, this.pageSize
-        ).subscribe(res => {
-            this.data = res.content;
-            this.total = res.page.totalElements;
-        });
+        this.svc
+            .getLogueosUsuarios(this.fechaInicio, this.fechaFin, this.pageIndex, this.pageSize)
+            .subscribe({
+                next: (res: Page<EstadisticaLogueos>) => {
+                    this.data = res.content;
+                    this.total = res.page.totalElements;
+                },
+                error: err => {
+                    console.error('Error cargando logueos:', err);
+                }
+            });
     }
 
     pageChanged(e: PageEvent) {
@@ -60,7 +65,7 @@ export class LogueosUsuariosComponent implements OnInit {
     exportCsv() {
         this.isExporting = true;
         this.svc.exportLogueosCsv(this.fechaInicio, this.fechaFin).subscribe({
-            next: blob => {
+            next: (blob: Blob) => {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -68,8 +73,8 @@ export class LogueosUsuariosComponent implements OnInit {
                 a.click();
                 window.URL.revokeObjectURL(url);
             },
-            complete: () => this.isExporting = false,
-            error: () => this.isExporting = false
+            complete: () => (this.isExporting = false),
+            error: () => (this.isExporting = false)
         });
     }
 }

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { CompraResponseDto } from '../../models/compra';
 
 @Component({
   selector: 'app-stripe-redirect',
@@ -26,48 +27,47 @@ export class StripeRedirectComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private compraService: CompraService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const url = this.router.url;
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get('session_id');
+    const sessionId = new URLSearchParams(window.location.search).get('session_id');
 
     if (!sessionId) {
-      this.mensaje = 'Error: sesión de pago no encontrada.';
+      this.mensaje = '❌ Error: sesión de pago no encontrada.';
       this.cargando = false;
       this.iniciarRedireccion();
       return;
     }
 
     if (url.includes('/compras/exito')) {
-      this.compraService.confirmarCompra(sessionId).subscribe({
-        next: () => {
-          this.mensaje = 'Compra confirmada con éxito ✅';
+      this.compraService.confirmarCompra(sessionId).subscribe(
+        (_: any) => {
+          this.mensaje = '✅ Compra confirmada con éxito!';
           this.cargando = false;
-          this.iniciarRedireccion();
+          setTimeout(() => this.router.navigate(['/compras', (_ as CompraResponseDto).compraId]), 2000);
         },
-        error: () => {
-          this.mensaje = 'Error al confirmar la compra.';
+        () => {
+          this.mensaje = '⚠️ Error al confirmar la compra.';
           this.cargando = false;
           this.iniciarRedireccion();
         }
-      });
+      );
     } else if (url.includes('/compras/cancelada')) {
-      this.compraService.cancelarCompra(sessionId).subscribe({
-        next: () => {
-          this.mensaje = 'Compra cancelada ❌';
+      this.compraService.cancelarCompra(sessionId).subscribe(
+        () => {
+          this.mensaje = '❌ Compra cancelada.';
           this.cargando = false;
           this.iniciarRedireccion();
         },
-        error: () => {
-          this.mensaje = 'Error al cancelar la compra.';
+        () => {
+          this.mensaje = '⚠️ Error al cancelar la compra.';
           this.cargando = false;
           this.iniciarRedireccion();
         }
-      });
+      );
     } else {
-      this.mensaje = 'Ruta de redirección no válida.';
+      this.mensaje = '🚫 Ruta de redirección no válida.';
       this.cargando = false;
       this.iniciarRedireccion();
     }

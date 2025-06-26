@@ -238,30 +238,6 @@
   </div>
 </mat-card>
 
-<!-- Paso 6: Resultado final (IDA_Y_VUELTA) -->
-<mat-card class="redirect-card" *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 6">
-  <div *ngIf="estadoCompra === 'exito'" class="success-box">
-    <h2>✅ ¡Compra Realizada con Éxito!</h2>
-    <p>Tu pago fue procesado. Recibirás el ticket por correo.</p>
-    <p>Gracias por elegir CharruaBus 🚍</p>
-  </div>
-
-  <div *ngIf="estadoCompra === 'cancelado'" class="cancel-box">
-    <h2>❌ Compra Cancelada</h2>
-    <p>Puedes volver atrás y modificar datos si fue un error.</p>
-  </div>
-
-  <div *ngIf="estadoCompra === 'error'" class="error-box">
-    <h2>⚠️ Hubo un error</h2>
-    <p>No se pudo procesar el pago. Intenta de nuevo.</p>
-  </div>
-
-  <div class="step-buttons" style="margin-top: 20px; text-align: center;">
-    <button mat-flat-button color="primary" routerLink="/comprar">Realizar nueva compra</button>
-    <button mat-stroked-button color="accent" routerLink="/mis-compras">Ver mis compras</button>
-  </div>
-</mat-card>
-
 <!-- Botones de paso -->
 <div class="step-buttons"
      *ngIf="(tipoViaje === 'IDA' && step < 4) || (tipoViaje === 'IDA_Y_VUELTA' && step < 6)">

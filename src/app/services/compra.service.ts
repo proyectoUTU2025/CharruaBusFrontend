@@ -25,12 +25,15 @@ export class CompraService {
       .pipe(map(resp => resp.data));
   }
 
-  confirmarCompra(sessionId: string): Observable<void> {
-    return this.http.post<void>(
-      `${this.base}/confirmar`,
-      { sessionId } as ConfirmCompraRequestDto
-    );
+  confirmarCompra(sessionId: string): Observable<CompraResponseDto> {
+    return this.http
+      .post<{ data: CompraResponseDto }>(
+        `${this.base}/confirmar`,
+        { sessionId } as ConfirmCompraRequestDto
+      )
+      .pipe(map(r => r.data));
   }
+
 
   cancelarCompra(sessionId: string): Observable<void> {
     return this.http.post<void>(

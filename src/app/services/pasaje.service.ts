@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { PasajeDto } from '../models/pasajes/pasaje.dto';
+import { PasajeDto } from '../models/pasajes/pasaje-dto.model';
 import { FiltroBusquedaPasajeDto } from '../models/pasajes/filtro-busqueda-pasaje.dto';
 import { ApiResponse } from '../models/api/api-response.model';
 

@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/materia
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { PasajeService } from '../../../services/pasaje.service';
-import { PasajeDto } from '../../../models/pasajes/pasaje.dto';
+import { PasajeDto } from '../../../models/pasajes/pasaje-dto.model';
 import { Observable } from 'rxjs';
 
 @Component({

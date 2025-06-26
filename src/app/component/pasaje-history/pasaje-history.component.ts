@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { LocalidadService } from '../../services/localidades.service';
 import { FiltroBusquedaPasajeDto } from '../../models/pasajes/filtro-busqueda-pasaje.dto';
 import { TipoEstadoPasaje } from '../../models/pasajes/tipo-estado-pasaje.enum';
-import { PasajeDto } from '../../models/pasajes/pasaje.dto';
+import { PasajeDto } from '../../models/pasajes/pasaje-dto.model';
 import { GenericListComponent } from '../shared/generic-list/generic-list.component';
 import { DetallePasajeDialogComponent } from '../shared/detalle-pasaje-dialog/detalle-pasaje-dialog.component';
 

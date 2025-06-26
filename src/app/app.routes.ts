@@ -27,6 +27,7 @@ import { MantenimientosPorOmnibusComponent } from './component/estadisticas/tran
 import { EstadisticasPasajesComponent } from './component/estadisticas/transporte/estadisticas-pasajes/estadisticas-pasajes.component';
 import { PasajesAgrupadosComponent } from './component/estadisticas/transporte/pasajes-agrupados/pasajes-agrupados.component';
 import { PasajesPorViajeComponent } from './component/pasajes-por-viaje/pasajes-por-viaje.component';
+import { CompraDetallePageComponent } from './component/compra-detalle/compra-detalle-page.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -64,6 +65,8 @@ export const routes: Routes = [
       { path: 'estadisticas/mantenimientos-por-omnibus', component: MantenimientosPorOmnibusComponent },
       { path: 'estadisticas/estadisticas-pasajes', component: EstadisticasPasajesComponent },
       { path: 'estadisticas/pasajes-agrupados', component: PasajesAgrupadosComponent },
+      { path: 'compras/:id', component: CompraDetallePageComponent, canActivate: [AuthGuard] }
+
     ]
   },
 

@@ -1,0 +1,72 @@
+<mat-card class="detalle-card" *ngIf="detalle">
+  <mat-card-header>
+    <div class="status-bar success">
+      <mat-icon>check_circle</mat-icon>
+      ¡Compra Realizada con Éxito!
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- PANEL SUPERIOR CON RUTA, FECHA Y PRECIO -->
+    <div class="ruta-info">
+      <div>{{ detalle.pasajes[0]?.paradaOrigen }} → {{ detalle.pasajes[0]?.paradaDestino }}</div>
+      <div>{{ detalle.fechaCompra | date:'dd/MM/yyyy' }} • {{ detalle.fechaCompra | date:'shortTime' }}</div>
+      <div class="total"> {{ detalle.precioActual | currency }} </div>
+    </div>
+
+    <!-- DETALLES DE LA COMPRA -->
+    <section class="detalles">
+      <h3>Detalles de la Compra</h3>
+      <div class="panels">
+        <!-- Información de Reserva -->
+        <div class="panel">
+          <h4>Información de Reserva</h4>
+          <div class="row">
+            <span><strong>N° Reserva:</strong></span>
+            <span>{{ 'CB-' + detalle.id }}</span>
+          </div>
+          <div class="row">
+            <span><strong>Fecha de Compra:</strong></span>
+            <span>{{ detalle.fechaCompra | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="row">
+            <span><strong>Método de Pago:</strong></span>
+            <span>Tarjeta terminada en 4567</span>
+          </div>
+          <div class="tag" [ngClass]="detalle.estado.toLowerCase()">{{ detalle.estado }}</div>
+        </div>
+      </div>
+
+      <!-- Resumen de Pago -->
+      <div class="resumen-pago">
+        <div class="row">
+          <span>Pasaje {{ detalle.pasajes[0]?.paradaOrigen }} – {{ detalle.pasajes[0]?.paradaDestino }}</span>
+          <span>{{ detalle.pasajes[0]?.precio | currency }}</span>
+        </div>
+       
+        <div class="total-row">
+          <span><strong>Total Pagado</strong></span>
+          <span><strong>{{ detalle.precioActual | currency }}</strong></span>
+        </div>
+      </div>
+    </section>
+  </mat-card-content>
+
+  <mat-card-actions align="start">
+    <button mat-stroked-button (click)="descargarPdf()">
+      <mat-icon>download</mat-icon>
+      Descargar Boleto
+    </button>
+    <button mat-stroked-button>
+      <mat-icon>print</mat-icon>
+      Imprimir Boleto
+    </button>
+    <button mat-stroked-button>
+      <mat-icon>share</mat-icon>
+      Compartir
+    </button>
+    <button mat-flat-button color="primary" routerLink="/mis-compras">
+      Ver Mis Viajes
+    </button>
+  </mat-card-actions>
+</mat-card>

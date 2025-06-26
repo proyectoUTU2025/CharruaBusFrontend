@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PasajeService } from '../../services/pasaje.service';
-import { PasajeDto } from '../../models/pasajes/pasaje.dto';
+import { PasajeDto } from '../../models/pasajes/pasaje-dto.model';
 import { Observable } from 'rxjs';
 
 @Component({

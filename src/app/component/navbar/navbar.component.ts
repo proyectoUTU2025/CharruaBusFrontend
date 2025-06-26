@@ -3,8 +3,11 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -15,13 +18,18 @@ import { AuthService } from '../../services/auth.service';
     RouterModule,
     MatToolbarModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule,
+    MatMenuModule
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  constructor(private router: Router, private loginService: AuthService) { }
+  constructor(
+    private router: Router,
+    public authService: AuthService,
+  ) {}
 
   onLogoClick(): void {
     if (this.router.url === '/' || this.router.url === '') {
@@ -32,6 +40,15 @@ export class NavbarComponent {
   }
 
   onLogout(): void {
-    this.loginService.logout();
+    this.authService.logout();
   }
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn;
+  }
+
+  get userRole(): string | null {
+    return this.authService.rol;
+  }
+
 }

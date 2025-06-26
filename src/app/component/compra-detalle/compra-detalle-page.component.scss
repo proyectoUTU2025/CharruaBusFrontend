@@ -1,7 +1,12 @@
+$purple-faded: #675992;
+
 .detalle-card {
   max-width: 900px;
   margin: 2rem auto;
   padding: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 
   .status-bar {
     display: flex;
@@ -48,6 +53,7 @@
         background: #fafafa;
         padding: 1rem;
         border: 1px solid #ddd;
+        border-radius: 0.5rem;
         position: relative;
 
         h4 {
@@ -99,5 +105,28 @@
     padding: 1rem;
     display: flex;
     gap: 0.5rem;
+
+    button {
+      border-radius: 0.5rem;
+      text-transform: none;
+    }
+
+    button.purple-stroked {
+      border-color: $purple-faded;
+      color: $purple-faded;
+
+      &:hover {
+        background-color: rgba($purple-faded, 0.1);
+      }
+    }
+
+    button.purple-flat {
+      background-color: $purple-faded;
+      color: white;
+
+      &:hover {
+        background-color: darken($purple-faded, 10%);
+      }
+    }
   }
 }

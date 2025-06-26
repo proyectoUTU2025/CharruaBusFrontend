@@ -14,6 +14,6 @@ export interface AltaLocalidadDto {
 
 export interface FiltroBusquedaLocalidadDto {
   nombre?: string;
-  departamento?: TipoDepartamento;
+  departamentos?: TipoDepartamento[]; 
 }
 

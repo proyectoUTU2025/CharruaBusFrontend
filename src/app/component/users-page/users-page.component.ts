@@ -11,12 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
-import {
-  UsuarioDto,
-  AltaUsuarioDto,
-  FiltroBusquedaUsuarioDto,
-  Page
-} from '../../models';
+import { UsuarioDto, AltaUsuarioDto, FiltroBusquedaUsuarioDto, Page } from '../../models';
 import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
 import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
 import { UserService } from '../../services/user.service';

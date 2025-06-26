@@ -58,7 +58,7 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
     localidadDestinoId: number | null;
     fechaDesde: string | Date;
     fechaHasta: string | Date;
-  } = {
+    } = {
       localidadOrigenId: null,
       localidadDestinoId: null,
       fechaDesde: '',

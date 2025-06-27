@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DetalleCompraDto } from '../../models';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CompraService } from '../../services/compra.service';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-compra-detalle-page',
@@ -21,7 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatPaginatorModule,
     MatButtonModule,
     RouterModule,
-    MatIconModule
+    MatIconModule    
   ],
  templateUrl: './compra-detalle-page.component.html',
   styleUrls: ['./compra-detalle-page.component.scss']
@@ -29,6 +30,8 @@ import { MatIconModule } from '@angular/material/icon';
 export class CompraDetallePageComponent implements OnInit {
   compraId!: number;
   detalle!: DetalleCompraDto;
+  isCliente = false;
+  mostrarBannerExito = false;
   displayedColumns = [
     'numeroAsiento',
     'paradaOrigen',
@@ -41,10 +44,15 @@ export class CompraDetallePageComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private compraService: CompraService
+    private router: Router,  
+    private compraService: CompraService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    const navigation = this.router.getCurrentNavigation();
+    this.mostrarBannerExito = !!navigation?.extras.state?.['compraExitosa'];
+    this.isCliente = this.authService.rol === 'CLIENTE';
     this.compraId = Number(this.route.snapshot.paramMap.get('id'));
     this.compraService.getDetalle(this.compraId)
       .subscribe(d => this.detalle = d);

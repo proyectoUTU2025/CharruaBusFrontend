@@ -1,39 +1,65 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import {
+    Component,
+    Input,
+    OnChanges,
+    SimpleChanges,
+    ViewChild
+} from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTableModule } from '@angular/material/table';
 import { SharedModule } from '../../../../../shared/shared.module';
 import { MaterialModule } from '../../../../../shared/material.module';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { MovimientoOmnibusDto } from '../../../../../models/movimiento-omnibus/movimiento-omnibus-dto.model';
 import { Page } from '../../../../../models';
 import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
     standalone: true,
     selector: 'app-omnibus-history',
     imports: [
         SharedModule,
-        MaterialModule
+        MaterialModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatProgressSpinnerModule,
+        MatPaginatorModule,
+        MatTableModule
     ],
     templateUrl: './omnibus-history.component.html',
     styleUrls: ['./omnibus-history.component.scss']
 })
 export class OmnibusHistoryComponent implements OnChanges {
     @Input() busId!: number;
+
     filterForm: FormGroup;
     history: MovimientoOmnibusDto[] = [];
     totalMovimientos = 0;
     columns = [
-        'id', 'fechaHoraSalida', 'fechaHoraLlegada',
-        'origenNombre', 'destinoNombre', 'tipoMovimientoOmnibus'
+        'id',
+        'fechaHoraSalida',
+        'fechaHoraLlegada',
+        'origenNombre',
+        'destinoNombre',
+        'tipoMovimientoOmnibus'
     ];
+
     pageIndex = 0;
     pageSize = 5;
 
-    @ViewChild('paginator') paginator!: MatPaginator;
-
-    localidades: any[] = [];
     localidadesMap: Record<number, string> = {};
+    localidadesKeys: string[] = [];
+
+    @ViewChild(MatPaginator) paginator!: MatPaginator;
 
     constructor(
         private fb: FormBuilder,
@@ -42,77 +68,75 @@ export class OmnibusHistoryComponent implements OnChanges {
     ) {
         this.filterForm = this.fb.group({
             fechaHoraSalida: [''],
+            fechaHoraLlegada: [''],
             origenId: [''],
             destinoId: [''],
             tipoMovimientoOmnibus: ['']
         });
-        this.cargarLocalidades();
+        this.loadLocalidades();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['busId']?.currentValue) {
-            this.pageIndex = 0;
-            this.loadHistory(0, this.pageSize);
+            this.resetFilters();
+            this.loadHistory();
         }
     }
 
-    cargarLocalidades() {
-        this.localidadService.getAll({}, 0, 1000).subscribe({
-            next: (resp) => {
-                if (resp.content) {
-                    this.localidades = resp.content;
-                    for (const l of resp.content) {
-                        this.localidadesMap[l.id] = l.nombre;
-                    }
-                }
-            }
+    private loadLocalidades() {
+        this.localidadService.getAll({}, 0, 1000).subscribe(resp => {
+            this.localidadesMap = {};
+            resp.content.forEach(loc => (this.localidadesMap[loc.id] = loc.nombre));
+            this.localidadesKeys = Object.keys(this.localidadesMap);
         });
     }
 
-    loadHistory(page: number, size: number) {
-        if (!this.busId || isNaN(this.busId)) return;
+    loadHistory(event?: PageEvent) {
+        if (event) {
+            this.pageIndex = event.pageIndex;
+            this.pageSize = event.pageSize;
+        }
         const raw = this.filterForm.value;
         const filtros: any = {};
         if (raw.fechaHoraSalida) filtros.fechaHoraSalida = raw.fechaHoraSalida;
+        if (raw.fechaHoraLlegada) filtros.fechaHoraLlegada = raw.fechaHoraLlegada;
         if (raw.origenId) filtros.origenId = raw.origenId;
         if (raw.destinoId) filtros.destinoId = raw.destinoId;
         if (raw.tipoMovimientoOmnibus) filtros.tipos = [raw.tipoMovimientoOmnibus];
 
-        this.busService.getTrips(this.busId, filtros, page, size).subscribe({
-            next: (resp: Page<MovimientoOmnibusDto>) => {
-                this.history = resp.content;
-                this.totalMovimientos = resp.page.totalElements;
-            },
-            error: err => {
-                console.error('Error cargando historial de movimientos:', err);
-            }
-        });
+        this.busService
+            .getTrips(this.busId, filtros, this.pageIndex, this.pageSize)
+            .subscribe({
+                next: resp => {
+                    this.history = resp.content;
+                    this.totalMovimientos = resp.page.totalElements;
+                },
+                error: err => console.error(err)
+            });
     }
 
     onSearch() {
         this.pageIndex = 0;
         this.paginator.firstPage();
-        this.loadHistory(this.pageIndex, this.pageSize);
+        this.loadHistory();
     }
 
     onClear() {
+        this.resetFilters();
+        this.onSearch();
+    }
+
+    private resetFilters() {
         this.filterForm.reset({
             fechaHoraSalida: '',
+            fechaHoraLlegada: '',
             origenId: '',
             destinoId: '',
             tipoMovimientoOmnibus: ''
         });
-        this.onSearch();
     }
 
-    onPageChange(event: PageEvent) {
-        this.pageIndex = event.pageIndex;
-        this.pageSize = event.pageSize;
-        this.loadHistory(this.pageIndex, this.pageSize);
-    }
-
-    getNombreLocalidad(id: number, movimiento?: MovimientoOmnibusDto): string {
-        if (!id || (movimiento && movimiento.tipoMovimientoOmnibus === 'MANTENIMIENTO')) return '';
-        return this.localidadesMap[id] || id.toString() || '';
+    getNombreLocalidad(id: number): string {
+        return this.localidadesMap[id] || '';
     }
 }

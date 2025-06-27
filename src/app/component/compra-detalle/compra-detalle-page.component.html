@@ -28,21 +28,41 @@
           <div class="row">
             <span><strong>Fecha de Compra:</strong></span>
             <span>{{ detalle.fechaCompra | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>          
+          <div class="row">
+            <span><strong>Cantidad de pasajes:</strong></span>
+            <span>{{ detalle.cantidadPasajes}}</span>
+          </div>
+          <div class="row" *ngIf="vendedorNombre">
+            <span><strong>Vendedor:</strong></span>
+            <span>{{ vendedorNombre }}</span>
           </div>
           <div class="row">
-            <span><strong>Método de Pago:</strong></span>
-            <span>Tarjeta terminada en 4567</span>
+            <span><strong>Cliente:</strong></span>
+            <span>{{ clienteNombre }}</span>
+          </div>
+          <div class="row">
+            <span><strong>Viaje:</strong> {{ detalle.pasajes[0]?.paradaOrigen }} – {{ detalle.pasajes[0]?.paradaDestino }}</span>
+            <span>{{ detalle.pasajes[0]?.precio | currency }}</span>
           </div>
           <div class="tag" [ngClass]="detalle.estado.toLowerCase()">{{ detalle.estado }}</div>
-        </div>
+            <h4>Pasajes</h4>
+            <div class="pasajes-compact">
+              <span
+                class="chip"
+                *ngFor="let p of detalle.pasajes"                
+                tabindex="0"
+                role="button"
+                [attr.aria-label]="'Ver detalle pasaje ' + p.numeroAsiento">
+                #{{ p.numeroAsiento }} {{ p.paradaOrigen }} → {{ p.paradaDestino }}
+              </span>
+            </div>
+          </div>
       </div>
 
       <!-- Resumen de Pago -->
       <div class="resumen-pago">
-        <div class="row">
-          <span>Pasaje {{ detalle.pasajes[0]?.paradaOrigen }} – {{ detalle.pasajes[0]?.paradaDestino }}</span>
-          <span>{{ detalle.pasajes[0]?.precio | currency }}</span>
-        </div>
+       
        
         <div class="total-row">
           <span><strong>Total Pagado</strong></span>

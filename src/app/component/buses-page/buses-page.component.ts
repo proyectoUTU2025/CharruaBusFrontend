@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -69,6 +70,7 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     private busService: BusService,
     private dialog: MatDialog,
     private localidadesService: LocalidadService,
+    private router: Router
   ) {
     this.filterForm = this.fb.group({
       matricula: [''],
@@ -179,4 +181,7 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
   }
 
+  goToBusDetail(bus: BusDto) {
+    this.router.navigate(['/omnibus', bus.id]);
+  }
 }

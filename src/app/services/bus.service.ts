@@ -93,14 +93,12 @@ export class BusService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    // ——— Date filters (to be enabled later) ———
-    // if (filtros.fechaHoraSalida) {
-    //   params = params.set('fechaHoraSalida', filtros.fechaHoraSalida);
-    // }
-    // if (filtros.fechaHoraLlegada) {
-    //   params = params.set('fechaHoraLlegada', filtros.fechaHoraLlegada);
-    // }
-
+    if (filtros.fechaHoraSalida) {
+      params = params.set('fechaHoraSalida', this.toISOString(filtros.fechaHoraSalida, 'start'));
+    }
+    if (filtros.fechaHoraLlegada) {
+      params = params.set('fechaHoraLlegada', this.toISOString(filtros.fechaHoraLlegada, 'end'));
+    }
     if (filtros.origenId) {
       params = params.set('origenId', filtros.origenId.toString());
     }
@@ -108,18 +106,30 @@ export class BusService {
       params = params.set('destinoId', filtros.destinoId.toString());
     }
     if (filtros.tipos?.length) {
-      filtros.tipos.forEach(t => {
-        params = params.append('tipos', t);
+      filtros.tipos.forEach(tipo => {
+        params = params.append('tipos', tipo);
       });
     }
-
-    console.log(`GET ${this.base}/${busId}/movimientos?${params.toString()}`);
 
     return this.http.get<Page<MovimientoOmnibusDto>>(
       `${this.base}/${busId}/movimientos`,
       { params, withCredentials: true }
     );
   }
+
+  /**
+   * Convierte una fecha a formato ISO 8601, ajustando la hora según el límite especificado.
+   * @param date Fecha a convertir (string o Date).
+   * @param bound 'start' para inicio del día, 'end' para fin del día.
+   * @returns Fecha en formato ISO 8601.
+   */
+  private toISOString(date: string | Date, bound: 'start' | 'end'): string {
+    const d = new Date(date);
+    if (bound === 'start') d.setHours(0, 0, 0, 0);
+    if (bound === 'end') d.setHours(23, 59, 59, 999);
+    return d.toISOString();
+  }
+
 
 
   cambiarEstado(id: number, activo: boolean): Promise<{ message: string }> {

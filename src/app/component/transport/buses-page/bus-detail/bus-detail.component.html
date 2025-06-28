@@ -1,32 +1,42 @@
-<mat-card *ngIf="bus">
-    <mat-card-title>
-        Detalle de Ómnibus: {{ bus.matricula }}
-    </mat-card-title>
-    <mat-card-content>
-        <p><strong>ID:</strong> {{ bus.id }}</p>
-        <p><strong>Matrícula:</strong> {{ bus.matricula }}</p>
-        <p><strong>Capacidad:</strong> {{ bus.capacidad }}</p>
-        <p>
-            <strong>Activo:</strong>
-            <span [ngClass]="bus.activo ? 'badge-active' : 'badge-inactive'" class="badge">
-                {{ bus.activo ? 'Sí' : 'No' }}
-            </span>
-        </p>
-    </mat-card-content>
+<ng-container *ngIf="loading; else content">
+    <div class="spinner-container">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+</ng-container>
 
-    <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="abrirAltaViajeExpreso()">
-            <mat-icon>add</mat-icon>
-            Registrar viaje expreso
-        </button>
-        <button mat-raised-button color="accent" (click)="abrirAsignarMantenimiento()">
-            <mat-icon>build</mat-icon>
-            Asignar mantenimiento
-        </button>
-    </mat-card-actions>
-</mat-card>
+<ng-template #content>
+    <div *ngIf="error; else detail">
+        <p class="error">{{ error }}</p>
+    </div>
+</ng-template>
 
-<div class="history-section" *ngIf="bus && bus.id">
-    <h2>Historial de Movimientos (Viajes y Mantenimientos)</h2>
-    <app-omnibus-history [busId]="bus.id"></app-omnibus-history>
-</div>
+<ng-template #detail>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Ómnibus {{ bus?.matricula }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p><strong>ID:</strong> {{ bus?.id }}</p>
+            <p><strong>Capacidad:</strong> {{ bus?.capacidad }}</p>
+            <p>
+                <strong>Activo:</strong>
+                <span class="badge" [class.active]="bus?.activo" [class.inactive]="!bus?.activo">
+                    {{ bus?.activo ? 'Sí' : 'No' }}
+                </span>
+            </p>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-raised-button color="primary" (click)="abrirAltaViajeExpreso()">
+                <mat-icon>add</mat-icon> Registrar viaje expreso
+            </button>
+            <button mat-raised-button color="accent" (click)="abrirAsignarMantenimiento()">
+                <mat-icon>build</mat-icon> Asignar mantenimiento
+            </button>
+        </mat-card-actions>
+    </mat-card>
+
+    <section *ngIf="bus">
+        <h2>Historial de Movimientos</h2>
+        <app-omnibus-history [busId]="bus.id"></app-omnibus-history>
+    </section>
+</ng-template>

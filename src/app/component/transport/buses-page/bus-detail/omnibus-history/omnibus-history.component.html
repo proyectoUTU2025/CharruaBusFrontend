@@ -1,24 +1,15 @@
 <form [formGroup]="filterForm" class="filters-container">
     <mat-form-field appearance="fill">
-        <mat-label>Salida desde</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fechaHoraSalida" />
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-        <mat-label>Hasta</mat-label>
-        <input matInput [matDatepicker]="picker2" formControlName="fechaHoraLlegada" />
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
+        <mat-label>Fecha de salida</mat-label>
+        <input matInput formControlName="fechaHoraSalida" placeholder="YYYY-MM-DD HH:mm:ss" />
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Origen</mat-label>
         <mat-select formControlName="origenId">
-            <mat-option value="">Todos</mat-option>
-            <mat-option *ngFor="let id of localidadesKeys" [value]="id">
-                {{ localidadesMap[+id] }}
+            <mat-option [value]="''">Todos</mat-option>
+            <mat-option *ngFor="let loc of localidades" [value]="loc.id">
+                {{ loc.nombre }} ({{ loc.departamento }})
             </mat-option>
         </mat-select>
     </mat-form-field>
@@ -26,17 +17,17 @@
     <mat-form-field appearance="fill">
         <mat-label>Destino</mat-label>
         <mat-select formControlName="destinoId">
-            <mat-option value="">Todos</mat-option>
-            <mat-option *ngFor="let id of localidadesKeys" [value]="id">
-                {{ localidadesMap[+id] }}
+            <mat-option [value]="''">Todos</mat-option>
+            <mat-option *ngFor="let loc of localidades" [value]="loc.id">
+                {{ loc.nombre }} ({{ loc.departamento }})
             </mat-option>
         </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-        <mat-label>Tipo</mat-label>
+        <mat-label>Tipo de Movimiento</mat-label>
         <mat-select formControlName="tipoMovimientoOmnibus">
-            <mat-option value="">Todos</mat-option>
+            <mat-option [value]="''">Todos</mat-option>
             <mat-option value="VIAJE">Viaje</mat-option>
             <mat-option value="EXPRESO">Expreso</mat-option>
             <mat-option value="INICIAL">Inicial</mat-option>
@@ -44,19 +35,11 @@
         </mat-select>
     </mat-form-field>
 
-    <button mat-flat-button color="primary" (click)="onSearch()" type="button">
-        Buscar
-    </button>
-    <button mat-stroked-button (click)="onClear()" type="button">
-        Limpiar
-    </button>
+    <button mat-flat-button color="primary" (click)="onSearch()" type="button">Buscar</button>
+    <button mat-stroked-button (click)="onClear()" type="button">Limpiar</button>
 </form>
 
-<mat-progress-spinner *ngIf="history.length === 0 && !filterForm.dirty" mode="indeterminate">
-</mat-progress-spinner>
-
-<table mat-table [dataSource]="history" class="mat-elevation-z1" *ngIf="history.length > 0">
-
+<table mat-table [dataSource]="history" class="mat-elevation-z1">
     <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef> ID </th>
         <td mat-cell *matCellDef="let m"> {{ m.id }} </td>
@@ -64,33 +47,36 @@
 
     <ng-container matColumnDef="fechaHoraSalida">
         <th mat-header-cell *matHeaderCellDef> Salida </th>
-        <td mat-cell *matCellDef="let m"> {{ m.fechaHoraSalida | date:'short' }} </td>
+        <td mat-cell *matCellDef="let m"> {{ m.fechaHoraSalida }} </td>
     </ng-container>
 
     <ng-container matColumnDef="fechaHoraLlegada">
         <th mat-header-cell *matHeaderCellDef> Llegada </th>
-        <td mat-cell *matCellDef="let m"> {{ m.fechaHoraLlegada | date:'short' }} </td>
+        <td mat-cell *matCellDef="let m"> {{ m.fechaHoraLlegada }} </td>
     </ng-container>
 
     <ng-container matColumnDef="origenNombre">
         <th mat-header-cell *matHeaderCellDef> Origen </th>
-        <td mat-cell *matCellDef="let m"> {{ getNombreLocalidad(m.origenId) }} </td>
+        <td mat-cell *matCellDef="let m"> {{ getNombreLocalidad(m.origenId, m) }} </td>
     </ng-container>
+
 
     <ng-container matColumnDef="destinoNombre">
         <th mat-header-cell *matHeaderCellDef> Destino </th>
-        <td mat-cell *matCellDef="let m"> {{ getNombreLocalidad(m.destinoId) }} </td>
+        <td mat-cell *matCellDef="let m"> {{ getNombreLocalidad(m.destinoId, m) }} </td>
     </ng-container>
+
 
     <ng-container matColumnDef="tipoMovimientoOmnibus">
         <th mat-header-cell *matHeaderCellDef> Tipo </th>
         <td mat-cell *matCellDef="let m"> {{ m.tipoMovimientoOmnibus }} </td>
     </ng-container>
 
+
     <tr mat-header-row *matHeaderRowDef="columns"></tr>
     <tr mat-row *matRowDef="let row; columns: columns;"></tr>
 </table>
 
 <mat-paginator [length]="totalMovimientos" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25]"
-    (page)="loadHistory($event)" showFirstLastButtons>
+    (page)="onPageChange($event)" showFirstLastButtons>
 </mat-paginator>

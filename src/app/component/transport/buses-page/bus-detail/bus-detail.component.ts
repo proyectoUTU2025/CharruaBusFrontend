@@ -1,15 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SharedModule } from '../../../../shared/shared.module';
 import { MaterialModule } from '../../../../shared/material.module';
 import { NgIf } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { BusService } from '../../../../services/bus.service';
-import { BusDto } from '../../../../models/buses';
+import { BusDto } from '../../../../models';
 import { OmnibusHistoryComponent } from './omnibus-history/omnibus-history.component';
 import { AsignarMantenimientoComponent } from '../../mantenimientos-page/asignar-mantenimiento/asignar-mantenimiento.component';
 import { AltaViajeExpresoComponent } from '../../viajes-page/alta-viaje-expreso/alta-viaje-expreso.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     standalone: true,
@@ -18,7 +17,6 @@ import { AltaViajeExpresoComponent } from '../../viajes-page/alta-viaje-expreso/
         SharedModule,
         MaterialModule,
         NgIf,
-        MatProgressSpinnerModule,
         OmnibusHistoryComponent,
         AsignarMantenimientoComponent,
         AltaViajeExpresoComponent
@@ -29,8 +27,6 @@ import { AltaViajeExpresoComponent } from '../../viajes-page/alta-viaje-expreso/
 export class BusDetailComponent implements OnInit {
     busId!: number;
     bus?: BusDto;
-    loading = true;
-    error = '';
     @ViewChild(OmnibusHistoryComponent) historyComponent!: OmnibusHistoryComponent;
 
     constructor(
@@ -41,43 +37,55 @@ export class BusDetailComponent implements OnInit {
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
-            const id = params.get('id');
-            if (id) {
-                this.busId = +id;
+            const idParam = params.get('id');
+            if (idParam !== null) {
+                this.busId = +idParam;
                 this.loadBus();
+            } else {
+                console.error('No llegó el parámetro "id" en la URL');
             }
         });
     }
 
     private loadBus() {
-        this.loading = true;
-        this.error = '';
         this.busService.getById(this.busId).subscribe({
-            next: b => { this.bus = b; this.loading = false; },
-            error: () => { this.error = 'No se pudo cargar detalle'; this.loading = false; }
+            next: (busDto: BusDto) => {
+                this.bus = busDto;
+            },
+            error: err => {
+                console.error('Error al cargar detalle de ómnibus:', err);
+            }
         });
     }
 
     abrirAltaViajeExpreso() {
-        const ref = this.dialog.open(AltaViajeExpresoComponent, {
-            width: '600px', data: { omnibusId: this.busId }
+        const dialogRef = this.dialog.open(AltaViajeExpresoComponent, {
+            width: '600px',
+            data: { omnibusId: this.busId }
         });
-        ref.afterClosed().subscribe(res => {
-            if (res === true || res === 'viajeRegistrado') {
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result === true || result === 'viajeRegistrado') {
                 this.loadBus();
-                setTimeout(() => this.historyComponent.loadHistory(), 0);
+                setTimeout(() => {
+                    this.historyComponent?.loadHistory(this.historyComponent.pageIndex, this.historyComponent.pageSize);
+                }, 0);
             }
         });
     }
 
     abrirAsignarMantenimiento() {
-        const ref = this.dialog.open(AsignarMantenimientoComponent, {
-            width: '600px', data: { omnibusId: this.busId }
+        const dialogRef = this.dialog.open(AsignarMantenimientoComponent, {
+            width: '600px',
+            data: { omnibusId: this.busId }
         });
-        ref.afterClosed().subscribe(res => {
-            if (res === 'mantenimientoCreado') {
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result === 'mantenimientoCreado') {
                 this.loadBus();
-                setTimeout(() => this.historyComponent.loadHistory(), 0);
+                setTimeout(() => {
+                    this.historyComponent?.loadHistory(this.historyComponent.pageIndex, this.historyComponent.pageSize);
+                }, 0);
             }
         });
     }

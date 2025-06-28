@@ -3,8 +3,8 @@ export interface MovimientoOmnibusDto {
     omnibusId: number;
     origenId: number;
     destinoId: number;
-    fechaHoraSalida: Date;
-    fechaHoraLlegada: Date;
+    fechaHoraSalida: string;
+    fechaHoraLlegada: string;
     tipoMovimientoOmnibus: string;
     viajeId: number | null;
     mantenimientoId: number | null;

@@ -11,6 +11,7 @@ import { TipoEstadoPasaje } from '../../models/pasajes/tipo-estado-pasaje.enum';
 import { PasajeDto } from '../../models/pasajes/pasaje-dto.model';
 import { GenericListComponent } from '../shared/generic-list/generic-list.component';
 import { DetallePasajeDialogComponent } from '../shared/detalle-pasaje-dialog/detalle-pasaje-dialog.component';
+import { MaterialUtilsService } from '../../shared/material-utils.service';
 
 @Component({
     standalone: true,
@@ -63,7 +64,8 @@ export class PasajeHistoryComponent implements OnInit {
         private auth: AuthService,
         private localidadService: LocalidadService,
         private dialog: MatDialog,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private materialUtils: MaterialUtilsService
     ) { }
 
     ngOnInit(): void {
@@ -99,7 +101,7 @@ export class PasajeHistoryComponent implements OnInit {
     onPageChange(page: number): void {
         this.pageIndex = page;
         this.loadPasajes();
-}
+    }
 
     openDetalle(pasajeId: number): void {
         this.dialog.open(DetallePasajeDialogComponent, {
@@ -112,12 +114,12 @@ export class PasajeHistoryComponent implements OnInit {
         if (!confirm('¿Confirmas la devolución de este pasaje?')) return;
         this.pasajeService.reembolsarPasaje(pasajeId).subscribe({
             next: msg => {
-                this.snackBar.open(msg, 'Cerrar', { duration: 3000 });
+                this.materialUtils.showSuccess(msg);
                 this.loadPasajes();
             },
             error: err => {
                 const m = err.error?.message || 'Error al procesar la devolución';
-                this.snackBar.open(m, 'Cerrar', { duration: 3000 });
+                this.materialUtils.showError(m);
             }
         });
     }

@@ -14,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TipoDocumento, TipoRol } from '../../../../models/users';
 import { UserService } from '../../../../services/user.service';
 import { AltaUsuarioDto } from '../../../../models';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 export const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password');
@@ -90,7 +90,7 @@ export class AddUserDialogComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddUserDialogComponent>,
     private userService: UserService,
-    private snackBar: MatSnackBar
+    private materialUtils: MaterialUtilsService
   ) {
     this.maxDate = new Date();
     this.form = this.fb.group({
@@ -144,7 +144,7 @@ export class AddUserDialogComponent implements OnInit {
 
     this.userService.create(dto)
       .then(() => {
-        this.snackBar.open('Usuario creado correctamente', 'Cerrar', { duration: 3000 });
+        this.materialUtils.showSuccess('Usuario creado correctamente');
         this.dialogRef.close(true);
       })
       .catch(err => {

@@ -65,6 +65,10 @@ export class LoginPageComponent {
   }
 
   goToSignup(): void {
-    this.router.navigate(['/registro']);
+    this.router.navigate(['/signup']);
   }  
+
+  goToForgotPassword(): void {
+    this.router.navigate(['/forgot-password']);
+  } 
 }

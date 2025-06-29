@@ -40,7 +40,7 @@ export class MaterialUtilsService {
   showSuccess(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 3000,
-      horizontalPosition: config?.horizontalPosition || 'end',
+      horizontalPosition: config?.horizontalPosition || 'center',
       verticalPosition: config?.verticalPosition || 'top',
       panelClass: ['success-snackbar', ...(config?.panelClass ? (Array.isArray(config.panelClass) ? config.panelClass : [config.panelClass]) : [])]
     });
@@ -52,7 +52,7 @@ export class MaterialUtilsService {
   showError(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 5000,
-      horizontalPosition: config?.horizontalPosition || 'end',
+      horizontalPosition: config?.horizontalPosition || 'center',
       verticalPosition: config?.verticalPosition || 'top',
       panelClass: ['error-snackbar', ...(config?.panelClass ? (Array.isArray(config.panelClass) ? config.panelClass : [config.panelClass]) : [])]
     });
@@ -64,7 +64,7 @@ export class MaterialUtilsService {
   showWarning(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 4000,
-      horizontalPosition: config?.horizontalPosition || 'end',
+      horizontalPosition: config?.horizontalPosition || 'center',
       verticalPosition: config?.verticalPosition || 'top',
       panelClass: ['warning-snackbar', ...(config?.panelClass ? (Array.isArray(config.panelClass) ? config.panelClass : [config.panelClass]) : [])]
     });
@@ -76,7 +76,7 @@ export class MaterialUtilsService {
   showInfo(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 3000,
-      horizontalPosition: config?.horizontalPosition || 'end',
+      horizontalPosition: config?.horizontalPosition || 'center',
       verticalPosition: config?.verticalPosition || 'top',
       panelClass: ['info-snackbar', ...(config?.panelClass ? (Array.isArray(config.panelClass) ? config.panelClass : [config.panelClass]) : [])]
     });

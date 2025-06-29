@@ -13,6 +13,8 @@ import { AuthenticationResponseDto } from '../models/auth/authentication-respons
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MaterialUtilsService } from '../shared/material-utils.service';
+import { ApiResponse } from '../models';
 
 interface DecodedToken extends JwtPayload {
   name?: string;
@@ -31,7 +33,8 @@ export class AuthService {
     private cookies: CookieService,
     private router: Router,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private materialUtils: MaterialUtilsService
   ) { }
 
   login(credentials: { email: string; password: string }) {
@@ -79,74 +82,56 @@ export class AuthService {
     });
   }
 
-  logout() {
+  logout(options: { message?: string; type?: 'success' | 'error' } = {}) {
+    const { 
+      message = 'Tu sesión ha expirado, por favor, inicia sesión nuevamente.', 
+      type = 'error' 
+    } = options;
+
     firstValueFrom(this.http.post(`${this.base}/logout`, {}))
       .finally(() => {
-        this.snackBar.open('Tu sesión ha expirado, por favor, inicia sesión nuevamente.', 'Cerrar', {
-          duration: 5000,
-          verticalPosition: 'top',
-        });
+        if (type === 'success') {
+          this.materialUtils.showSuccess(message);
+        } else {
+          this.materialUtils.showError(message);
+        }
+        
         this.dialog.closeAll();
         this.cookies.delete(this.tokenKey, '/');
         this.router.navigate(['/login']);
       });
   }
 
-  verifyEmail(email: string, verificationCode: string): Promise<void> {
+  verifyEmail(email: string, verificationCode: string): Promise<ApiResponse<void>> {
     return firstValueFrom(
-      this.http.post<void>(
+      this.http.post<ApiResponse<void>>(
         `${this.base}/verify-email`,
         { email, verificationCode } as VerifyResetCodeRequestDto
       )
     );
   }
 
-  requestPasswordReset(email: string): Promise<void> {
+  requestPasswordReset(email: string): Promise<ApiResponse<void>> {
     return firstValueFrom(
-      this.http.post<void>(
+      this.http.post<ApiResponse<void>>(
         `${this.base}/forgot-password`,
         { email } as ForgotPasswordRequestDto
       )
     );
   }
 
-  verifyResetCode(email: string, verificationCode: string): Promise<void> {
+  verifyResetCode(email: string, verificationCode: string): Promise<ApiResponse<void>> {
     return firstValueFrom(
-      this.http.post<void>(
+      this.http.post<ApiResponse<void>>(
         `${this.base}/verify-reset-code`,
         { email, verificationCode } as VerifyResetCodeRequestDto
       )
     );
   }
 
-  resetPassword(
-    payload: ResetPasswordRequestDto
-  ): Promise<void>;
-  resetPassword(
-    email: string,
-    verificationCode: string,
-    newPassword: string,
-    confirmPassword: string
-  ): Promise<void>;
-  resetPassword(
-    arg1: string | ResetPasswordRequestDto,
-    verificationCode?: string,
-    newPassword?: string,
-    confirmPassword?: string
-  ): Promise<void> {
-    let body: ResetPasswordRequestDto;
-    if (typeof arg1 === 'object') {
-      body = arg1;
-    } else {
-      body = {
-        email: arg1,
-        verificationCode: verificationCode!,
-        newPassword: newPassword!,
-        confirmPassword: confirmPassword!
-      };
-    }
+  resetPassword(payload: ResetPasswordRequestDto): Promise<ApiResponse<void>> {
     return firstValueFrom(
-      this.http.post<void>(`${this.base}/reset-password`, body)
+      this.http.post<ApiResponse<void>>(`${this.base}/reset-password`, payload)
     );
   }
 

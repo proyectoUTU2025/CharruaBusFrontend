@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PasajeService } from '../../services/pasaje.service';
 import { PasajeDto } from '../../models/pasajes/pasaje-dto.model';
 import { Observable } from 'rxjs';
+import { MaterialUtilsService } from '../../shared/material-utils.service';
 
 @Component({
     standalone: true,
@@ -35,7 +36,8 @@ export class PasajesPorViajeComponent implements OnInit {
 
     constructor(
         private pasajeService: PasajeService,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private materialUtils: MaterialUtilsService
     ) { }
 
     ngOnInit(): void {
@@ -64,12 +66,12 @@ export class PasajesPorViajeComponent implements OnInit {
         this.pasajeService.reembolsarPasaje(pasajeId)
             .subscribe({
                 next: () => {
-                    this.snackBar.open('Pasaje devuelto correctamente', 'Cerrar', { duration: 3000 });
+                    this.materialUtils.showSuccess('Pasaje devuelto correctamente');
                     this.loadPasajes();
                 },
                 error: err => {
                     const msg = err.error?.message || 'Error al devolver pasaje';
-                    this.snackBar.open(msg, 'Cerrar', { duration: 3000 });
+                    this.materialUtils.showError(msg);
                 }
             });
     }

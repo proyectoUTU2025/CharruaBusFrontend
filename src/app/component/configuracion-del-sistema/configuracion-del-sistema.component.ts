@@ -15,6 +15,9 @@ import { Configuracion } from '../../models/configuracion';
 import { ConfiguracionDelSistemaService } from '../../services/configuracion-del-sistema.service';
 import { EditConfiguracionDialogComponent } from './dialogs/edit-configuracion-dialog.component';
 import { CreateConfiguracionDialogComponent } from './dialogs/create-configuracion-dialog/create-configuracion-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
+import { MaterialUtilsService } from '../../shared/material-utils.service';
 
 @Component({
     standalone: true,
@@ -34,13 +37,14 @@ import { CreateConfiguracionDialogComponent } from './dialogs/create-configuraci
         MatInputModule,
         MatSnackBarModule,
         MatProgressSpinnerModule,
+        LoadingSpinnerComponent,
     ]
 })
 export class ConfiguracionDelSistemaComponent implements OnInit {
     displayedColumns = ['id', 'nombre', 'valorInt', 'valor', 'acciones'];
     dataSource = new MatTableDataSource<Configuracion>();
     totalElements = 0;
-    pageSize = 20;
+    pageSize = 10;
     currentPage = 0;
     filtroNombre = '';
     isLoading = false;
@@ -48,24 +52,25 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
     constructor(
         private service: ConfiguracionDelSistemaService,
         private dialog: MatDialog,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private materialUtils: MaterialUtilsService
     ) { }
 
     ngOnInit() {
         this.load();
     }
 
-    load(page = 0, size = 20) {
+    load(page = 0, size = 10) {
         this.isLoading = true;
         this.service.list(this.filtroNombre.trim() || undefined, page, size).subscribe({
             next: pageData => {
                 this.dataSource.data = pageData.content;
-                this.totalElements = pageData.totalElements;
+                this.totalElements = pageData.page.totalElements;
                 this.pageSize = size;
                 this.currentPage = page;
             },
             error: () => {
-                this.snackBar.open('Error al cargar configuraciones', 'Cerrar', { duration: 3000 });
+                this.materialUtils.showError('Error al cargar configuraciones');
             },
             complete: () => {
                 this.isLoading = false;
@@ -94,11 +99,11 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
             if (dto) {
                 this.service.create(dto).subscribe({
                     next: () => {
-                        this.snackBar.open('Configuración creada', 'Cerrar', { duration: 3000 });
+                        this.materialUtils.showSuccess('Configuración creada');
                         this.load(this.currentPage, this.pageSize);
                     },
                     error: () => {
-                        this.snackBar.open('Error al crear configuración', 'Cerrar', { duration: 3000 });
+                        this.materialUtils.showError('Error al crear configuración');
                     }
                 });
             }
@@ -114,11 +119,11 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
             if (updated) {
                 this.service.update(updated).subscribe({
                     next: () => {
-                        this.snackBar.open('Configuración actualizada', 'Cerrar', { duration: 3000 });
+                        this.materialUtils.showSuccess('Configuración actualizada');
                         this.load(this.currentPage, this.pageSize);
                     },
                     error: () => {
-                        this.snackBar.open('Error al actualizar configuración', 'Cerrar', { duration: 3000 });
+                        this.materialUtils.showError('Error al actualizar configuración');
                     }
                 });
             }
@@ -126,16 +131,28 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
     }
 
     delete(conf: Configuracion) {
-        if (confirm(`¿Eliminar configuración "${conf.nombre}"?`)) {
-            this.service.delete(conf.id).subscribe({
-                next: () => {
-                    this.snackBar.open('Configuración eliminada', 'Cerrar', { duration: 3000 });
-                    this.load(this.currentPage, this.pageSize);
-                },
-                error: () => {
-                    this.snackBar.open('Error al eliminar configuración', 'Cerrar', { duration: 3000 });
-                }
-            });
-        }
+        const ref = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                title: 'Confirmar Eliminación',
+                message: `¿Está seguro de que desea eliminar la configuración "${conf.nombre}"?`,
+                confirmText: 'Eliminar',
+                cancelText: 'Cancelar',
+                type: 'warning'
+            },
+            width: '400px'
+        });
+        ref.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.service.delete(conf.id).subscribe({
+                    next: () => {
+                        this.materialUtils.showSuccess('Configuración eliminada');
+                        this.load(this.currentPage, this.pageSize);
+                    },
+                    error: () => {
+                        this.materialUtils.showError('Error al eliminar configuración');
+                    }
+                });
+            }
+        });
     }
 }

@@ -24,9 +24,11 @@ export interface ConfirmDialogData {
         <mat-icon>{{ getIcon() }}</mat-icon>
         <h2 mat-dialog-title>{{ data.title }}</h2>
       </div>
+      <mat-divider></mat-divider>
       <div mat-dialog-content>
         <p>{{ data.message }}</p>
       </div>
+      <mat-divider></mat-divider>
       <div mat-dialog-actions align="end">
         <button mat-stroked-button class="cancel-btn" (click)="onCancel()">{{ data.cancelText || 'Cancelar' }}</button>
         <button mat-flat-button class="confirm-btn" color="primary" (click)="onConfirm()">{{ data.confirmText || 'Confirmar' }}</button>
@@ -67,17 +69,23 @@ export interface ConfirmDialogData {
       gap: 8px;
     }
     
-    .cancel-btn, .confirm-btn {
+    .cancel-btn {
+      border-color: var(--primary-color, #1976d2);
+      color: var(--primary-color, #1976d2);
       text-transform: none;
-      border-radius: 18px;
-      padding: 0 24px;
-      height: 36px;
       font-weight: 500;
+      border-radius: 8px;
+      padding: 8px 20px;
+      background: white;
     }
 
     .confirm-btn {
-      background-color: var(--app-primary);
+      background-color: var(--primary-color, #1976d2);
       color: white;
+      text-transform: none;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 8px 20px;
     }
 
     @media (max-width: 600px) {

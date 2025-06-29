@@ -7,52 +7,131 @@
   <p class="subtitle">Completá tus datos para crear una cuenta</p>
 
   <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="login-form">
-    <div class="form-field" *ngFor="let field of [
-      { label:'Nombre', control:'nombre' },
-      { label:'Apellido', control:'apellido' },
-      { label:'Documento', control:'documento' },
-      { label:'Fecha de Nacimiento', control:'fechaNacimiento', type:'date' },
-      { label:'Email', control:'email', type:'email' }
-    ]">
-      <label [for]="field.control">{{field.label}}</label>
-      <input [id]="field.control" [type]="field.type || 'text'" [formControlName]="field.control" matInput />
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput id="nombre" type="text" formControlName="nombre">
+      <mat-error *ngIf="signupForm.get('nombre')?.invalid && signupForm.get('nombre')?.touched">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Apellido</mat-label>
+      <input matInput id="apellido" type="text" formControlName="apellido">
+      <mat-error *ngIf="signupForm.get('apellido')?.invalid && signupForm.get('apellido')?.touched">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Correo</mat-label>
+      <input matInput id="email" type="email" formControlName="email">
+      <mat-error *ngIf="signupForm.get('email')?.hasError('required')">
+        Campo obligatorio
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('email')?.hasError('email')">
+        El formato del correo es incorrecto
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de Documento</mat-label>
+      <mat-select formControlName="tipoDocumento" id="tipoDocumento">
+        <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo">{{ tipo }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="signupForm.get('tipoDocumento')?.invalid && signupForm.get('tipoDocumento')?.touched">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Documento</mat-label>
+      <input matInput id="documento" type="text" formControlName="documento">
+      <mat-error *ngIf="signupForm.get('documento')?.invalid && signupForm.get('documento')?.touched">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha de Nacimiento</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" [max]="today" id="fechaNacimiento">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="signupForm.get('fechaNacimiento')?.invalid && signupForm.get('fechaNacimiento')?.touched">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Situación Laboral</mat-label>
+      <mat-select formControlName="situacionLaboral" id="situacionLaboral">
+        <mat-option *ngFor="let s of situacionesLaborales" [value]="s">{{ s }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="signupForm.get('situacionLaboral')?.invalid && signupForm.get('situacionLaboral')?.touched">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input matInput id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword; $event.stopPropagation()" class="visibility-toggle">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="signupForm.get('password')?.hasError('required')">
+        Campo obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <div class="password-requirements" *ngIf="signupForm.get('password')?.dirty">
+      <ul>
+        <li [class.valid]="passwordValidationStatus.minLength">
+          <mat-icon>{{ passwordValidationStatus.minLength ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Mínimo 8 caracteres</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasUppercase">
+          <mat-icon>{{ passwordValidationStatus.hasUppercase ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Una letra mayúscula</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasLowercase">
+          <mat-icon>{{ passwordValidationStatus.hasLowercase ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Una letra minúscula</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasNumber">
+          <mat-icon>{{ passwordValidationStatus.hasNumber ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Un número</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasSpecialChar">
+          <mat-icon>{{ passwordValidationStatus.hasSpecialChar ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Un caracter especial (!&#64;#$%^&*)</span>
+        </li>
+      </ul>
     </div>
 
-    <div class="form-field">
-      <label for="tipoDocumento">Tipo de Documento</label>
-      <mat-form-field appearance="fill" style="width: 100%">
-        <mat-select formControlName="tipoDocumento">
-          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo">{{ tipo }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Confirmar Contraseña</mat-label>
+      <input 
+        matInput 
+        [type]="hideConfirmPassword ? 'password' : 'text'" 
+        formControlName="confirmPassword" 
+        [errorStateMatcher]="matcher"
+        required />
+      <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" (mousedown)="$event.preventDefault()" type="button" [attr.aria-label]="'Ocultar o mostrar contraseña'">
+        <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="signupForm.get('confirmPassword')?.hasError('required')">Debe confirmar la contraseña.</mat-error>
+      <mat-error *ngIf="signupForm.hasError('passwordsNotMatching') && signupForm.get('confirmPassword')?.touched">
+        Las contraseñas no coinciden.
+      </mat-error>
+    </mat-form-field>
 
-    <div class="form-field">
-      <label for="situacionLaboral">Situación Laboral</label>
-      <mat-form-field appearance="fill" style="width: 100%">
-        <mat-select formControlName="situacionLaboral">
-          <mat-option *ngFor="let s of situacionesLaborales" [value]="s">{{ s }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <div class="form-field">
-      <label for="password">Contraseña</label>
-      <div class="password-field">
-        <input id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password" matInput />
-        <button type="button" mat-icon-button (click)="hidePassword = !hidePassword" class="visibility-toggle">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-      </div>
-    </div>
-
-    <button type="submit" mat-flat-button class="sign-in-button">
+    <button type="submit" mat-flat-button color="primary" class="sign-in-button" [disabled]="signupForm.invalid">
       <mat-icon>person_add</mat-icon>
       Crear cuenta
     </button>
 
-    <div *ngIf="error" class="forgot-password">
-      <span style="color: red;">{{ error }}</span>
+    <div *ngIf="error" class="error-message">
+      {{ error }}
     </div>
   </form>
 </div>

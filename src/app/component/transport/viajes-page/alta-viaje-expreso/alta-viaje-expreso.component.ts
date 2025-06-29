@@ -14,6 +14,7 @@ import { BusService } from '../../../../services/bus.service';
 import { ViajeExpresoService } from '../../../../services/viaje-expreso.service';
 import { ViajeExpresoRequest } from '../../../../models/viajes/viaje-expreso-request.model';
 import { ConfirmDialogComponent } from './dialogs/confirm-warning-dialog.component';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 @Component({
     selector: 'app-alta-viaje-expreso',
@@ -42,7 +43,8 @@ export class AltaViajeExpresoComponent implements OnInit {
         private snackBar: MatSnackBar,
         private dialog: MatDialog,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        private dialogRef: MatDialogRef<AltaViajeExpresoComponent>
+        private dialogRef: MatDialogRef<AltaViajeExpresoComponent>,
+        private materialUtils: MaterialUtilsService
     ) {
         this.form = this.fb.group({
             omnibusId: [null, Validators.required],
@@ -167,11 +169,7 @@ export class AltaViajeExpresoComponent implements OnInit {
     }
 
     private showSnackbar(msg: string, ms: number = 3000) {
-        this.snackBar.open(msg, 'Cerrar', {
-            duration: ms,
-            verticalPosition: 'top',
-            horizontalPosition: 'center'
-        });
+        this.materialUtils.showError(msg, { duration: ms });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }

@@ -1,18 +1,31 @@
-<div class="wrapper fadeInDown">
-  <div id="formContent">
-    <h2 class="active">Verificar Email</h2>
+<div class="login-card">
+  <div class="header-bar"></div>
+  <div class="logo-container">
+    <img src="assets/charruabusIcon.png" alt="Charrua Bus" class="logo">
+  </div>
+  <h1 class="title">Verificar Email</h1>
+  <p class="subtitle">
+    Se envió un código de verificación al correo:<br>
+    <strong>{{ email }}</strong>
+  </p>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <input type="email" formControlName="email" class="fadeIn first" placeholder="Email" />
-      <input type="text" formControlName="verificationCode" class="fadeIn second"
-        placeholder="Código recibido por mail" />
-      <button type="submit" class="login-button fadeIn fourth">
-        Validar
-      </button>
-    </form>
-
-    <div *ngIf="error" class="fadeIn fourth" style="color: red; margin-top: 10px;">
-      {{ error }}
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="digits-container" (paste)="onPaste($event)">
+      <input #digitInput type="text" formControlName="digit1" maxlength="1" (input)="onInput($event, 0)" (keydown)="onKeyDown($event, 0)" class="digit-input">
+      <input #digitInput type="text" formControlName="digit2" maxlength="1" (input)="onInput($event, 1)" (keydown)="onKeyDown($event, 1)" class="digit-input">
+      <input #digitInput type="text" formControlName="digit3" maxlength="1" (input)="onInput($event, 2)" (keydown)="onKeyDown($event, 2)" class="digit-input">
+      <input #digitInput type="text" formControlName="digit4" maxlength="1" (input)="onInput($event, 3)" (keydown)="onKeyDown($event, 3)" class="digit-input">
+      <input #digitInput type="text" formControlName="digit5" maxlength="1" (input)="onInput($event, 4)" (keydown)="onKeyDown($event, 4)" class="digit-input">
+      <input #digitInput type="text" formControlName="digit6" maxlength="1" (input)="onInput($event, 5)" (keydown)="onKeyDown($event, 5)" class="digit-input">
     </div>
+    <button type="submit" mat-flat-button color="primary" class="submit-button" [disabled]="form.invalid">
+      <mat-icon>verified_user</mat-icon>
+      Validar
+    </button>
+  </form>
+
+  <div *ngIf="error" class="error-message">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error }}</span>
   </div>
 </div>

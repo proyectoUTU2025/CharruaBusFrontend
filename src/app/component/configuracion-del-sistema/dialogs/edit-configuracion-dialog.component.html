@@ -1,31 +1,31 @@
-<h2 mat-dialog-title>
-    {{ config.id ? 'Editar Configuración' : 'Nueva Configuración' }}
-</h2>
+<div class="dialog-header">
+  <h2 class="dialog-title">{{ config.id ? 'Editar Configuración' : 'Nueva Configuración' }}</h2>
+</div>
 
-<mat-dialog-content [formGroup]="form">
-    <mat-form-field class="full-width">
-        <mat-label>Parámetro</mat-label>
-        <input matInput formControlName="nombre" />
+<div class="edit-container" mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Parámetro</mat-label>
+      <input matInput formControlName="nombre" />
     </mat-form-field>
 
-    <mat-form-field class="full-width">
-        <mat-label>Valor (número)</mat-label>
-        <input matInput type="number" formControlName="valorInt" />
+    <mat-form-field appearance="outline">
+      <mat-label>Valor (número)</mat-label>
+      <input matInput type="number" formControlName="valorInt" />
     </mat-form-field>
 
-    <mat-form-field class="full-width">
-        <mat-label>Valor (texto)</mat-label>
-        <input matInput formControlName="valor" />
+    <mat-form-field appearance="outline">
+      <mat-label>Valor (texto)</mat-label>
+      <input matInput formControlName="valor" />
     </mat-form-field>
 
     <div *ngIf="form.errors?.['oneOfTwo']" class="error">
-        Debe especificar valor numérico o de texto, pero no ambos.
+      Debe especificar valor numérico o de texto, pero no ambos.
     </div>
-</mat-dialog-content>
 
-<mat-dialog-actions>
-    <button mat-stroked-button (click)="cancel()">Cancelar</button>
-    <button mat-flat-button color="primary" (click)="save()" [disabled]="!form.valid">
-        Guardar
-    </button>
-</mat-dialog-actions>
+    <div class="actions" mat-dialog-actions>
+      <button mat-stroked-button class="cancel-btn" type="button" (click)="cancel()">Cancelar</button>
+      <button mat-flat-button class="create-btn" type="button" (click)="save()" [disabled]="!form.valid">Guardar</button>
+    </div>
+  </form>
+</div>

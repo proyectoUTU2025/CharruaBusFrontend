@@ -1,14 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn, FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, ErrorStateMatcher } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
+
+export const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirmPassword');
+  
+  return password && confirmPassword && password.value !== confirmPassword.value 
+    ? { passwordsNotMatching: true } 
+    : null;
+};
+
+export class PasswordsMatchErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    const hasMismatchError = control?.parent?.hasError('passwordsNotMatching');
+    const isDirty = !!control?.dirty;
+    
+    return !!(hasMismatchError && isDirty || (hasMismatchError && isSubmitted));
+  }
+}
 
 @Component({
   selector: 'app-signup-page',
@@ -16,30 +37,50 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatIconModule,
     MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatSelectModule
   ],
   templateUrl: './signup-page.component.html',
   styleUrls: ['./signup-page.component.scss']
 })
-export class SignupPageComponent {
+export class SignupPageComponent implements OnInit {
   signupForm: FormGroup;
   hidePassword = true;
+  hideConfirmPassword = true;
   error: string | null = null;
+  today: Date;
+  matcher = new PasswordsMatchErrorStateMatcher();
+
+  passwordValidationStatus = {
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecialChar: false
+  };
 
   tiposDocumento = ['CEDULA', 'OTRO', 'PASAPORTE'];
   situacionesLaborales = ['ESTUDIANTE', 'JUBILADO', 'OTRO'];
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+    this.today = new Date();
+    const todayString = this.today.toISOString().split('T')[0];
+    this.today.setHours(0, 0, 0, 0);
+
     this.signupForm = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       documento: ['', Validators.required],
       tipoDocumento: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required],
+      fechaNacimiento: ['', [Validators.required, (control: AbstractControl) => {
+        const date = new Date(control.value);
+        return date > this.today ? { futureDate: true } : null;
+      }]],
       email: ['', [Validators.required, Validators.email]],
       password: [
         '',
@@ -48,15 +89,34 @@ export class SignupPageComponent {
           Validators.pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$%\^&\*]).{8,}$/)
         ]
       ],
+      confirmPassword: ['', Validators.required],
       situacionLaboral: ['', Validators.required]
+    }, { validators: passwordsMatchValidator });
+  }
+
+  ngOnInit(): void {
+    this.signupForm.get('password')?.valueChanges.subscribe(value => {
+      this.updatePasswordValidationStatus(value || '');
     });
+  }
+
+  updatePasswordValidationStatus(password: string): void {
+    this.passwordValidationStatus.minLength = password.length >= 8;
+    this.passwordValidationStatus.hasUppercase = /[A-Z]/.test(password);
+    this.passwordValidationStatus.hasLowercase = /[a-z]/.test(password);
+    this.passwordValidationStatus.hasNumber = /[0-9]/.test(password);
+    this.passwordValidationStatus.hasSpecialChar = /[!@#$%^&*]/.test(password);
+  }
+
+  get todayISO(): string {
+    return new Date().toISOString().split('T')[0];
   }
 
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) return;
     try {
       await this.authService.registrarCliente(this.signupForm.value);
-      this.router.navigate(['/verificar-codigo']);
+      this.router.navigate(['/verificar-codigo'], { state: { email: this.signupForm.value.email } });
     } catch (error) {
       this.error = 'Error al registrar. Verificá los datos.';
     }

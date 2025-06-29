@@ -10,6 +10,7 @@ import { BulkErrorsDialogComponent } from '../bulk-errors-dialog/bulk-errors-dia
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 @Component({
   standalone: true,
@@ -32,7 +33,8 @@ export class BulkUploadDialogComponent {
     private dialogRef: MatDialogRef<BulkUploadDialogComponent>,
     private userService: UserService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private materialUtils: MaterialUtilsService
   ) {}
 
   onFileDrop(event: DragEvent) {
@@ -72,11 +74,7 @@ export class BulkUploadDialogComponent {
         const schemaError = resp.results.find(r => r.fila === 0 && !r.creado);
 
         if (schemaError) {
-          this.snackBar.open(schemaError.mensaje, 'Cerrar', {
-            duration: 10000,
-            verticalPosition: 'top',
-            panelClass: ['error-snackbar'],
-          });
+          this.materialUtils.showError(schemaError.mensaje, { duration: 4000 });
           this.dialogRef.close();
         } else {
           this.dialogRef.close(true);
@@ -91,11 +89,7 @@ export class BulkUploadDialogComponent {
         this.loading = false;
         const errorMessage = error.error?.message || 'Ocurrió un error inesperado.';
         
-        this.snackBar.open(errorMessage, 'Cerrar', {
-          duration: 7000,
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
+        this.materialUtils.showError(errorMessage, { duration: 4000 });
         this.dialogRef.close();
       });
   }

@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
 import { AsignarMantenimientoDto } from '../../../../models/buses/asignar-mantenimiento-dto.model';
 import { MatSelectModule } from '@angular/material/select';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 @Component({
     selector: 'app-asignar-mantenimiento',
@@ -31,6 +32,7 @@ export class AsignarMantenimientoComponent implements OnInit {
     private mantenimientoService = inject(MantenimientoService);
     private dialogRef = inject(MatDialogRef<AsignarMantenimientoComponent>);
     private fb = inject(FormBuilder);
+    private materialUtils = inject(MaterialUtilsService);
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: { omnibusId: number }) {
         this.form = this.fb.group({
@@ -115,10 +117,6 @@ export class AsignarMantenimientoComponent implements OnInit {
     }
 
     private showSnackbar(msg: string, ms: number = 3000) {
-        this.snackBar.open(msg, 'Cerrar', {
-            duration: ms,
-            verticalPosition: 'top',
-            horizontalPosition: 'center'
-        });
+        this.materialUtils.showError(msg, { duration: ms });
     }
 }

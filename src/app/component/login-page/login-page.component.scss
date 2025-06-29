@@ -1,6 +1,7 @@
 $primary-color: #1976d2;
 $input-border: #ddd;
 $background: #f5f7fa;
+$input-bg: #fafdff;
 
 :host {
   display: flex;
@@ -77,85 +78,9 @@ $background: #f5f7fa;
   padding: 0 32px 24px;
 }
 
-.form-field {
-  margin-bottom: 18px;
-
-  label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 15px;
-    color: #1976d2;
-    font-weight: 500;
-  }
-
-  input {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid $input-border;
-    border-radius: 4px;
-    font-size: 17px;
-    box-sizing: border-box;
-    background: #fafdff;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-      background: #fff;
-    }
-
-    &.ng-invalid.ng-touched {
-      border-color: #d32f2f;
-    }
-  }
-}
-
-.password-field {
-  position: relative;
-
-  input {
-    width: 100%;
-    padding: 14px 44px 14px 14px;
-    border: 1px solid $input-border;
-    border-radius: 4px;
-    font-size: 17px;
-    background: #fafdff;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-      background: #fff;
-    }
-
-    &.ng-invalid.ng-touched {
-      border-color: #d32f2f;
-    }
-  }
-
-  .visibility-toggle {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 2;
-    color: #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-
-    &:hover {
-      color: $primary-color;
-      background: #f0f4fa;
-      border-radius: 50%;
-    }
-  }
+mat-form-field {
+  width: 100%;
+  margin-bottom: 12px;
 }
 
 .sign-in-button {

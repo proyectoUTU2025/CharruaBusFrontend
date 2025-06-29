@@ -1,14 +1,32 @@
-$primary-color: #675992;
+$primary-color: #1976d2;
 $input-border: #ddd;
+$background: #f5f7fa;
+$input-bg: #fafdff;
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: $background;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+  max-width: 440px;
+  min-width: 320px;
+  margin: 32px 0;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 16px;
+  box-shadow: 0 6px 32px rgba(25, 118, 210, 0.10);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-bottom: 8px;
 }
 
 .header-bar {
@@ -19,89 +37,42 @@ $input-border: #ddd;
 .logo-container {
   display: flex;
   justify-content: center;
-  margin: 24px 0 16px;
-  user-select: none;
-  caret-color: transparent;
-  cursor: default;
-  pointer-events: none;
-
+  margin: 32px 0 20px;
   .logo {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
   }
-}
-
-.title,
-.subtitle,
-.forgot-password a {
-  user-select: none;
-  caret-color: transparent;
-  cursor: default;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 500;
-  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  color: $primary-color;
   text-align: center;
   margin-bottom: 8px;
+  margin-top: 8px;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: #666;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .login-form {
-  padding: 0 24px 24px;
+  padding: 0 32px 24px;
 }
 
-.form-field {
-  margin-bottom: 16px;
-
-  label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #333;
-  }
-
-  input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid $input-border;
-    border-radius: 4px;
-    font-size: 16px;
-    box-sizing: border-box;
-
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-    }
-  }
+mat-form-field {
+  width: 100%;
+  margin-bottom: 12px;
 }
 
 .password-field {
   position: relative;
 
-  input {
-    width: calc(100% - 48px);
-    padding: 12px;
-  }
-
   .visibility-toggle {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 1;
     color: #666;
 
     &:hover {
@@ -112,45 +83,73 @@ $input-border: #ddd;
 
 .sign-in-button {
   width: 100%;
-  padding: 12px;
+  padding: 14px 0;
   background-color: $primary-color;
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 18px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+  letter-spacing: 0.5px;
+  transition: background 0.2s, box-shadow 0.2s;
+  text-transform: none;
+  gap: 8px;
 
   mat-icon {
-    margin-right: 8px;
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
   }
 
   &:hover {
-    background-color: darken($primary-color, 5%);
+    background-color: #1251a3;
+    box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+  }
+  
+  &:disabled {
+    background-color: #b3c6e6;
   }
 }
 
-.forgot-password {
-  text-align: center;
+.error-message {
+  color: #d32f2f;
   margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
 
-  a {
-    text-decoration: none;
-    font-size: 14px;
-    color: $primary-color;
-    cursor: pointer;
+.password-requirements {
+  margin: -10px 0 16px 0;
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+  }
 
-    &:hover {
-      text-decoration: underline;
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--mat-form-field-error-text-color, #f44336);
+    transition: color 0.3s ease-in-out;
+    margin-bottom: 2px;
+
+    &.valid {
+      color: var(--success-color, #4caf50);
+    }
+
+    mat-icon {
+      font-size: 16px;
+      height: 16px;
+      width: 16px;
     }
   }
-}
-
-mat-error {
-  font-size: 12px;
-  margin-top: 4px;
 }

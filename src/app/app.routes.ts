@@ -27,22 +27,25 @@ import { MantenimientosPorOmnibusComponent } from './component/estadisticas/tran
 import { EstadisticasPasajesComponent } from './component/estadisticas/transporte/estadisticas-pasajes/estadisticas-pasajes.component';
 import { PasajesPorViajeComponent } from './component/pasajes-por-viaje/pasajes-por-viaje.component';
 import { CompraDetallePageComponent } from './component/compra-detalle/compra-detalle-page.component';
+import { AppComponent } from './app.component';
 
 export const routes: Routes = [
+  // Rutas de autenticación (sin navbar)
   { path: 'login', component: LoginPageComponent },
-  { path: 'registro', component: SignupPageComponent },
+  { path: 'signup', component: SignupPageComponent },
   { path: 'verificar-codigo', component: VerificarCodigoComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'verify-reset', component: VerifyResetComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
 
+  // Rutas de la aplicación principal (con navbar y protegidas)
   {
     path: '',
     canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', loadComponent: () => import('./component/home-page/home-page.component').then(m => m.HomePageComponent) },
-      { path: 'configuracion', component: ConfiguracionDelSistemaComponent },
+      { path: 'configuraciones', component: ConfiguracionDelSistemaComponent },
       { path: 'usuarios', component: UsersPageComponent, pathMatch: 'full' },
       { path: 'omnibus', component: BusesPageComponent },
       { path: 'omnibus/:id', component: BusDetailComponent },
@@ -67,5 +70,5 @@ export const routes: Routes = [
     ]
   },
 
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'login' } // Redirigir a login si la ruta no existe
 ];

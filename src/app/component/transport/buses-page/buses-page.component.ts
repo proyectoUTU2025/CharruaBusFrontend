@@ -10,6 +10,7 @@ import {
 import { RouterModule, Router } from '@angular/router';
 import { GenericListComponent } from '../../../shared/generic-list/generic-list.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MaterialUtilsService } from '../../../shared/material-utils.service';
 
 import { BusService } from '../../../services/bus.service';
 import { BusDto } from '../../../models';
@@ -53,7 +54,8 @@ export class BusesPageComponent implements OnInit {
         private localidadService: LocalidadService,
         private dialog: MatDialog,
         private snackBar: MatSnackBar,
-        private router: Router
+        private router: Router,
+        private materialUtils: MaterialUtilsService
     ) {
         this.filterForm = this.fb.group({
             matricula: [''],
@@ -140,12 +142,12 @@ export class BusesPageComponent implements OnInit {
                 if (!ok) return;
                 this.busService.cambiarEstado(bus.id, nuevo)
                     .then(res => {
-                        this.snackBar.open(res.message, 'Cerrar', { duration: 3000 });
+                        this.materialUtils.showSuccess(res.message);
                         this.loadBuses(this.pageIndex, this.pageSize);
                     })
                     .catch(err => {
                         const m = err.error?.message || 'Error al cambiar estado';
-                        this.snackBar.open(m, 'Cerrar', { duration: 4000 });
+                        this.materialUtils.showError(m, { duration: 4000 });
                         this.loadBuses(this.pageIndex, this.pageSize);
                     });
             });

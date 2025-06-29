@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Configuracion } from '../models/configuracion';
 import { environment } from '../../environments/environment';
 
-interface Paged<T> { content: T[]; totalElements: number; }
+interface Paged<T> { content: T[]; page: { totalElements: number; [key: string]: any }; }
 
 @Injectable({ providedIn: 'root' })
 export class ConfiguracionDelSistemaService {

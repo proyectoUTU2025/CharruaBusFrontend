@@ -7,32 +7,24 @@
   <p class="subtitle">Introduce tus credenciales para iniciar sesión en tu cuenta</p>
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-    <div class="form-field">
-      <label for="email">Email</label>
-      <input id="email" type="email" formControlName="email" placeholder="mail@ejemplo.com" matInput>
-      <mat-error *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
-        El email es requerido
-      </mat-error>
-      <mat-error *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
-        Ingresa un email válido
-      </mat-error>
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput id="email" type="email" formControlName="email" placeholder="mail@ejemplo.com">
+      <mat-error *ngIf="loginForm.get('email')?.hasError('required')">El email es requerido</mat-error>
+      <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Ingresa un email válido</mat-error>
+    </mat-form-field>
 
-    <div class="form-field">
-      <label for="password">Contraseña</label>
-      <div class="password-field">
-        <input id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password"
-          placeholder="●●●●●●●●" matInput>
-        <button type="button" mat-icon-button (click)="hidePassword = !hidePassword" class="visibility-toggle" aria-label="Mostrar/ocultar contraseña">
-          <mat-icon>
-            {{ hidePassword ? 'visibility_off' : 'visibility' }}
-          </mat-icon>
-        </button>
-      </div>
-      <mat-error *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
-        La contraseña es requerida
-      </mat-error>
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input matInput id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+        placeholder="●●●●●●●●">
+      <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" class="visibility-toggle" aria-label="Mostrar/ocultar contraseña">
+        <mat-icon>
+          {{ hidePassword ? 'visibility_off' : 'visibility' }}
+        </mat-icon>
+      </button>
+      <mat-error *ngIf="loginForm.get('password')?.hasError('required')">La contraseña es requerida</mat-error>
+    </mat-form-field>
 
     <button type="submit" mat-flat-button color="primary" class="sign-in-button" [disabled]="loginForm.invalid || isLoading">
       <ng-container *ngIf="!isLoading; else loadingSpinner">
@@ -50,10 +42,10 @@
     </div>
 
     <div class="forgot-password">
-      <a (click)="goToSignup()">¿No tienes cuenta? Registrarse</a>
+      <a (click)="goToSignup()">¿No tienes cuenta? Regístrate</a>
     </div>
     <div class="forgot-password">
-      <a >Olvidaste tu password? Recuperalo</a>
+      <a (click)="goToForgotPassword()">¿Olvidaste tu contraseña? Solicitá una nueva</a>
     </div>
 
   </form>

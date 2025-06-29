@@ -1,62 +1,81 @@
-<div class="page-header">
-    <h1>Configuración del Sistema</h1>
-    <button mat-flat-button color="primary" (click)="create()">+ Nueva Configuración</button>
-    <p>Editar parámetros globales: plazos, penalizaciones, mensajes, etc.</p>
-</div>
+<div class="configuracion-page-container">
+  <div class="page-header">
+    <div class="header-block">
+      <h1>Configuración del Sistema</h1>
+      <p class="subtitle">Editar parámetros globales: plazos, penalizaciones, mensajes, etc.</p>
+    </div>
+  </div>
 
-<div class="filtro-nombre">
-    <mat-form-field appearance="outline">
+  <div class="content-card">
+    <form class="filters-container" (ngSubmit)="aplicarFiltro()">
+      <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar por nombre</mat-label>
-        <input matInput [(ngModel)]="filtroNombre" placeholder="Ej: Plazo devolución" />
-    </mat-form-field>
-    <button mat-stroked-button color="primary" (click)="aplicarFiltro()">Buscar</button>
-    <button mat-button (click)="limpiarFiltro()" *ngIf="filtroNombre">Limpiar</button>
-</div>
+        <input matInput [(ngModel)]="filtroNombre" name="filtroNombre" placeholder="Buscar por nombre" />
+      </mat-form-field>
+      <button mat-flat-button class="create-btn" type="submit">Buscar</button>
+      <button mat-stroked-button class="massive-btn" type="button" (click)="limpiarFiltro()">Limpiar</button>
+    </form>
+  </div>
 
-<div *ngIf="isLoading" class="spinner-container">
-    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-</div>
-
-<div *ngIf="!isLoading" class="card">
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
-
+  <div class="users-card">
+    <div class="table-header-row">
+      <div class="table-header-title">
+        <span class="card-title">Lista de Configuraciones</span>
+      </div>
+      <div class="table-header-actions">
+        <button mat-flat-button class="create-btn" (click)="create()">
+          <mat-icon>add</mat-icon> Nueva Configuración
+        </button>
+      </div>
+    </div>
+    <div class="table-container">
+      <app-loading-spinner
+        *ngIf="isLoading"
+        type="spinner"
+        message="Cargando configuraciones..."
+        [diameter]="40">
+      </app-loading-spinner>
+      <table *ngIf="!isLoading" mat-table [dataSource]="dataSource" class="mat-elevation-z1">
         <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef> ID </th>
-            <td mat-cell *matCellDef="let c"> {{ c.id }} </td>
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let c">{{ c.id }}</td>
         </ng-container>
-
         <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef> Parámetro </th>
-            <td mat-cell *matCellDef="let c"> {{ c.nombre }} </td>
+          <th mat-header-cell *matHeaderCellDef>Parámetro</th>
+          <td mat-cell *matCellDef="let c">{{ c.nombre }}</td>
         </ng-container>
-
         <ng-container matColumnDef="valorInt">
-            <th mat-header-cell *matHeaderCellDef> Valor (número) </th>
-            <td mat-cell *matCellDef="let c"> {{ c.valorInt ?? '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Valor (número)</th>
+          <td mat-cell *matCellDef="let c">{{ c.valorInt ?? '-' }}</td>
         </ng-container>
-
         <ng-container matColumnDef="valor">
-            <th mat-header-cell *matHeaderCellDef> Valor (texto) </th>
-            <td mat-cell *matCellDef="let c"> {{ c.valor ?? '-' }} </td>
+          <th mat-header-cell *matHeaderCellDef>Valor (texto)</th>
+          <td mat-cell *matCellDef="let c">{{ c.valor ?? '-' }}</td>
         </ng-container>
-
         <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef> Acciones </th>
-            <td mat-cell *matCellDef="let c">
-                <button mat-icon-button (click)="edit(c)">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="delete(c)">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </td>
+          <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+          <td mat-cell *matCellDef="let c" class="acciones-cell">
+            <div class="action-buttons-container">
+              <button mat-icon-button class="icon-btn" (click)="edit(c)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="icon-btn" (click)="delete(c)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
         </ng-container>
-
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-    <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]"
-        (page)="pageChange($event)">
+      </table>
+    </div>
+    <mat-paginator
+      *ngIf="!isLoading"
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      (page)="pageChange($event)"
+      showFirstLastButtons>
     </mat-paginator>
+  </div>
 </div>

@@ -16,6 +16,9 @@
       <button mat-button routerLink="/usuarios" routerLinkActive="active-link" class="nav-btn">
         <mat-icon class="nav-icon">people</mat-icon> <span class="nav-text">Usuarios</span>
       </button>
+      <button mat-button routerLink="/configuraciones" routerLinkActive="active-link" class="nav-btn">
+        <mat-icon class="nav-icon">settings</mat-icon> <span class="nav-text">Configuraciones</span>
+      </button>
     </ng-container>
 
     <!-- VENDEDOR -->
@@ -80,9 +83,9 @@
 
   <!-- Login solo si NO hay sesión -->
   <ng-container *ngIf="!isLoggedIn">
-    <button mat-stroked-button color="primary" class="login-navbar-btn" routerLink="/login">
+    <button mat-stroked-button class="logout-button" routerLink="/login">
       <mat-icon>login</mat-icon>
-      <span class="login-navbar-text">Login</span>
+      <span class="logout-text">Login</span>
     </button>
   </ng-container>
 </mat-toolbar>

@@ -47,7 +47,10 @@ export class NavbarComponent {
   }
 
   onLogout(): void {
-    this.authService.logout();
+    this.authService.logout({ 
+      message: 'Has cerrado sesión correctamente.', 
+      type: 'success' 
+    });
   }
 
   get isLoggedIn(): boolean {

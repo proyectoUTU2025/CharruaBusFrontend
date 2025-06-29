@@ -51,7 +51,7 @@ export class UserService {
   }
 
   delete(id: number): Promise<void> {
-    return firstValueFrom(this.http.delete<void>(`${this.base}/${id}`));
+    return firstValueFrom(this.http.patch<void>(`${this.base}/${id}/desactivar`, {}));
   }
 
   bulkUpload(file: File): Promise<BulkResponseDto> {

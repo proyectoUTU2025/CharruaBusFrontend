@@ -147,6 +147,16 @@ $purple-faded: #675992;
   font-size: 0.875rem;
   color: #333;
 }
-
-
 }
+.detalle-card .mat-card-header {
+  padding: 0 !important;
+}
+
+.detalle-card .status-bar {
+  width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  padding: 1rem;            
+  border-radius: 1rem 1rem 0 0 !important;
+}
+

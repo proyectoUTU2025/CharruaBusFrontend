@@ -42,10 +42,13 @@ export class StripeRedirectComponent implements OnInit {
 
     if (url.includes('/compras/exito')) {
       this.compraService.confirmarCompra(sessionId).subscribe(
-        (_: any) => {
+        (response: any) => {
           this.mensaje = '✅ Compra confirmada con éxito!';
           this.cargando = false;
-          setTimeout(() => this.router.navigate(['/compras', (_ as CompraResponseDto).compraId]), 2000);
+          setTimeout(() => {
+          this.router.navigate(['/compras', response.compraId], { state: { compraExitosa: true } }
+          );
+        }, 2000);
         },
         () => {
           this.mensaje = '⚠️ Error al confirmar la compra.';

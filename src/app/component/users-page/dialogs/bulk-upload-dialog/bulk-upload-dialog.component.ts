@@ -7,6 +7,9 @@ import { UserService } from '../../../../services/user.service';
 import { BulkLineResult } from '../../../../models/bulk/bulk-line-result.dto';
 import { BulkResponseDto } from '../../../../models/bulk/bulk-response.dto';
 import { BulkErrorsDialogComponent } from '../bulk-errors-dialog/bulk-errors-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   standalone: true,
@@ -15,18 +18,21 @@ import { BulkErrorsDialogComponent } from '../bulk-errors-dialog/bulk-errors-dia
     CommonModule,
     MatDialogModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './bulk-upload-dialog.component.html',
   styleUrls: ['./bulk-upload-dialog.component.scss']
 })
 export class BulkUploadDialogComponent {
   file: File | null = null;
+  loading = false;
 
   constructor(
     private dialogRef: MatDialogRef<BulkUploadDialogComponent>,
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   onFileDrop(event: DragEvent) {
@@ -44,7 +50,7 @@ export class BulkUploadDialogComponent {
   }
 
   downloadTemplate() {
-    const header = 'id,nombre,correo,documento,rol\n';
+    const header = 'email,password,nombre,apellido,fechaNacimiento,documento,tipoDocumento,rol\n';
     const blob = new Blob([header], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -56,19 +62,42 @@ export class BulkUploadDialogComponent {
 
   process() {
     if (!this.file) return;
+    
+    this.loading = true; // Inicia la carga
+
     this.userService.bulkUpload(this.file)
       .then((resp: BulkResponseDto) => {
-        const errores = resp.results.filter((r: BulkLineResult) => !r.creado);
-        if (errores.length > 0) {
-          this.dialog.open(BulkErrorsDialogComponent, {
-            width: '600px',
-            data: errores
+        this.loading = false;
+
+        const schemaError = resp.results.find(r => r.fila === 0 && !r.creado);
+
+        if (schemaError) {
+          this.snackBar.open(schemaError.mensaje, 'Cerrar', {
+            duration: 10000,
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar'],
           });
+          this.dialogRef.close();
         } else {
           this.dialogRef.close(true);
+          this.dialog.open(BulkErrorsDialogComponent, {
+            width: '500px',
+            data: resp.results,
+            disableClose: true,
+          });
         }
       })
-      .catch(console.error);
+      .catch((error: HttpErrorResponse) => {
+        this.loading = false;
+        const errorMessage = error.error?.message || 'Ocurrió un error inesperado.';
+        
+        this.snackBar.open(errorMessage, 'Cerrar', {
+          duration: 7000,
+          verticalPosition: 'top',
+          panelClass: ['error-snackbar']
+        });
+        this.dialogRef.close();
+      });
   }
 
   cancel() {

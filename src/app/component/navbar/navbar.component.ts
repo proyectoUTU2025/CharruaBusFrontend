@@ -7,6 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -19,7 +20,8 @@ import { AuthService } from '../../services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatMenuModule
+    MatMenuModule,
+    MatChipsModule
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
@@ -54,5 +56,44 @@ export class NavbarComponent {
 
   get userRole(): string | null {
     return this.authService.rol;
+  }
+
+  getUserRoleChipColor(): 'primary' | 'accent' | 'warn' {
+    switch (this.userRole) {
+      case 'ADMIN':
+        return 'primary';
+      case 'VENDEDOR':
+        return 'accent';
+      case 'CLIENTE':
+        return 'warn';
+      default:
+        return 'primary';
+    }
+  }
+
+  getUserRoleChipText(): string {
+    switch (this.userRole) {
+      case 'ADMIN':
+        return 'ADMIN';
+      case 'VENDEDOR':
+        return 'VENDEDOR';
+      case 'CLIENTE':
+        return 'CLIENTE';
+      default:
+        return '';
+    }
+  }
+
+  getRoleChipClass(rol: string): string {
+    switch (rol) {
+      case 'ADMIN':
+        return 'admin';
+      case 'VENDEDOR':
+        return 'vendedor';
+      case 'CLIENTE':
+        return 'cliente';
+      default:
+        return '';
+    }
   }
 }

@@ -1,171 +1,232 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatCardModule } from '@angular/material/card';
-import { UsuarioDto, AltaUsuarioDto, FiltroBusquedaUsuarioDto, Page } from '../../models';
-import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
-import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSort, Sort } from '@angular/material/sort';
+
 import { UserService } from '../../services/user.service';
+import { MaterialUtilsService } from '../../shared/material-utils.service';
 import { AddUserDialogComponent } from './dialogs/add-user-dialog/add-user-dialog.component';
 import { EditUserDialogComponent } from './dialogs/edit-user-dialog/edit-user-dialog.component';
-import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { BulkUploadDialogComponent } from './dialogs/bulk-upload-dialog/bulk-upload-dialog.component';
+import { UsuarioDto, TipoRol, FiltroBusquedaUsuarioDto } from '../../models';
+import { SharedModule } from '../../shared/shared.module';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 
 @Component({
-  selector: 'app-usuarios-page',
+  selector: 'app-users-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
-    MatCardModule,
-    AddUserDialogComponent,
-    EditUserDialogComponent,
-    ConfirmDialogComponent,
-    BulkUploadDialogComponent
-  ],
+  imports: [SharedModule, LoadingSpinnerComponent],
   templateUrl: './users-page.component.html',
   styleUrls: ['./users-page.component.scss']
 })
-export class UsersPageComponent implements OnInit, AfterViewInit {
-  filterForm: FormGroup;
+export class UsersPageComponent implements OnInit {
+  isLoading = false;
+  columns: string[] = ['id', 'nombre', 'apellido', 'fechaNacimiento', 'email', 'documento', 'rol', 'activo', 'acciones'];
   dataSource = new MatTableDataSource<UsuarioDto>();
-  totalElements = 0;
   pageIndex = 0;
-  pageSize = 5;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  columns = [
-    'id', 'nombre', 'apellido', 'email', 'documento',
-    'tipoDocumento', 'rol', 'fechaNacimiento', 'activo', 'acciones'
-  ];
+  pageSize = 10;
+  totalElements = 0;
+  filterForm: FormGroup;
   bulkErrors: string[] = [];
+
+  roles = Object.values(TipoRol) 
+    .map(value => ({ value, viewValue: value }));
+    
+  estados = [
+    { value: 'todos', viewValue: 'TODOS' },
+    { value: 'activos', viewValue: 'ACTIVOS' },
+    { value: 'inactivos', viewValue: 'INACTIVOS' }
+  ];
+
+  private paginator!: MatPaginator;
+  private sort!: MatSort;
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    if (mp) {
+      this.paginator = mp;
+      this.paginator.page.subscribe((event: PageEvent) => {
+        this.pageIndex = event.pageIndex;
+        this.pageSize = event.pageSize;
+        this.loadUsers();
+      });
+    }
+  }
+
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    if (ms) {
+      this.sort = ms; // mantenemos el sort solo para capturar eventos, sin aplicar orden local
+
+      // Al cambiar el orden, recargar desde el backend con la dirección correcta
+      this.sort.sortChange.subscribe((event: Sort) => {
+        console.log('SortChange event', event);
+        this.pageIndex = 0;
+        this.loadUsers(event);
+      });
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private materialUtils: MaterialUtilsService
   ) {
     this.filterForm = this.fb.group({
       nombre: [''],
       apellido: [''],
       email: [''],
       documento: [''],
-      rol: [''],
-      activo: [null]
+      rol: [null],
+      estado: ['todos']
     });
+
+    // Configurar acceso de datos para ordenamiento personalizado
+    this.dataSource.sortingDataAccessor = (item: UsuarioDto, property: string): string | number => {
+      const value: any = (item as any)[property];
+      if (value === null || value === undefined) {
+        return '';
+      }
+      if (property === 'fechaNacimiento') {
+        return new Date(value).getTime();
+      }
+      if (typeof value === 'boolean') {
+        return value ? 1 : 0;
+      }
+      return value as string | number;
+    };
   }
 
-  ngOnInit() { }
-
-  ngAfterViewInit() {
+  ngOnInit(): void {
     this.loadUsers();
   }
 
-  private loadUsers() {
-    const raw = this.filterForm.value;
-    const filtro: FiltroBusquedaUsuarioDto = {
-      nombre: raw.nombre,
-      apellido: raw.apellido,
-      email: raw.email,
-      documento: raw.documento,
-      roles: raw.rol ? [raw.rol] : undefined,
-      activo: raw.activo
-    };
+  async loadUsers(sortEvent?: Sort): Promise<void> {
+    // Solo mostrar spinner si no viene de un cambio de orden
+    const isSortRequest = !!sortEvent;
+    if (!isSortRequest) {
+      this.isLoading = true;
+    }
+    const { nombre, apellido, email, documento, rol, estado } = this.filterForm.value;
 
-    this.userService.getAll(filtro, this.pageIndex, this.pageSize)
-      .then((res: Page<UsuarioDto>) => {
-        this.dataSource.data = res.content;
-        this.totalElements    = res.page.totalElements;
-        this.pageIndex        = res.page.number;
-        this.pageSize         = res.page.size;
-      })
-      .catch(console.error);
+    const filtro: FiltroBusquedaUsuarioDto = {
+      nombre: nombre || undefined,
+      apellido: apellido || undefined,
+      email: email || undefined,
+      documento: documento || undefined,
+      roles: rol ? [rol] : undefined,
+      activo: estado === 'todos' ? undefined : estado === 'activos'
+    };
+    
+    let sortParam = 'nombre,asc';
+    // Si recibimos evento, usarlo; si no, usar sort actual
+    const activeField = sortEvent?.active || this.sort?.active;
+    const direction = sortEvent?.direction || this.sort?.direction;
+    if (activeField && direction) {
+      sortParam = `${activeField},${direction.toUpperCase()}`;
+    }
+
+    console.log('Sort param enviado al backend:', sortParam);
+
+    try {
+      const page = await this.userService.getAll(filtro, this.pageIndex, this.pageSize, sortParam);
+      this.dataSource.data = page.content;
+      this.totalElements = page.page.totalElements;
+    } catch (err) {
+      console.error("Error loading users", err);
+      this.materialUtils.showError('Error al cargar la lista de usuarios.');
+    } finally {
+      if (!isSortRequest) {
+        this.isLoading = false;
+      }
+    }
   }
 
   onSearch() {
     this.pageIndex = 0;
+    if(this.paginator) {
+      this.paginator.firstPage();
+    }
     this.loadUsers();
   }
 
   onClear() {
-    this.filterForm.reset({ nombre: '', apellido: '', email: '', documento: '', rol: '', activo: null });
+    this.filterForm.reset({ nombre: '', apellido: '', email: '', documento: '', rol: null, estado: 'todos' });
     this.onSearch();
   }
 
-  onPaginate(e: PageEvent) {
-    this.pageIndex = e.pageIndex;
-    this.pageSize  = e.pageSize;
-    this.loadUsers();
-  }
-
-  openBulkUpload() {
-    this.dialog.open(BulkUploadDialogComponent, { width: '600px' })
-      .afterClosed()
-      .subscribe((file: File | undefined) => {
-        if (!file) return;
-        this.userService.bulkUpload(file)
-          .then((resp: BulkResponseDto) => {
-            const errs = resp.results.filter((r: BulkLineResult) => !r.creado);
-            this.bulkErrors = errs.length
-              ? errs.map(e => `Fila ${e.fila}: ${e.mensaje}`)
-              : ['Archivo procesado exitosamente sin errores.'];
-            this.loadUsers();
-          })
-          .catch(console.error);
-      });
-  }
-
   add() {
-    this.dialog.open(AddUserDialogComponent, {
-      width: '450px', maxHeight: '95vh'
-    })
-    .afterClosed()
-    .subscribe((alta: AltaUsuarioDto) => {
-      if (alta) this.userService.create(alta)
-        .then(() => this.onSearch())
-        .catch(console.error);
+    const dialogRef = this.dialog.open(AddUserDialogComponent, {
+      width: '500px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadUsers(); 
+      }
     });
   }
 
-  edit(u: UsuarioDto) {
-    this.dialog.open(EditUserDialogComponent, {
-      width: '400px', data: u
-    })
-    .afterClosed()
-    .subscribe((updated: UsuarioDto) => {
-      if (updated) this.userService.update(updated)
-        .then(() => this.onSearch())
-        .catch(console.error);
+  edit(user: UsuarioDto) {
+    const dialogRef = this.dialog.open(EditUserDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: { userId: user.id }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadUsers();
+      }
     });
   }
 
-  remove(u: UsuarioDto) {
-    this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: { title: 'Confirmar eliminación', message: `¿Eliminar a ${u.nombre}?` }
-    })
-    .afterClosed()
-    .subscribe(ok => {
-      if (ok) this.userService.delete(u.id)
-        .then(() => this.onSearch())
-        .catch(console.error);
+  remove(user: UsuarioDto) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Confirmar Eliminación',
+        message: `¿Está seguro de que desea eliminar al usuario ${user.nombre} ${user.apellido}?`
+      }
     });
+
+    dialogRef.afterClosed().subscribe(async confirmed => {
+      if (confirmed) {
+        try {
+          await this.userService.delete(user.id);
+          this.materialUtils.showSuccess('Usuario eliminado correctamente.');
+          this.loadUsers();
+        } catch (err: any) {
+          this.materialUtils.showError(err.error?.message || 'Error al eliminar el usuario.');
+        }
+      }
+    });
+  }
+  
+  openBulkUpload() {
+    const dialogRef = this.dialog.open(BulkUploadDialogComponent, {
+      width: '600px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadUsers();
+      }
+    });
+  }
+
+  getRoleChipClass(role: string): string {
+    switch(role) {
+      case 'ADMIN': return 'chip-admin';
+      case 'VENDEDOR': return 'chip-vendedor';
+      default: return 'chip-cliente';
+    }
+  }
+
+  getRoleChipText(role: string): string {
+    const roleLower = role.toLowerCase();
+    return roleLower.charAt(0).toUpperCase() + roleLower.slice(1);
   }
 }

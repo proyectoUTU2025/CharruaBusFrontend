@@ -1,91 +1,132 @@
 :host {
   display: block;
-  padding: 24px;
-  background: #fff;
-  border-radius: 12px;
 }
 
-h2[mat-dialog-title] {
-  margin-bottom: 16px;
-  font-size: 1.3rem;
+.dialog-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 1.25rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #333);
+}
+
+.dialog-container {
+  padding-top: 20px;
+}
+
+mat-dialog-content {
+  position: relative;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
 }
 
 mat-form-field {
   width: 100%;
-  margin-bottom: 16px;
-
-  .mat-mdc-form-field-flex {
-    border-radius: 8px;
-  }
-
-  .mat-mdc-text-field-wrapper {
-    background-color: #f7f7f7;
-    border-radius: 8px;
-  }
+  margin-bottom: 12px;
 }
 
+mat-checkbox {
+  margin-bottom: 16px;
+}
 
-$primary-color: #675992;
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 24px;
+  margin-top: 24px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}
 
-.massive-btn {
-  border: 1px solid $primary-color;
-  color: $primary-color;
+.cancel-btn,
+.create-btn {
   text-transform: none;
-  height: 36px;
-  border-radius: 18px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 20px;
 }
 
 .create-btn {
-  background-color: $primary-color;
+  background-color: var(--primary-color, #1976d2);
   color: white;
-  text-transform: none;
-  height: 36px;
-  border-radius: 18px;
-}
 
-mat-dialog-actions {
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  padding-top: 16px;
-  margin-top: 24px;
-
-  button + button {
-    margin-left: 8px;
+  &:disabled {
+    background-color: var(--primary-color, #1976d2);
+    opacity: 0.5;
   }
 }
 
-.checkbox-field {
-  margin-bottom: 16px;
+.cancel-btn {
+  border-color: var(--primary-color, #1976d2);
+  color: var(--primary-color, #1976d2);
 }
 
-.mat-checkbox .mat-checkbox-frame {
-  border-color: $primary-color;
-}
-
-.mat-checkbox-checked .mat-checkbox-background,
-.mat-checkbox-checked .mat-checkbox-checkmark-path {
-  background-color: $primary-color;
-  stroke: white;
-}
-
-.mat-checkbox .mat-checkbox-ripple .mat-ripple-element {
-  background-color: rgba(103, 89, 146, 0.2);
-}
-
-::ng-deep .mat-datepicker-content {
-  background: #fff !important;
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
   border-radius: 12px;
 }
 
-::ng-deep .mat-calendar {
-  color: #333;
+.error-banner {
+  background-color: var(--warn-color-light, #f8d7da);
+  color: var(--warn-color-dark, #721c24);
+  border: 1px solid var(--warn-color, #f5c6cb);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
-::ng-deep .mat-calendar-body-selected,
-::ng-deep .mat-calendar-body-today {
-  background-color: $primary-color !important;
-  color: white !important;
+.password-requirements {
+  margin: -10px 0 16px 0;
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--warn-color);
+    transition: color 0.3s ease-in-out;
+    margin-bottom: 2px;
+
+    &.valid {
+      color: var(--success-color);
+    }
+
+    mat-icon {
+      font-size: 16px;
+      height: 16px;
+      width: 16px;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
 }

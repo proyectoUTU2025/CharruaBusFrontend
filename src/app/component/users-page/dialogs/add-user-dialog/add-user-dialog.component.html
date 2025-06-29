@@ -1,59 +1,134 @@
-<h2 mat-dialog-title>Crear Nuevo Usuario</h2>
-<form [formGroup]="form" mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>Correo</mat-label>
-    <input matInput formControlName="email" />
-  </mat-form-field>
+<div class="dialog-header">
+  <h2 class="dialog-title">Crear Nuevo Usuario</h2>
+</div>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Contraseña</mat-label>
-    <input matInput type="password" formControlName="password" />
-  </mat-form-field>
+<div mat-dialog-content class="dialog-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Nombre</mat-label>
-    <input matInput formControlName="nombre" />
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" required />
+      <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es obligatorio.</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Apellido</mat-label>
-    <input matInput formControlName="apellido" />
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="apellido" required />
+      <mat-error *ngIf="form.get('apellido')?.hasError('required')">El apellido es obligatorio.</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Documento</mat-label>
-    <input matInput formControlName="documento" />
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Correo</mat-label>
+      <input matInput formControlName="email" required email />
+      <mat-error *ngIf="form.get('email')?.hasError('required')">El correo es obligatorio.</mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">El formato del correo no es válido.</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Tipo Doc.</mat-label>
-    <mat-select formControlName="tipoDocumento">
-      <mat-option *ngFor="let t of tiposDocumento" [value]="t">
-        {{ t }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de Documento</mat-label>
+      <mat-select formControlName="tipoDocumento" required>
+        <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">
+          {{ tipo.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('tipoDocumento')?.hasError('required')">El tipo de documento es obligatorio.</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Rol</mat-label>
-    <mat-select formControlName="rol">
-      <mat-option *ngFor="let r of roles" [value]="r">
-        {{ r }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Documento</mat-label>
+      <input matInput formControlName="documento" required />
+      <mat-error *ngIf="form.get('documento')?.hasError('required')">El documento es obligatorio.</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Fecha de Nac.</mat-label>
-    <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" />
-    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha de Nacimiento</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" [max]="maxDate" [matDatepickerFilter]="noFutureDate" required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('required')">La fecha de nacimiento es obligatoria.</mat-error>
+      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('futureDate')">No se permiten fechas futuras.</mat-error>
+    </mat-form-field>
 
-  <mat-checkbox formControlName="activo">Activo</mat-checkbox>
-</form>
+    <mat-form-field appearance="outline">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="rol" required>
+        <mat-option *ngFor="let rol of roles" [value]="rol.value">
+          {{ rol.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('rol')?.hasError('required')">El rol es obligatorio.</mat-error>
+    </mat-form-field>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button class="massive-btn" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="create-btn" (click)="save()">Guardar</button>
-</mat-dialog-actions>
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input 
+        matInput 
+        [type]="hidePassword ? 'password' : 'text'" 
+        formControlName="password"
+        required />
+      <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" (mousedown)="$event.preventDefault()" type="button" [attr.aria-label]="'Ocultar o mostrar contraseña'">
+        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('password')?.hasError('required')">La contraseña es obligatoria.</mat-error>
+    </mat-form-field>
+
+    <div class="password-requirements" *ngIf="form.get('password')?.dirty">
+      <ul>
+        <li [class.valid]="passwordValidationStatus.minLength">
+          <mat-icon>{{ passwordValidationStatus.minLength ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Mínimo 8 caracteres</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasUppercase">
+          <mat-icon>{{ passwordValidationStatus.hasUppercase ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Una letra mayúscula</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasLowercase">
+          <mat-icon>{{ passwordValidationStatus.hasLowercase ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Una letra minúscula</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasNumber">
+          <mat-icon>{{ passwordValidationStatus.hasNumber ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Un número</span>
+        </li>
+        <li [class.valid]="passwordValidationStatus.hasSpecialChar">
+          <mat-icon>{{ passwordValidationStatus.hasSpecialChar ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>Un caracter especial (!&#64;#$%^&*)</span>
+        </li>
+      </ul>
+    </div>
+    
+    <mat-form-field appearance="outline">
+      <mat-label>Confirmar Contraseña</mat-label>
+      <input 
+        matInput 
+        [type]="hideConfirmPassword ? 'password' : 'text'" 
+        formControlName="confirmPassword" 
+        [errorStateMatcher]="matcher"
+        required />
+      <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" (mousedown)="$event.preventDefault()" type="button" [attr.aria-label]="'Ocultar o mostrar contraseña'">
+        <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('confirmPassword')?.hasError('required')">Debe confirmar la contraseña.</mat-error>
+      <mat-error *ngIf="form.hasError('passwordsNotMatching')">
+        Las contraseñas no coinciden.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-checkbox formControlName="activo" class="activo-checkbox">Activo</mat-checkbox>
+    
+    <div *ngIf="error" class="error-banner">
+      {{ error }}
+    </div>
+
+    <div class="actions" mat-dialog-actions>
+      <button mat-stroked-button class="cancel-btn" type="button" (click)="onCancel()" [disabled]="loading">Cancelar</button>
+      <button mat-flat-button class="create-btn" type="submit" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
+    </div>
+  </form>
+</div>

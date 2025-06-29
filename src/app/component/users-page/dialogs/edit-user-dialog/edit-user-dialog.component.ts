@@ -1,10 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
-  Validators
+  Validators,
+  AbstractControl,
+  ValidationErrors
 } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { AuthService } from '../../../../services/auth.service';
@@ -16,6 +18,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { UsuarioDto } from '../../../../models/users/usuario.dto.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   standalone: true,
@@ -27,7 +34,10 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './edit-user-dialog.component.html',
   styleUrls: ['./edit-user-dialog.component.scss']
@@ -36,6 +46,19 @@ export class EditUserDialogComponent implements OnInit {
   form!: FormGroup;
   loading = false;
   error: string | null = null;
+  user!: UsuarioDto;
+  private userId: number;
+  maxDate: Date = new Date();
+
+  noFutureDate = (d: Date | null): boolean => {
+    return (d ?? this.maxDate) <= this.maxDate;
+  };
+
+  private static futureDateValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    const valueDate = new Date(control.value);
+    return valueDate > new Date() ? { futureDate: true } : null;
+  }
 
   tiposDocumento = Object.values(TipoDocumento).map(value => ({
     value,
@@ -47,35 +70,40 @@ export class EditUserDialogComponent implements OnInit {
     label: v.charAt(0) + v.slice(1).toLowerCase()
   }));
 
-  private fb = inject(FormBuilder);
-  private auth = inject(AuthService);
-  private userService = inject(UserService);
-  private dialogRef = inject(MatDialogRef<EditUserDialogComponent>);
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private dialogRef: MatDialogRef<EditUserDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) data: { userId: number },
+    private snackBar: MatSnackBar
+  ) {
+    this.userId = data.userId;
+  }
 
   ngOnInit(): void {
-    const id = this.auth.userId!;
     this.form = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required],
+      fechaNacimiento: ['', [Validators.required, EditUserDialogComponent.futureDateValidator]],
       tipoDocumento: ['', Validators.required],
       documento: ['', Validators.required],
       situacionLaboral: ['']
     });
 
     this.loading = true;
-    this.userService.getById(id)
-      .then(user => {
+    this.userService.getById(this.userId)
+      .then(fullUser => {
         this.form.patchValue({
-          nombre: user.nombre,
-          apellido: user.apellido,
-          fechaNacimiento: user.fechaNacimiento,
-          tipoDocumento: user.tipoDocumento,
-          documento: user.documento,
-          situacionLaboral: (user as any).situacionLaboral || ''
+          nombre: fullUser.nombre,
+          apellido: fullUser.apellido,
+          fechaNacimiento: new Date(fullUser.fechaNacimiento),
+          tipoDocumento: fullUser.tipoDocumento,
+          documento: fullUser.documento,
+          situacionLaboral: (fullUser as any).situacionLaboral || ''
         });
+        this.user = fullUser;
       })
-      .catch(() => this.error = 'Error al cargar datos')
+      .catch(() => this.error = 'Error al cargar los datos del usuario')
       .finally(() => this.loading = false);
   }
 
@@ -83,9 +111,21 @@ export class EditUserDialogComponent implements OnInit {
     if (this.form.invalid) return;
     this.loading = true;
     this.error = null;
-    const id = this.auth.userId!;
-    const dto: EditarUsuarioRequestDto = this.form.value;
-    this.userService.editProfile(id, dto)
+    
+    const formValue = this.form.value;
+    const dto: EditarUsuarioRequestDto = {
+      nombre: formValue.nombre,
+      apellido: formValue.apellido,
+      fechaNacimiento: new Date(formValue.fechaNacimiento).toISOString().slice(0,10),
+      tipoDocumento: formValue.tipoDocumento,
+      documento: formValue.documento
+    };
+
+    if (this.user.rol === 'CLIENTE' && formValue.situacionLaboral) {
+      dto.situacionLaboral = formValue.situacionLaboral;
+    }
+
+    this.userService.editProfile(this.userId, dto)
       .then(() => this.dialogRef.close(true))
       .catch(err => this.error = err.error?.message || 'Error al guardar')
       .finally(() => this.loading = false);

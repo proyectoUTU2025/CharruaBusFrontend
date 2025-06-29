@@ -1,4 +1,158 @@
-$primary-color: #675992;
+$primary-color: #1976d2;
+
+.navbar-toolbar {
+  background: #fff;
+  color: #222;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 0 32px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 36px;
+  margin-right: 12px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-right: 12px;
+  color: #1976d2;
+}
+
+.role-chip {
+  margin-right: 24px;
+  font-size: 0.95em;
+  height: 28px;
+  text-transform: capitalize;
+  font-weight: 600;
+  border-radius: 16px;
+  padding: 0 16px;
+  border: 1.5px solid #e0e0e0;
+  background: #f5f5f5;
+  color: #222;
+  display: inline-flex;
+  align-items: center;
+}
+
+.role-chip.admin {
+  background: #e3f2fd !important;
+  color: #1976d2 !important;
+  border: 1.5px solid #1976d2 !important;
+}
+.role-chip.vendedor {
+  background: #f3e8fd !important;
+  color: #8e24aa !important;
+  border: 1.5px solid #8e24aa !important;
+}
+.role-chip.cliente {
+  background: #fffde7 !important;
+  color: #f9a825 !important;
+  border: 1.5px solid #f9a825 !important;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nav-btn {
+  font-weight: 500;
+  color: #1976d2 !important;
+  border-radius: 8px;
+  margin-right: 4px;
+  text-transform: none;
+  transition: background 0.2s, color 0.2s, font-weight 0.2s;
+  font-size: 16px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff !important;
+  box-shadow: none;
+  border: 1.5px solid transparent;
+}
+
+.nav-btn .nav-icon {
+  font-size: 20px;
+  margin-right: 6px;
+}
+
+.nav-btn .nav-text {
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+}
+
+.nav-btn.active-link,
+.nav-btn.active-link:focus {
+  color: #1976d2 !important;
+  font-weight: 700;
+  background: #f5f7fa !important;
+  border-radius: 8px;
+  border: 1.5px solid #1976d2;
+}
+
+.nav-btn:hover:not(.active-link) {
+  background: #f5f7fa !important;
+  color: #1251a3 !important;
+  border-radius: 8px;
+  border: 1.5px solid #1976d2;
+}
+
+button[mat-stroked-button].logout-button {
+  font-weight: 500;
+  font-size: 17px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: #1976d2 !important;
+  border: 2px solid #1976d2 !important;
+  background: #fff !important;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: none;
+}
+
+button[mat-stroked-button].logout-button:hover {
+  background: #f5f7fa !important;
+  color: #1251a3 !important;
+  border-color: #1251a3 !important;
+}
+
+.logout-text, .login-navbar-text {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+button[mat-stroked-button] mat-icon,
+button[mat-stroked-button] .mat-icon,
+.nav-btn .nav-icon {
+  font-size: 20px !important;
+  margin-right: 6px;
+}
+
+@media (max-width: 900px) {
+  .navbar-toolbar {
+    padding: 0 8px;
+  }
+  .brand {
+    font-size: 1rem;
+  }
+  .role-chip {
+    margin-right: 8px;
+  }
+  .nav-btn, .logout-button, .login-navbar-btn {
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+  .logout-text, .login-navbar-text, .nav-text {
+    font-size: 15px;
+  }
+}
 
 .navbar {
   display: flex;
@@ -32,10 +186,6 @@ $primary-color: #675992;
   }
 }
 
-.spacer {
-  flex: 1 1 auto;
-}
-
 .nav-button {
   color: $primary-color !important;
   background: none !important;
@@ -48,28 +198,6 @@ $primary-color: #675992;
   mat-icon {
     margin-right: 4px !important;
   }
-}
-
-.logout-button {
-  color: $primary-color;
-  border: 1px solid $primary-color;
-  border-radius: 24px;
-  text-transform: none;
-  display: flex;
-  align-items: center;
-
-  mat-icon {
-    margin-right: 4px;
-  }
-}
-
-.logout-button,
-.logout-button:hover,
-.logout-button:focus,
-.logout-button:active {
-  color: $primary-color !important;
-  border: 1px solid $primary-color !important;
-  background: none !important;
 }
 
 .clickable {

@@ -11,6 +11,8 @@ import { LoginRequestDto } from '../models/auth/login-request.dto';
 import { RegisterRequestDto } from '../models/auth/register-request.dto';
 import { AuthenticationResponseDto } from '../models/auth/authentication-response.dto';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface DecodedToken extends JwtPayload {
   name?: string;
@@ -27,7 +29,9 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private cookies: CookieService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) { }
 
   login(credentials: { email: string; password: string }) {
@@ -78,6 +82,11 @@ export class AuthService {
   logout() {
     firstValueFrom(this.http.post(`${this.base}/logout`, {}))
       .finally(() => {
+        this.snackBar.open('Tu sesión ha expirado, por favor, inicia sesión nuevamente.', 'Cerrar', {
+          duration: 5000,
+          verticalPosition: 'top',
+        });
+        this.dialog.closeAll();
         this.cookies.delete(this.tokenKey, '/');
         this.router.navigate(['/login']);
       });

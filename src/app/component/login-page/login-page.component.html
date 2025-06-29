@@ -23,7 +23,7 @@
       <div class="password-field">
         <input id="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password"
           placeholder="●●●●●●●●" matInput>
-        <button type="button" mat-icon-button (click)="hidePassword = !hidePassword" class="visibility-toggle">
+        <button type="button" mat-icon-button (click)="hidePassword = !hidePassword" class="visibility-toggle" aria-label="Mostrar/ocultar contraseña">
           <mat-icon>
             {{ hidePassword ? 'visibility_off' : 'visibility' }}
           </mat-icon>
@@ -34,20 +34,27 @@
       </mat-error>
     </div>
 
-    <button type="submit" mat-flat-button color="primary" class="sign-in-button" [disabled]="loginForm.invalid">
-      <mat-icon>login</mat-icon>
-      Iniciar sesión
+    <button type="submit" mat-flat-button color="primary" class="sign-in-button" [disabled]="loginForm.invalid || isLoading">
+      <ng-container *ngIf="!isLoading; else loadingSpinner">
+        <mat-icon>arrow_forward</mat-icon>
+        <span class="sign-in-text">Iniciar sesión</span>
+      </ng-container>
+      <ng-template #loadingSpinner>
+        <mat-spinner diameter="24"></mat-spinner>
+      </ng-template>
     </button>
 
-   <div class="forgot-password">
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <div class="forgot-password">
       <a (click)="goToSignup()">¿No tienes cuenta? Registrarse</a>
     </div>
     <div class="forgot-password">
       <a >Olvidaste tu password? Recuperalo</a>
     </div>
 
-    <div *ngIf="error" class="error-message">
-      {{ error }}
-    </div>
   </form>
 </div>

@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,8 @@ import { AuthService } from '../../services/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss']
@@ -26,6 +28,7 @@ export class LoginPageComponent {
   loginForm: FormGroup;
   hidePassword = true;
   error: string | null = null;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -36,18 +39,28 @@ export class LoginPageComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+
+    this.loginForm.valueChanges.subscribe(() => {
+      if (this.error) {
+        this.error = null;
+      }
+    });
   }
 
   async onSubmit(): Promise<void> {
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.isLoading) {
       this.loginForm.markAllAsTouched();
       return;
     }
+    
+    this.isLoading = true;
     try {
       await this.authService.login(this.loginForm.value);
       this.router.navigate(['/']);
     } catch {
       this.error = 'Credenciales inválidas';
+    } finally {
+      this.isLoading = false;
     }
   }
 

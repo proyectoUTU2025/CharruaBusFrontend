@@ -1,21 +1,45 @@
-.filters {
+$primary-color: #675992;
+
+.titulo {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: $primary-color;
+}
+
+.filtros {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+table {
+    width: 100%;
+}
+
+.grafico-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    max-width: 800px;
+    max-height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tabla-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.resumen-card .resumen-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    align-items: flex-end;
-}
-
-mat-form-field {
-    width: 200px;
-}
-
-.actions {
-    display: flex;
-    gap: 0.5rem;
+    gap: 1.5rem;
     align-items: center;
-}
-
-mat-card {
-    padding: 1rem;
+    justify-content: center;
 }

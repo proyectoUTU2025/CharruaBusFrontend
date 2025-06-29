@@ -7,7 +7,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -31,6 +30,12 @@ export class NavbarComponent {
     public authService: AuthService,
   ) {}
 
+  navigateIfNeeded(path: string) {
+    if (this.router.url !== path) {
+      this.router.navigateByUrl(path);
+    }
+  }
+
   onLogoClick(): void {
     if (this.router.url === '/' || this.router.url === '') {
       window.location.reload();
@@ -50,5 +55,4 @@ export class NavbarComponent {
   get userRole(): string | null {
     return this.authService.rol;
   }
-
 }

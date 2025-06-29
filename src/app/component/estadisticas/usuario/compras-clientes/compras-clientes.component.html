@@ -1,64 +1,66 @@
-<app-chart-card [title]="'Compras por Cliente'" [labels]="chartLabels" [data]="chartData">
-</app-chart-card>
+<h2 class="titulo">Estadísticas de Compras por Clientes</h2>
 
-<div class="controls">
-    <mat-form-field appearance="fill">
-        <mat-label>Fecha Inicio</mat-label>
-        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaInicio" />
+<div class="filtros">
+    <mat-form-field>
+        <mat-label>Fecha inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" [formControl]="fechaInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
     </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>Fecha Fin</mat-label>
-        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaFin" />
+    
+    <mat-form-field>
+        <mat-label>Fecha fin</mat-label>
+        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
+        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
     </mat-form-field>
-
-    <button mat-button (click)="load()">Filtrar</button>
-
-    <button mat-raised-button color="primary" (click)="exportCsv()" [disabled]="isExportingCsv">
-        <ng-container *ngIf="!isExportingCsv; else exportingCsvTpl">
-            Exportar CSV
-        </ng-container>
-        <ng-template #exportingCsvTpl>
-            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-            &nbsp;Descargando CSV...
-        </ng-template>
+    
+    <button mat-button (click)="filtrar()">Filtrar</button>
+    <button mat-button [disabled]="isExportingCsv" (click)="exportCsv()">
+        {{ isExportingCsv ? 'Descargando CSV...' : 'Descargar CSV' }}
     </button>
-
-    <button mat-raised-button color="accent" (click)="exportPdf()" [disabled]="isExportingPdf">
-        <ng-container *ngIf="!isExportingPdf; else exportingPdfTpl">
-            Exportar PDF
-        </ng-container>
-        <ng-template #exportingPdfTpl>
-            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-            &nbsp;Descargando PDF...
-        </ng-template>
-    </button>
-
-    <button mat-button (click)="toggleSort()">
-        Orden {{ ascendente ? '↑' : '↓' }}
-    </button>
+    <button mat-button color="primary" (click)="exportPdf()">Descargar PDF</button>
 </div>
 
-<table mat-table [dataSource]="data" class="mat-elevation-z1">
+<div class="grafico-container">
+    <canvas baseChart
+            [data]="{ labels: chartLabels, datasets: chartData }"
+            [type]="chartType"
+            [options]="chartOptions"
+            height="250">
+    </canvas>
+</div>
 
-    <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>Email</th>
-        <td mat-cell *matCellDef="let x">{{ x.email }}</td>
-    </ng-container>
+<div class="tabla-container">
+    <table mat-table [dataSource]="data" class="mat-elevation-z1 tabla">
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('email')">
+                Email
+                <span *ngIf="ordenarPor === 'email'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.email }}</td>
+        </ng-container>
 
-    <ng-container matColumnDef="cantidadPasajes">
-        <th mat-header-cell *matHeaderCellDef>Pasajes</th>
-        <td mat-cell *matCellDef="let x">{{ x.cantidadPasajes }}</td>
-    </ng-container>
+        <ng-container matColumnDef="cantidadPasajes">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidadPasajes')">
+                Pasajes
+                <span *ngIf="ordenarPor === 'cantidadPasajes'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.cantidadPasajes }}</td>
+        </ng-container>
 
-    <ng-container matColumnDef="totalGastado">
-        <th mat-header-cell *matHeaderCellDef>Total Gastado</th>
-        <td mat-cell *matCellDef="let x">{{ x.totalGastado }}</td>
-    </ng-container>
+        <ng-container matColumnDef="totalGastado">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('totalGastado')">
+                Total Gastado
+                <span *ngIf="ordenarPor === 'totalGastado'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.totalGastado | currency:'USD':'symbol':'1.2-2' }}</td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['email','cantidadPasajes','totalGastado']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
+        <tr mat-header-row *matHeaderRowDef="['email','cantidadPasajes','totalGastado']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
+    </table>
 
-</table>
-
-<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="pageChanged($event)">
-</mat-paginator>
+    <mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)">
+    </mat-paginator>
+</div>

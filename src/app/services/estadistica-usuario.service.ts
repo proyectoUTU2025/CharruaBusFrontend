@@ -93,18 +93,22 @@ export class EstadisticaUsuarioService {
         );
     }
 
-    /** Logueos de usuarios */
     getLogueosUsuarios(
         fechaInicio?: string,
         fechaFin?: string,
         page = 0,
-        size = 10
+        size = 10,
+        ordenarPor = 'email',
+        ascendente = true
     ): Observable<Page<EstadisticaLogueos>> {
         let params = new HttpParams()
             .set('page', page.toString())
-            .set('size', size.toString());
+            .set('size', size.toString())
+            .set('ordenarPor', ordenarPor)
+            .set('ascendente', ascendente.toString());
         if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
         if (fechaFin) params = params.set('fechaFin', fechaFin);
+    
         return this.http.get<Page<EstadisticaLogueos>>(
             `${this.BASE}/logueos`,
             { params }

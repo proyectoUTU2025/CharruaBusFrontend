@@ -1,28 +1,35 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { EstadisticaUsuarioService } from '../../../../services/estadistica-usuario.service';
 import { EstadisticaLogueos } from '../../../../models/estadisticas/usuario/estadistica-logueos';
 import { Page } from '../../../../models';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
     selector: 'app-logueos-usuarios',
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
+        ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
         MatTableModule,
         MatPaginatorModule,
         MatButtonModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        NgChartsModule
     ],
     templateUrl: './logueos-usuarios.component.html',
     styleUrls: ['./logueos-usuarios.component.scss']
@@ -32,9 +39,25 @@ export class LogueosUsuariosComponent implements OnInit {
     total = 0;
     pageSize = 10;
     pageIndex = 0;
-    fechaInicio = '';
-    fechaFin = '';
-    isExporting = false;
+    ordenarPor = 'email';
+    ascendente = true;
+
+    fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
+    fechaFin = new FormControl<Date | null>(new Date());
+
+    downloadingCsv = false;
+
+    chartLabels: string[] = [];
+    chartData: ChartDataset<'bar'>[] = [];
+    chartType: ChartType = 'bar';
+    chartOptions: ChartOptions = {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { ticks: { maxRotation: 45, minRotation: 45 } }
+        },
+        plugins: { legend: { display: false } }
+    };
 
     constructor(private svc: EstadisticaUsuarioService) { }
 
@@ -42,18 +65,39 @@ export class LogueosUsuariosComponent implements OnInit {
         this.load();
     }
 
-    load() {
-        this.svc
-            .getLogueosUsuarios(this.fechaInicio, this.fechaFin, this.pageIndex, this.pageSize)
-            .subscribe({
-                next: (res: Page<EstadisticaLogueos>) => {
-                    this.data = res.content;
-                    this.total = res.page.totalElements;
-                },
-                error: err => {
-                    console.error('Error cargando logueos:', err);
-                }
-            });
+    load(event?: PageEvent) {
+        if (event) {
+            this.pageIndex = event.pageIndex;
+            this.pageSize = event.pageSize;
+        }
+
+        this.svc.getLogueosUsuarios(
+            this.formatDate(this.fechaInicio.value),
+            this.formatDate(this.fechaFin.value),
+            this.pageIndex,
+            this.pageSize,
+            this.ordenarPor,
+            this.ascendente
+        ).subscribe({
+            next: (res: Page<EstadisticaLogueos>) => {
+                this.data = res.content;
+                this.total = res.page.totalElements;
+                this.chartLabels = res.content.map(x => x.email);
+                this.chartData = [
+                    { data: res.content.map(x => x.cantidadLogueos), backgroundColor: '#1976d2', label: 'Total Gastado' }
+                ];
+            },
+            error: err => console.error('Error cargando:', err)
+        });
+    }
+
+    filtrar() {
+        localStorage.setItem('filtrosLogueosUsuarios', JSON.stringify({
+            fechaInicio: this.fechaInicio.value?.toISOString() || null,
+            fechaFin: this.fechaFin.value?.toISOString() || null
+        }));
+        this.pageIndex = 0;
+        this.load();
     }
 
     pageChanged(e: PageEvent) {
@@ -62,19 +106,56 @@ export class LogueosUsuariosComponent implements OnInit {
         this.load();
     }
 
+    toggleSort(campo: string) {
+        if (this.ordenarPor === campo) {
+            this.ascendente = !this.ascendente;
+        } else {
+            this.ordenarPor = campo;
+            this.ascendente = true;
+        }
+        this.load();
+    }
+
     exportCsv() {
-        this.isExporting = true;
-        this.svc.exportLogueosCsv(this.fechaInicio, this.fechaFin).subscribe({
+        const inicio = this.formatDate(this.fechaInicio.value);
+        const fin = this.formatDate(this.fechaFin.value);
+
+        this.downloadingCsv = true;
+        this.svc.exportLogueosCsv(inicio || undefined, fin || undefined).subscribe({
             next: (blob: Blob) => {
-                const url = window.URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'usuarios_logueos.csv';
                 a.click();
-                window.URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
             },
-            complete: () => (this.isExporting = false),
-            error: () => (this.isExporting = false)
+            complete: () => this.downloadingCsv = false,
+            error: () => this.downloadingCsv = false
         });
     }
+
+    exportPdf() {
+        const token = this.getCookie('access_token') || '';
+        const params = new URLSearchParams({
+            fechaInicio: this.formatDate(this.fechaInicio.value) || '',
+            fechaFin: this.formatDate(this.fechaFin.value) || '',
+            ordenarPor: this.ordenarPor,
+            ascendente: this.ascendente.toString(),
+            token
+        });
+        const url = `http://localhost:8080/usuarios/estadisticas/logueos/export/pdf?${params.toString()}`;
+        window.open(url, '_blank');
+    }
+
+    private formatDate(date: Date | null): string | undefined {
+        if (!date) return undefined;
+        return date.toISOString().slice(0, 10);
+    }
+
+    private getCookie(name: string): string | null {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
 }

@@ -1,21 +1,65 @@
+<h2 class="titulo">Estadísticas de Manenimientos</h2>
+
 <form class="filtros">
-    <mat-form-field><mat-label>Fecha inicio</mat-label><input matInput [formControl]="fechaInicio"
-            type="date"></mat-form-field>
-    <mat-form-field><mat-label>Fecha fin</mat-label><input matInput [formControl]="fechaFin"
-            type="date"></mat-form-field>
-    <button mat-raised-button color="primary" (click)="load()">Filtrar</button>
-    <button mat-button (click)="exportCsv()">CSV</button>
-</form>
-<table mat-table [dataSource]="dataSource">
-    <ng-container matColumnDef="matricula">
-        <th mat-header-cell *matHeaderCellDef>Matrícula</th>
-        <td mat-cell *matCellDef="let e">{{e.matricula}}</td>
-    </ng-container>
-    <ng-container matColumnDef="cantidad">
-        <th mat-header-cell *matHeaderCellDef>Cantidad</th>
-        <td mat-cell *matCellDef="let e">{{e.cantidad}}</td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
-</table>
-<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)"></mat-paginator>
+    <mat-form-field>
+        <mat-label>Fecha inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" [formControl]="fechaInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+    
+        <mat-form-field>
+        <mat-label>Fecha fin</mat-label>
+        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
+        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+    
+        <button mat-button (click)="filtrar()">Filtrar</button>
+        <button mat-button [disabled]="downloadingCsv" (click)="exportCsv()">
+            {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar CSV' }}
+        </button>
+        <button mat-button (click)="exportPdf()">Descargar PDF</button>
+    </form>
+    
+    <div *ngIf="dataSource.length > 0" class="grafico-container">
+        <canvas
+        baseChart
+        [data]="{ labels: chartLabels, datasets: chartData }"
+        [type]="chartType"
+        [options]="chartOptions"
+        height="250">
+        </canvas>
+    </div>
+    
+    <div class="tabla-container">
+        <table mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="matricula">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('matricula')">
+                Matrícula
+                <span *ngIf="ordenarPor==='matricula'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let e">{{ e.matricula }}</td>
+        </ng-container>
+    
+        <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidad')">
+                Cantidad
+                <span *ngIf="ordenarPor==='cantidad'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let e">{{ e.cantidad }}</td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    
+        <mat-paginator
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        (page)="load($event)">
+        </mat-paginator>
+    </div>
+
+    <mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)"></mat-paginator>

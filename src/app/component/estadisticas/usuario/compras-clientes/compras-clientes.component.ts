@@ -1,47 +1,64 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EstadisticaUsuarioService } from '../../../../services/estadistica-usuario.service';
 import { EstadisticaClienteCompras } from '../../../../models/estadisticas/usuario/estadistica-cliente-compras';
-import { ChartCardComponent } from '../../../shared/chart-card/chart-card.component';
+import { Page } from '../../../../models';
+import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
+import { NgChartsModule } from 'ng2-charts';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
     selector: 'app-compras-clientes',
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
+        ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
         MatTableModule,
         MatPaginatorModule,
         MatButtonModule,
         MatProgressSpinnerModule,
-        ChartCardComponent
+        NgChartsModule
     ],
     templateUrl: './compras-clientes.component.html',
     styleUrls: ['./compras-clientes.component.scss']
 })
+
 export class ComprasClientesComponent implements OnInit {
     data: EstadisticaClienteCompras[] = [];
     total = 0;
     pageSize = 10;
     pageIndex = 0;
+    ordenarPor = 'totalGastado';
     ascendente = false;
-    fechaInicio = '';
-    fechaFin = '';
-    isExportingCsv = false;
-    isExportingPdf = false;
 
-    // Datos para la gráfica
+    fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
+    fechaFin = new FormControl<Date | null>(new Date());
+
+    isExportingCsv = false;
+
     chartLabels: string[] = [];
-    chartData: number[] = [];
+    chartData: ChartDataset<'bar'>[] = [];
+    chartType: ChartType = 'bar';
+    chartOptions: ChartOptions = {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { ticks: { maxRotation: 45, minRotation: 45 } }
+        },
+        plugins: { legend: { display: false } }
+    };
 
     constructor(private svc: EstadisticaUsuarioService) { }
 
@@ -49,62 +66,97 @@ export class ComprasClientesComponent implements OnInit {
         this.load();
     }
 
-    load() {
+    load(event?: PageEvent) {
+        if (event) {
+            this.pageIndex = event.pageIndex;
+            this.pageSize = event.pageSize;
+        }
+
         this.svc.getComprasClientes(
-            this.fechaInicio,
-            this.fechaFin,
+            this.formatDate(this.fechaInicio.value),
+            this.formatDate(this.fechaFin.value),
             this.pageIndex,
             this.pageSize,
-            'totalGastado',
+            this.ordenarPor,
             this.ascendente
-        ).subscribe(res => {
-            this.data = res.content;
-            this.total = res.page.totalElements;
-            this.chartLabels = this.data.map(x => x.email);
-            this.chartData = this.data.map(x => x.totalGastado);
+        ).subscribe({
+            next: (res: Page<EstadisticaClienteCompras>) => {
+                this.data = res.content;
+                this.total = res.page.totalElements;
+                this.chartLabels = res.content.map(x => x.email);
+                this.chartData = [
+                    { data: res.content.map(x => x.totalGastado), backgroundColor: '#1976d2', label: 'Total Gastado' }
+                ];
+            },
+            error: err => console.error('Error cargando:', err)
         });
     }
 
-    pageChanged(e: PageEvent) {
-        this.pageIndex = e.pageIndex;
-        this.pageSize = e.pageSize;
+    filtrar() {
+        localStorage.setItem('filtrosComprasClientes', JSON.stringify({
+            fechaInicio: this.fechaInicio.value?.toISOString() || null,
+            fechaFin: this.fechaFin.value?.toISOString() || null
+        }));
+        this.pageIndex = 0;
         this.load();
     }
 
-    toggleSort() {
-        this.ascendente = !this.ascendente;
+    toggleSort(columna: string) {
+        if (this.ordenarPor === columna) {
+            this.ascendente = !this.ascendente;
+        } else {
+            this.ordenarPor = columna;
+            this.ascendente = true;
+        }
         this.load();
     }
 
     exportCsv() {
         this.isExportingCsv = true;
-        this.svc.exportComprasClientesCsv(this.fechaInicio, this.fechaFin).subscribe({
+        this.svc.exportComprasClientesCsv(
+            this.formatDate(this.fechaInicio.value),
+            this.formatDate(this.fechaFin.value)
+        ).subscribe({
             next: blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'compras_clientes.csv';
-                a.click();
-                window.URL.revokeObjectURL(url);
+                if (blob.size > 0) {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'compras_clientes.csv';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    alert('El archivo CSV vino vacío.');
+                }
             },
             complete: () => this.isExportingCsv = false,
-            error: () => this.isExportingCsv = false
+            error: () => {
+                this.isExportingCsv = false;
+                alert('Hubo un problema descargando el CSV. Intenta nuevamente.');
+            }
         });
     }
 
     exportPdf() {
-        this.isExportingPdf = true;
-        this.svc.exportComprasClientesPdf(this.fechaInicio, this.fechaFin).subscribe({
-            next: blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'compras_clientes.pdf';
-                a.click();
-                window.URL.revokeObjectURL(url);
-            },
-            complete: () => this.isExportingPdf = false,
-            error: () => this.isExportingPdf = false
+        const token = this.getCookie('access_token') || '';
+        const params = new URLSearchParams({
+            fechaInicio: this.formatDate(this.fechaInicio.value) || '',
+            fechaFin: this.formatDate(this.fechaFin.value) || '',
+            ordenarPor: this.ordenarPor,
+            ascendente: this.ascendente.toString(),
+            token
         });
+        const url = `http://localhost:8080/usuarios/estadisticas/compras-clientes/export/pdf?${params.toString()}`;
+        window.open(url, '_blank');
+    }
+
+    private formatDate(date: Date | null): string | undefined {
+        if (!date) return undefined;
+        return date.toISOString().slice(0, 10);
+    }
+
+    private getCookie(name: string): string | null {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
     }
 }

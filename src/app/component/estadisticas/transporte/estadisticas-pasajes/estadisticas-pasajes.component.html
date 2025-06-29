@@ -1,40 +1,96 @@
-<div class="filters">
-    <mat-form-field appearance="fill">
-      <mat-label>Fecha Inicio</mat-label>
-      <input matInput placeholder="YYYY-MM-DD" [formControl]="fechaInicio" />
-    </mat-form-field>
-  
-    <mat-form-field appearance="fill">
-      <mat-label>Fecha Fin</mat-label>
-      <input matInput placeholder="YYYY-MM-DD" [formControl]="fechaFin" />
-    </mat-form-field>
-  
-    <mat-form-field appearance="fill">
-      <mat-label>Origen</mat-label>
-      <mat-select [formControl]="origen">
-        <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  
-    <mat-form-field appearance="fill">
-      <mat-label>Destino</mat-label>
-      <mat-select [formControl]="destino">
-        <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  
+<h2 class="titulo">Estadísticas de Pasajes</h2>
+
+<form class="filtros">
+    <mat-form-field>
+        <mat-label>Fecha inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" [formControl]="fechaInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+    
+        <mat-form-field>
+        <mat-label>Fecha fin</mat-label>
+        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
+        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+    
+        <mat-form-field>
+        <mat-label>Origen</mat-label>
+        <mat-select [formControl]="origen">
+            <mat-option [value]="null">Todos</mat-option>
+            <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
+        </mat-select>
+        </mat-form-field>
+    
+        <mat-form-field>
+        <mat-label>Destino</mat-label>
+        <mat-select [formControl]="destino">
+            <mat-option [value]="null">Todos</mat-option>
+            <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
+        </mat-select>
+        </mat-form-field>
+    
+        <button mat-button (click)="filtrar()">Filtrar</button>
+    </form>
+    
     <div class="actions">
-      <button mat-button (click)="load()">Consultar</button>
-      <button mat-raised-button color="primary" (click)="exportCsv()">Exportar CSV</button>
+        <button mat-button [disabled]="downloadingCsv" (click)="exportResumenCsv()">
+            {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar Resumen CSV' }}
+        </button>
+        <button mat-raised-button color="primary" (click)="exportResumenPdf()">Descargar Resumen PDF</button>
+        <button mat-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()">
+            {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar Detalle CSV' }}
+        </button>
+        <button mat-raised-button color="accent" (click)="exportDetallePdf()">Descargar Detalle PDF</button>
     </div>
-  </div>
-  
-  <mat-card *ngIf="resultado">
-    <h3>Estadísticas de Pasajes</h3>
-    <p><strong>Destino:</strong> {{ resultado.destino }}</p>
-    <p><strong>Vendidos:</strong> {{ resultado.vendidos }}</p>
-    <p><strong>Devueltos:</strong> {{ resultado.devueltos }}</p>
-    <p><strong>Tasa Venta:</strong> {{ resultado.tasaVenta | number:'1.2-2' }}%</p>
-    <p><strong>Tasa Devolución:</strong> {{ resultado.tasaDevolucion | number:'1.2-2' }}%</p>
-  </mat-card>
-  
+    
+    <mat-card class="resumen-card" *ngIf="resumen">
+        <div class="resumen-row">
+        <div><strong>Destino:</strong> {{ resumen.destino }}</div>
+        <div><strong>Vendidos:</strong> {{ resumen.vendidos }}</div>
+        <div><strong>Devueltos:</strong> {{ resumen.devueltos }}</div>
+        <div><strong>Tasa venta:</strong> {{ resumen.tasaVenta | number:'1.2-2' }}%</div>
+        <div><strong>Tasa devolución:</strong> {{ resumen.tasaDevolucion | number:'1.2-2' }}%</div>
+        </div>
+    </mat-card>
+    
+    <div *ngIf="mostrarGrafico" class="grafico-container">
+        <canvas
+        baseChart
+        [data]="{ labels: chartLabels, datasets: chartData }"
+        [type]="chartType"
+        [options]="chartOptions"
+        height="250">
+        </canvas>
+    </div>
+    
+    <div class="tabla-container">
+        <table mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="destino">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('destino')">
+                Destino
+                <span *ngIf="ordenarPor==='destino'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let e">{{ e.destino }}</td>
+        </ng-container>
+    
+        <ng-container matColumnDef="vendidos">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('vendidos')">
+                Vendidos
+                <span *ngIf="ordenarPor==='vendidos'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let e">{{ e.vendidos }}</td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    
+        <mat-paginator
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        (page)="load($event)">
+        </mat-paginator>
+    </div>

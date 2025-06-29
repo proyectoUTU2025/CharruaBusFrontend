@@ -1,16 +1,43 @@
-:host {
-    display: block;
-    padding: 16px;
+$primary-color: #675992;
+
+.titulo {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: $primary-color;
 }
 
-.controls {
+.filtros {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    justify-content: center;
 }
 
-table.mat-elevation-z1 {
+table {
     width: 100%;
-    margin-bottom: 16px;
+}
+
+.grafico-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    max-width: 800px;
+    max-height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tabla-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+mat-paginator {
+    display: flex;
+    justify-content: center;
 }

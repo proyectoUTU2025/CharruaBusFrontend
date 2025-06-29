@@ -6,8 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EstadisticaUsuarioService } from '../../../../services/estadistica-usuario.service';
 import { EstadisticaUsuario } from '../../../../models/estadisticas/usuario/estadistica-usuario';
-import { ChartCardComponent } from '../../../shared/chart-card/chart-card.component';
 import { Page } from '../../../../models';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 
 @Component({
     selector: 'app-usuarios-por-tipo',
@@ -18,7 +19,7 @@ import { Page } from '../../../../models';
         MatPaginatorModule,
         MatButtonModule,
         MatProgressSpinnerModule,
-        ChartCardComponent
+        NgChartsModule
     ],
     templateUrl: './usuarios-por-tipo.component.html',
     styleUrls: ['./usuarios-por-tipo.component.scss']
@@ -28,13 +29,23 @@ export class UsuariosPorTipoComponent implements OnInit {
     total = 0;
     pageSize = 10;
     pageIndex = 0;
+    ordenarPor = 'tipo';
     ascendente = true;
 
-    isExportingCsv = false;
-    isExportingPdf = false;
+    downloadingCsv = false;
+    downloadingPdf = false;
 
     chartLabels: string[] = [];
-    chartData: number[] = [];
+    chartData: ChartDataset<'bar'>[] = [];
+    chartType: ChartType = 'bar';
+    chartOptions: ChartOptions = {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { ticks: { maxRotation: 45, minRotation: 45 } }
+        },
+        plugins: { legend: { display: false } }
+    };
 
     constructor(private svc: EstadisticaUsuarioService) { }
 
@@ -43,14 +54,17 @@ export class UsuariosPorTipoComponent implements OnInit {
     }
 
     load() {
-        this.svc
-            .getUsuariosPorTipo(this.pageIndex, this.pageSize, 'tipo', this.ascendente)
+        this.svc.getUsuariosPorTipo(this.pageIndex, this.pageSize, this.ordenarPor, this.ascendente)
             .subscribe({
                 next: (res: Page<EstadisticaUsuario>) => {
                     this.data = res.content;
                     this.total = res.page.totalElements;
                     this.chartLabels = this.data.map(x => x.tipo);
-                    this.chartData = this.data.map(x => x.cantidad);
+                    this.chartData = [{
+                        label: 'Usuarios por Tipo',
+                        data: this.data.map(x => x.cantidad),
+                        backgroundColor: '#1976d2'
+                    }];
                 },
                 error: err => console.error('Error cargando estadísticas:', err)
             });
@@ -62,40 +76,45 @@ export class UsuariosPorTipoComponent implements OnInit {
         this.load();
     }
 
-    toggleSort() {
-        this.ascendente = !this.ascendente;
+    toggleSort(campo: string) {
+        if (this.ordenarPor === campo) {
+            this.ascendente = !this.ascendente;
+        } else {
+            this.ordenarPor = campo;
+            this.ascendente = true;
+        }
         this.load();
     }
 
     exportCsv() {
-        this.isExportingCsv = true;
+        this.downloadingCsv = true;
         this.svc.exportUsuariosPorTipoCsv().subscribe({
             next: (blob: Blob) => {
-                const url = window.URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'usuarios_por_tipo.csv';
                 a.click();
-                window.URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
             },
-            complete: () => (this.isExportingCsv = false),
-            error: () => (this.isExportingCsv = false)
+            complete: () => this.downloadingCsv = false,
+            error: () => this.downloadingCsv = false
         });
     }
 
     exportPdf() {
-        this.isExportingPdf = true;
-        this.svc.exportUsuariosPorTipoPdf().subscribe({
-            next: (blob: Blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'usuarios_por_tipo.pdf';
-                a.click();
-                window.URL.revokeObjectURL(url);
-            },
-            complete: () => (this.isExportingPdf = false),
-            error: () => (this.isExportingPdf = false)
+        const token = this.getCookie('access_token') || '';
+        const params = new URLSearchParams({
+            ordenarPor: this.ordenarPor,
+            ascendente: this.ascendente.toString(),
+            token
         });
+        const url = `http://localhost:8080/usuarios/estadisticas/tipo/export/pdf?${params.toString()}`;
+        window.open(url, '_blank');
+    }
+
+    private getCookie(name: string): string | null {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
     }
 }

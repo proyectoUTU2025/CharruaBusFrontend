@@ -1,46 +1,49 @@
-<app-chart-card [title]="'Usuarios por Tipo'" [labels]="chartLabels" [data]="chartData">
-</app-chart-card>
+<h2 class="titulo">Estadísticas de cantidad de Usuarios</h2>
 
-<div class="controls">
-    <button mat-button (click)="toggleSort()">
-        Orden {{ ascendente ? '↑' : '↓' }}
+<div class="filtros">
+    <button mat-button [disabled]="downloadingCsv" (click)="exportCsv()">
+        {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar CSV' }}
     </button>
-
-    <button mat-raised-button color="primary" (click)="exportCsv()" [disabled]="isExportingCsv">
-        <ng-container *ngIf="!isExportingCsv; else csvTpl">
-            Exportar CSV
-        </ng-container>
-        <ng-template #csvTpl>
-            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-            &nbsp;Descargando CSV...
-        </ng-template>
-    </button>
-
-    <button mat-raised-button color="accent" (click)="exportPdf()" [disabled]="isExportingPdf">
-        <ng-container *ngIf="!isExportingPdf; else pdfTpl">
-            Exportar PDF
-        </ng-container>
-        <ng-template #pdfTpl>
-            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-            &nbsp;Descargando PDF...
-        </ng-template>
+    <button mat-button color="primary" (click)="exportPdf()">
+        Descargar PDF
     </button>
 </div>
 
-<table mat-table [dataSource]="data" class="mat-elevation-z1">
-    <ng-container matColumnDef="tipo">
-        <th mat-header-cell *matHeaderCellDef> Tipo </th>
-        <td mat-cell *matCellDef="let x"> {{ x.tipo }} </td>
-    </ng-container>
+<div class="grafico-container">
+    <canvas baseChart
+        [data]="{ labels: chartLabels, datasets: chartData }"
+        [type]="chartType"
+        [options]="chartOptions"
+        height="250">
+    </canvas>
+</div>
 
-    <ng-container matColumnDef="cantidad">
-        <th mat-header-cell *matHeaderCellDef> Cantidad </th>
-        <td mat-cell *matCellDef="let x"> {{ x.cantidad }} </td>
-    </ng-container>
+<div class="tabla-container">
+    <table mat-table [dataSource]="data">
+        <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('tipo')">
+                Tipo
+                <span *ngIf="ordenarPor==='tipo'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.tipo }}</td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['tipo','cantidad']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['tipo','cantidad']"></tr>
-</table>
+        <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidad')">
+                Cantidad
+                <span *ngIf="ordenarPor==='cantidad'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.cantidad }}</td>
+        </ng-container>
 
-<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="pageChanged($event)">
-</mat-paginator>
+        <tr mat-header-row *matHeaderRowDef="['tipo','cantidad']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['tipo','cantidad']"></tr>
+    </table>
+
+    <mat-paginator
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        (page)="pageChanged($event)">
+    </mat-paginator>
+</div>

@@ -65,7 +65,10 @@
       </button>
       <mat-menu #estadisticasMenu="matMenu">
         <ng-container *ngIf="userRole === 'VENDEDOR'">
-          <button mat-menu-item routerLink="/estadisticas/viajes-departamento">Viajes</button>
+          <button mat-menu-item (click)="navigateIfNeeded('/estadisticas/viajes-departamento')">
+            Viajes por Departamento
+          </button>
+          <button mat-menu-item routerLink="/estadisticas/viajes-por-omnibus">Viajes por Ómnibus</button>
           <button mat-menu-item routerLink="/estadisticas/mantenimientos-por-omnibus">Mantenimientos</button>
           <button mat-menu-item routerLink="/estadisticas/estadisticas-pasajes">Pasajes</button>
         </ng-container>

@@ -1,38 +1,64 @@
-<div class="filters">
-    <mat-form-field appearance="fill">
-        <mat-label>Fecha Inicio</mat-label>
-        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaInicio" />
+<h2 class="titulo">Estadísticas de Logueos por Usuario</h2>
+
+<div class="filtros">
+    <mat-form-field>
+        <mat-label>Fecha inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" [formControl]="fechaInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
     </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>Fecha Fin</mat-label>
-        <input matInput placeholder="YYYY-MM-DD" [(ngModel)]="fechaFin" />
+    
+    <mat-form-field>
+        <mat-label>Fecha fin</mat-label>
+        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
+        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
     </mat-form-field>
-    <button mat-button (click)="load()">Filtrar</button>
-    <button mat-raised-button color="primary" (click)="exportCsv()" [disabled]="isExporting">
-        <ng-container *ngIf="!isExporting; else exportingTpl">
-            Exportar CSV
-        </ng-container>
-        <ng-template #exportingTpl>
-            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-            &nbsp;Descargando...
-        </ng-template>
+
+    <button mat-button (click)="filtrar()">Filtrar</button>
+    <button mat-button [disabled]="downloadingCsv" (click)="exportCsv()">
+        {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar CSV' }}
+    </button>
+    <button mat-button color="primary" (click)="exportPdf()">
+        Descargar PDF
     </button>
 </div>
 
-<table mat-table [dataSource]="data" class="mat-elevation-z1">
-    <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>Email</th>
-        <td mat-cell *matCellDef="let x">{{ x.email }}</td>
-    </ng-container>
+<div class="grafico-container">
+    <canvas baseChart
+        [data]="{ labels: chartLabels, datasets: chartData }"
+        [type]="chartType"
+        [options]="chartOptions"
+        height="250">
+    </canvas>
+</div>
 
-    <ng-container matColumnDef="cantidadLogueos">
-        <th mat-header-cell *matHeaderCellDef>Logueos</th>
-        <td mat-cell *matCellDef="let x">{{ x.cantidadLogueos }}</td>
-    </ng-container>
+<div class="tabla-container">
+    <table mat-table [dataSource]="data">
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('email')">
+                Email
+                <span *ngIf="ordenarPor==='email'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.email }}</td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['email','cantidadLogueos']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['email','cantidadLogueos']"></tr>
-</table>
+        <ng-container matColumnDef="cantidadLogueos">
+            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidadLogueos')">
+                Logueos
+                <span *ngIf="ordenarPor==='cantidadLogueos'">{{ ascendente ? '↑' : '↓' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.cantidadLogueos }}</td>
+        </ng-container>
 
-<mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="pageChanged($event)">
-</mat-paginator>
+        <tr mat-header-row *matHeaderRowDef="['email','cantidadLogueos']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['email','cantidadLogueos']"></tr>
+    </table>
+
+    <mat-paginator
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        (page)="pageChanged($event)">
+    </mat-paginator>
+</div>

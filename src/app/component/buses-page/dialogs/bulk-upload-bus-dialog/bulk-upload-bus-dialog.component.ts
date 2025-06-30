@@ -1,20 +1,33 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BusService } from '../../../../services/bus.service';
+import { BulkLineResult } from '../../../../models/bulk/bulk-line-result.dto';
+import { BulkResponseDto } from '../../../../models/bulk/bulk-response.dto';
+import { BulkErrorsDialogComponent } from '../bulk-errors-dialog/bulk-errors-dialog.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 @Component({
   standalone: true,
   selector: 'app-bulk-upload-bus-dialog',
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './bulk-upload-bus-dialog.component.html',
   styleUrls: ['./bulk-upload-bus-dialog.component.scss']
 })
 export class BulkUploadBusDialogComponent {
   file: File | null = null;
+  loading = false;
 
-  constructor(private dialogRef: MatDialogRef<BulkUploadBusDialogComponent>) {}
+  constructor(
+    private dialogRef: MatDialogRef<BulkUploadBusDialogComponent>,
+    private busService: BusService,
+    private dialog: MatDialog,
+    private materialUtils: MaterialUtilsService
+  ) {}
 
   onFileDrop(event: DragEvent) {
     event.preventDefault();
@@ -39,7 +52,35 @@ export class BulkUploadBusDialogComponent {
   }
 
   process() {
-    this.dialogRef.close(this.file);
+    if (!this.file) return;
+    
+    this.loading = true; // Inicia la carga
+
+    this.busService.bulkUpload(this.file)
+      .then((resp: BulkResponseDto) => {
+        this.loading = false;
+
+        const schemaError = resp.results.find(r => r.fila === 0 && !r.creado);
+
+        if (schemaError) {
+          this.materialUtils.showError(schemaError.mensaje, { duration: 4000 });
+          this.dialogRef.close();
+        } else {
+          this.dialogRef.close(true);
+          this.dialog.open(BulkErrorsDialogComponent, {
+            width: '500px',
+            data: resp.results,
+            disableClose: true,
+          });
+        }
+      })
+      .catch((error: HttpErrorResponse) => {
+        this.loading = false;
+        const errorMessage = error.error?.message || 'Ocurrió un error inesperado.';
+        
+        this.materialUtils.showError(errorMessage, { duration: 4000 });
+        this.dialogRef.close();
+      });
   }
 
   cancel() {

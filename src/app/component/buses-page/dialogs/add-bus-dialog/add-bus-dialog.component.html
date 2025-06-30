@@ -1,23 +1,48 @@
-<h2 mat-dialog-title>Agregar Ómnibus</h2>
+<div class="dialog-header">
+  <h2 class="dialog-title">Agregar Nuevo Ómnibus</h2>
+</div>
 
-<mat-dialog-content [formGroup]="form">
-  <mat-form-field appearance="fill">
-    <mat-label>Matrícula</mat-label>
-    <input matInput formControlName="matricula" />
-  </mat-form-field>
+<div mat-dialog-content class="dialog-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Localidad ID</mat-label>
-    <input matInput type="number" formControlName="localidadId" />
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Matrícula</mat-label>
+      <input matInput formControlName="matricula" required />
+      <mat-error *ngIf="form.get('matricula')?.hasError('required')">La matrícula es obligatoria.</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Cantidad de Asientos</mat-label>
-    <input matInput type="number" formControlName="cantidadAsientos" />
-  </mat-form-field>
-</mat-dialog-content>
+    <mat-form-field appearance="outline">
+      <mat-label>Ubicación</mat-label>
+      <mat-select formControlName="localidadId" required>
+        <mat-option *ngFor="let localidad of localidades" [value]="localidad.id">
+          {{ localidad.nombreConDepartamento }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('localidadId')?.hasError('required')">La ubicación es obligatoria.</mat-error>
+    </mat-form-field>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="save-btn" (click)="save()">Guardar</button>
-</mat-dialog-actions>
+    <mat-form-field appearance="outline">
+      <mat-label>Cantidad de Asientos</mat-label>
+      <input matInput type="number" formControlName="cantidadAsientos" required min="1" />
+      <mat-error *ngIf="form.get('cantidadAsientos')?.hasError('required')">La cantidad de asientos es obligatoria.</mat-error>
+      <mat-error *ngIf="form.get('cantidadAsientos')?.hasError('min')">Debe tener al menos 1 asiento.</mat-error>
+    </mat-form-field>
+
+
+    
+    <div *ngIf="error" class="error-banner">
+      {{ error }}
+    </div>
+
+    <div class="actions" mat-dialog-actions>
+      <button mat-stroked-button class="cancel-btn" type="button" (click)="onCancel()" [disabled]="loading">Cancelar</button>
+      <button mat-flat-button class="create-btn" type="submit" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
+    </div>
+  </form>
+</div>

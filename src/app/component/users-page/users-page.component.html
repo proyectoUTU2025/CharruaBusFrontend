@@ -85,8 +85,17 @@
       [diameter]="40">
     </app-loading-spinner>
 
+    <!-- Sin resultados -->
+    <div *ngIf="!isLoading && hasSearched && dataSource.data.length === 0" class="no-results-container">
+      <div class="no-results-content">
+        <mat-icon class="no-results-icon">people</mat-icon>
+        <h3>No se encontraron usuarios</h3>
+        <p>No hay usuarios que coincidan con los filtros especificados.</p>
+      </div>
+    </div>
+
     <!-- Table content -->
-    <div *ngIf="!isLoading" class="table-container">
+    <div *ngIf="!isLoading && !(hasSearched && dataSource.data.length === 0)" class="table-container">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z1" matSort matSortDisableClear>
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
@@ -144,7 +153,7 @@
       </table>
     </div>
     <mat-paginator
-      *ngIf="!isLoading"
+      *ngIf="!isLoading && dataSource.data.length > 0"
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="pageIndex"

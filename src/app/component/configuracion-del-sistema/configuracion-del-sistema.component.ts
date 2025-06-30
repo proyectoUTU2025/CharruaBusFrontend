@@ -48,6 +48,7 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
     currentPage = 0;
     filtroNombre = '';
     isLoading = false;
+    hasSearched = false;
 
     constructor(
         private service: ConfiguracionDelSistemaService,
@@ -62,6 +63,7 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
 
     load(page = 0, size = 10) {
         this.isLoading = true;
+        this.hasSearched = true;
         this.service.list(this.filtroNombre.trim() || undefined, page, size).subscribe({
             next: pageData => {
                 this.dataSource.data = pageData.content;

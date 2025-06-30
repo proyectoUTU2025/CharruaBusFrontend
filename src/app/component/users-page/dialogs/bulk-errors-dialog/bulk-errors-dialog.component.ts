@@ -44,7 +44,7 @@ export class BulkErrorsDialogComponent {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'resultado_carga_masiva.csv';
+    a.download = 'resultado_carga_masiva_usuarios.csv';
     a.click();
     URL.revokeObjectURL(url);
   }

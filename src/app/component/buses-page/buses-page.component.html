@@ -1,76 +1,112 @@
+<div class="buses-page-container">
   <div class="page-header">
     <h1>Gestión de Ómnibus</h1>
     <p>Crear y administrar ómnibus en el sistema.</p>
   </div>
+  
   <div class="content-card">
     <form [formGroup]="filterForm" class="filters-container">
       <div class="filter-field">
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline" class="search-field">
           <mat-label>Matrícula</mat-label>
-          <input matInput formControlName="matricula" />
+          <input matInput formControlName="matricula" placeholder="Buscar por matrícula">
         </mat-form-field>
       </div>
       <div class="filter-field">
-        <mat-form-field appearance="fill">
-          <mat-label>Localidad</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Ubicación del Ómnibus</mat-label>
           <mat-select formControlName="localidadId">
-            <mat-option [value]="null">-- Todas --</mat-option>
+            <mat-option [value]="null">TODAS LAS UBICACIONES</mat-option>
             <mat-option *ngFor="let loc of localidades" [value]="loc.id">
               {{ loc.nombreConDepartamento }}
             </mat-option>
           </mat-select>
+          <mat-hint>Requiere indicar salida y llegada</mat-hint>
         </mat-form-field>
       </div>
-      <div class="filter-field">
-        <mat-form-field appearance="fill">
+      <div class="filter-field compact-field">
+        <mat-form-field appearance="outline">
           <mat-label>Min. Asientos</mat-label>
-          <input matInput type="number" formControlName="minAsientos" />
+          <input matInput type="number" formControlName="minAsientos" min="0">
+          <mat-hint>≤ Máximo</mat-hint>
         </mat-form-field>
       </div>
-      <div class="filter-field">
-        <mat-form-field appearance="fill">
+      <div class="filter-field compact-field">
+        <mat-form-field appearance="outline">
           <mat-label>Max. Asientos</mat-label>
-          <input matInput type="number" formControlName="maxAsientos" />
+          <input matInput type="number" formControlName="maxAsientos" min="0">
+          <mat-hint>≥ Mínimo</mat-hint>
         </mat-form-field>
       </div>
-      <div class="filter-field">
-        <mat-form-field appearance="fill">
-          <mat-label>Fecha Salida</mat-label>
-          <input matInput [matDatepicker]="dpS" formControlName="fechaSalida" />
-          <mat-datepicker-toggle matSuffix [for]="dpS"></mat-datepicker-toggle>
-          <mat-datepicker #dpS></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Hora Salida</mat-label>
-          <input matInput type="time" formControlName="horaSalida" />
+      <div class="filter-field compact-field">
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="activo">
+            <mat-option [value]="null">TODOS</mat-option>
+            <mat-option [value]="true">ACTIVOS</mat-option>
+            <mat-option [value]="false">INACTIVOS</mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
-
-      <div class="filter-field">
-        <mat-form-field appearance="fill">
-          <mat-label>Fecha Llegada</mat-label>
-          <input matInput [matDatepicker]="dpL" formControlName="fechaLlegada" />
-          <mat-datepicker-toggle matSuffix [for]="dpL"></mat-datepicker-toggle>
-          <mat-datepicker #dpL></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Hora Llegada</mat-label>
-          <input matInput type="time" formControlName="horaLlegada" />
-        </mat-form-field>
+      
+      <!-- Fecha y Hora de Salida -->
+      <div class="filter-field datetime-field">
+        <div class="datetime-group">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Fecha Salida</mat-label>
+            <input matInput [matDatepicker]="dpSalida" formControlName="fechaSalida">
+            <mat-datepicker-toggle matSuffix [for]="dpSalida"></mat-datepicker-toggle>
+            <mat-datepicker #dpSalida></mat-datepicker>
+            <mat-hint>Requerida si especifica ubicación</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Hora</mat-label>
+            <mat-select formControlName="horaSalida">
+              <mat-option value="">Sin especificar (00:00)</mat-option>
+              <mat-option *ngFor="let hora of horasDisponibles" [value]="hora.value">
+                {{ hora.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      
+      <!-- Fecha y Hora de Llegada -->
+      <div class="filter-field datetime-field">
+        <div class="datetime-group">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Fecha Llegada</mat-label>
+            <input matInput [matDatepicker]="dpLlegada" formControlName="fechaLlegada">
+            <mat-datepicker-toggle matSuffix [for]="dpLlegada"></mat-datepicker-toggle>
+            <mat-datepicker #dpLlegada></mat-datepicker>
+            <mat-hint>Requerida si especifica ubicación</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Hora</mat-label>
+            <mat-select formControlName="horaLlegada">
+              <mat-option value="">Sin especificar (00:00)</mat-option>
+              <mat-option *ngFor="let hora of horasDisponibles" [value]="hora.value">
+                {{ hora.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
       </div>
       <div class="filter-actions">
         <div class="action-buttons">
           <button mat-flat-button class="create-btn" (click)="onSearch()">Buscar</button>
           <button mat-stroked-button class="massive-btn" (click)="onClear()">Limpiar</button>
         </div>
-      <mat-checkbox formControlName="activo">Activos</mat-checkbox>
       </div>
     </form>
   </div>
+
   <div class="buses-card">
-    <div class="table-header">
-      <span class="card-title">Lista de Ómnibus</span>
-      <div class="actions">
+    <div class="table-header-row">
+      <div class="table-header-title">
+        <span class="card-title">Lista de Ómnibus</span>
+      </div>
+      <div class="table-header-actions">
         <button mat-stroked-button class="massive-btn" (click)="openBulkUpload()">
           <mat-icon>upload_file</mat-icon> Alta Masiva
         </button>
@@ -80,53 +116,73 @@
       </div>
     </div>
 
-    <table mat-table [dataSource]="buses" class="mat-elevation-z1">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let b">{{ b.id }}</td>
-      </ng-container>
+    <!-- Loading spinner -->
+    <app-loading-spinner 
+      *ngIf="isLoading" 
+      type="spinner" 
+      message="Cargando ómnibus..."
+      [diameter]="40">
+    </app-loading-spinner>
 
-      <ng-container matColumnDef="matricula">
-        <th mat-header-cell *matHeaderCellDef>Matrícula</th>
-        <td mat-cell *matCellDef="let b">{{ b.matricula }}</td>
-      </ng-container>
+    <!-- Sin resultados -->
+    <div *ngIf="!isLoading && hasSearched && buses.length === 0" class="no-results-container">
+      <div class="no-results-content">
+        <mat-icon class="no-results-icon">directions_bus_filled</mat-icon>
+        <h3>No se encontraron ómnibus</h3>
+        <p>No hay ómnibus que coincidan con los filtros especificados.</p>
+      </div>
+    </div>
 
-      <ng-container matColumnDef="ubicacionActual">
-        <th mat-header-cell *matHeaderCellDef>Ubicación</th>
-        <td mat-cell *matCellDef="let b">{{ b.ubicacionActual }}</td>
-      </ng-container>
+    <!-- Table content -->
+    <div *ngIf="!isLoading && !(hasSearched && buses.length === 0)" class="table-container">
+      <table mat-table [dataSource]="buses" class="mat-elevation-z1" matSort matSortDisableClear>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
+          <td mat-cell *matCellDef="let b">{{ b.id }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="capacidad">
-        <th mat-header-cell *matHeaderCellDef>Asientos</th>
-        <td mat-cell *matCellDef="let b">{{ b.capacidad }}</td>
-      </ng-container>
+        <ng-container matColumnDef="matricula">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="matricula">Matrícula</th>
+          <td mat-cell *matCellDef="let b">{{ b.matricula }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="activo">
-        <th mat-header-cell *matHeaderCellDef>Estado</th>
-        <td mat-cell *matCellDef="let b">
-          <span [ngClass]="b.activo ? 'badge-active' : 'badge-inactive'" class="badge">
-            {{ b.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="ubicacionActual">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="ubicacionActual">Ubicación</th>
+          <td mat-cell *matCellDef="let b">{{ b.ubicacionActual }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef>Acciones</th>
-        <td mat-cell *matCellDef="let b" class="actions-cell">          
-          <button mat-icon-button
-              color="primary"
-              [attr.aria-label]="'Ver detalle ómnibus ' + b.id"
-              (click)="goToBusDetail(b)">
-            <mat-icon>visibility</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="capacidad">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="capacidad">Asientos</th>
+          <td mat-cell *matCellDef="let b">{{ b.capacidad }}</td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
-    </table>
+        <ng-container matColumnDef="activo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="activo">Estado</th>
+          <td mat-cell *matCellDef="let b">
+            <span [ngClass]="b.activo ? 'badge-active' : 'badge-inactive'" class="badge">
+              {{ b.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+          <td mat-cell *matCellDef="let b" class="acciones-cell">
+            <div class="action-buttons-container">
+              <button mat-icon-button class="icon-btn" (click)="goToBusDetail(b)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+      </table>
+    </div>
 
     <mat-paginator
+      *ngIf="!isLoading && buses.length > 0"
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="pageIndex"
@@ -134,3 +190,4 @@
       showFirstLastButtons>
     </mat-paginator>
   </div>
+</div>

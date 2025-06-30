@@ -31,6 +31,7 @@ export class UsersPageComponent implements OnInit {
   totalElements = 0;
   filterForm: FormGroup;
   bulkErrors: string[] = [];
+  hasSearched = false;
 
   roles = Object.values(TipoRol) 
     .map(value => ({ value, viewValue: value }));
@@ -108,6 +109,7 @@ export class UsersPageComponent implements OnInit {
     if (!isSortRequest) {
       this.isLoading = true;
     }
+    this.hasSearched = true;
     const { nombre, apellido, email, documento, rol, estado } = this.filterForm.value;
 
     const filtro: FiltroBusquedaUsuarioDto = {

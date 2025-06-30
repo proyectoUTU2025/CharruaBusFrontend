@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -8,8 +8,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AltaBusDto, BusDto } from '../../../../models/buses/bus.model.dto';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AltaBusDto } from '../../../../models/buses/bus.model.dto';
+import { LocalidadService } from '../../../../services/localidades.service';
+import { LocalidadNombreDepartamentoDto } from '../../../../models/localidades/localidad-nombre-departamento-dto.model';
 
 @Component({
   standalone: true,
@@ -23,39 +25,64 @@ import { AltaBusDto, BusDto } from '../../../../models/buses/bus.model.dto';
     MatSelectModule,
     MatCheckboxModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './add-bus-dialog.component.html',
   styleUrls: ['./add-bus-dialog.component.scss']
 })
-export class AddBusDialogComponent {
+export class AddBusDialogComponent implements OnInit {
   form: FormGroup;
-  localidades = ['Montevideo', 'Punta del Este', 'Colonia', 'Paysandú', 'Salto', 'Durazno', 'San José'];
+  localidades: LocalidadNombreDepartamentoDto[] = [];
+  loading = false;
+  error: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AddBusDialogComponent>
+    private dialogRef: MatDialogRef<AddBusDialogComponent>,
+    private localidadService: LocalidadService
   ) {
     this.form = this.fb.group({
       matricula: ['', Validators.required],
       localidadId: [null, Validators.required],
-      cantidadAsientos: [1, [Validators.required, Validators.min(1)]],
+      cantidadAsientos: [1, [Validators.required, Validators.min(1)]]
     });
-
   }
 
-save(): void {
-  if (this.form.valid) {
-    const alta: AltaBusDto = {
-      matricula: this.form.value.matricula,
-      cantidadAsientos: this.form.value.cantidadAsientos,
-      localidadId: parseInt(this.form.value.localidadId, 10)
-    };
-    this.dialogRef.close(alta);
+  ngOnInit() {
+    this.localidadService.getAllFlat().subscribe({
+      next: (localidades) => {
+        this.localidades = localidades;
+      },
+      error: (error) => {
+        console.error('Error al cargar localidades:', error);
+        this.error = 'Error al cargar las ubicaciones. Por favor, intenta nuevamente.';
+      }
+    });
   }
-}
+
+  onSubmit(): void {
+    if (this.form.valid && !this.loading) {
+      const alta: AltaBusDto = {
+        matricula: this.form.value.matricula,
+        cantidadAsientos: this.form.value.cantidadAsientos,
+        localidadId: this.form.value.localidadId
+      };
+      
+      this.dialogRef.close(alta);
+    }
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+
+  // Método legacy para compatibilidad
+  save(): void {
+    this.onSubmit();
+  }
 
   cancel(): void {
-    this.dialogRef.close();
+    this.onCancel();
   }
 }

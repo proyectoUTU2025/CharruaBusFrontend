@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -12,6 +12,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
+import { MaterialUtilsService } from '../../shared/material-utils.service';
 import { AltaBusDto, FiltroBusquedaBusDto, BusDto, Page } from '../../models';
 import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
 import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
@@ -22,8 +28,7 @@ import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-err
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { LocalidadService } from '../../services/localidades.service';
 import { firstValueFrom } from 'rxjs';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-buses-page',
@@ -41,16 +46,22 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatIconModule,
     MatDialogModule,
     MatCardModule,
+    MatSortModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSnackBarModule,
+    LoadingSpinnerComponent,
     AddBusDialogComponent,
     BulkUploadBusDialogComponent,
-    BulkErrorsDialogComponent,
-    MatNativeDateModule,
-    MatDatepickerModule
+    BulkErrorsDialogComponent
   ],
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
 })
 export class BusesPageComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   filterForm: FormGroup;
   buses: BusDto[] = [];
   totalElements = 0;
@@ -58,19 +69,19 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   pageSize = 5;
   columns = ['id', 'matricula', 'capacidad','ubicacionActual', 'activo', 'acciones'];
   localidades: LocalidadNombreDepartamentoDto[] = [];
-  horaSalida = '';
-  horaLlegada = '';
-  fechaSalida: Date | null = null;
-  fechaLlegada: Date | null = null;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  isLoading = false;
+  hasSearched = false;
+  
+  horasDisponibles = this.generateTimeOptions();
 
   constructor(
     private fb: FormBuilder,
     private busService: BusService,
     private dialog: MatDialog,
     private localidadesService: LocalidadService,
-    private router: Router
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef,
+    private materialUtils: MaterialUtilsService
   ) {
     this.filterForm = this.fb.group({
       matricula: [''],
@@ -79,10 +90,23 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       maxAsientos: [null],
       activo: [null],
       fechaSalida: [null],
-      fechaLlegada: [null],
       horaSalida: [''],
+      fechaLlegada: [null],
       horaLlegada: ['']
     });
+  }
+
+  private generateTimeOptions() {
+    const options = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 5) {
+        const hour = h.toString().padStart(2, '0');
+        const minute = m.toString().padStart(2, '0');
+        const time = `${hour}:${minute}`;
+        options.push({ value: time, label: time });
+      }
+    }
+    return options;
   }
 
   async ngOnInit() { 
@@ -90,51 +114,187 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.paginator.page.subscribe((e: PageEvent) => {
-      this.pageIndex = e.pageIndex;
-      this.pageSize = e.pageSize;
-      this.loadBuses();
+    if (this.paginator) {
+      this.paginator.page.subscribe((e: PageEvent) => {
+        this.pageIndex = e.pageIndex;
+        this.pageSize = e.pageSize;
+        // Solo recargar si ya se hizo una búsqueda previa
+        if (this.hasSearched) {
+          this.loadBuses();
+        }
+      });
+    }
+    
+    // Cargar datos iniciales sin filtros
+    setTimeout(() => {
+      this.loadInitialData();
     });
-    this.loadBuses();
+  }
+
+  loadInitialData() {
+    // Cargar datos iniciales sin filtros
+    this.isLoading = true;
+    const filtro: FiltroBusquedaBusDto = {};
+    
+    this.busService.getAll(filtro, 0, this.pageSize)
+      .then((res: Page<BusDto>) => {
+        console.log('Respuesta del backend:', res); // Debug
+        this.buses = res.content || [];
+        this.totalElements = res.page?.totalElements || 0;
+        this.pageIndex = res.page?.number || 0;
+        this.pageSize = res.page?.size || this.pageSize;
+      })
+      .catch((error) => {
+        console.error('Error al cargar datos:', error);
+        this.materialUtils.showError('Error al cargar los datos. Por favor, intenta nuevamente.');
+        this.buses = [];
+        this.totalElements = 0;
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   private loadBuses() {
+    this.isLoading = true;
+    this.hasSearched = true;
     const f = this.filterForm.value;
-    const buildDateTime = (d: Date, h: string) => {
-    const [hh, mm] = h.split(':').map(Number);
-    const dt = new Date(d);
-    dt.setHours(hh, mm);
-    return dt.toISOString();
-    }
+    
+    // Función para combinar fecha y hora (manteniendo zona horaria local)
+    const buildDateTime = (fecha: Date | null, hora: string): string | undefined => {
+      if (!fecha) return undefined;
+      
+      // Si no hay hora especificada, usar 00:00 por defecto
+      const timeToUse = hora || '00:00';
+      const [hh, mm] = timeToUse.split(':').map(Number);
+      const dt = new Date(fecha);
+      dt.setHours(hh, mm, 0, 0);
+      
+      // Formatear como YYYY-MM-DDTHH:mm:ss sin conversión de zona horaria
+      const year = dt.getFullYear();
+      const month = (dt.getMonth() + 1).toString().padStart(2, '0');
+      const day = dt.getDate().toString().padStart(2, '0');
+      const hours = dt.getHours().toString().padStart(2, '0');
+      const minutes = dt.getMinutes().toString().padStart(2, '0');
+      const seconds = dt.getSeconds().toString().padStart(2, '0');
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    };
+    
     const filtro: FiltroBusquedaBusDto = {
       matricula: f.matricula,
       localidadId: f.localidadId ?? undefined,
       minAsientos: f.minAsientos ?? undefined,
       maxAsientos: f.maxAsientos ?? undefined,
       activo: f.activo ?? undefined,
-      fechaHoraSalida:   f.fechaSalida && f.horaSalida ? buildDateTime(f.fechaSalida, f.horaSalida): undefined,
-      fechaHoraLlegada:  f.fechaLlegada && f.horaLlegada ? buildDateTime(f.fechaLlegada, f.horaLlegada) : undefined
-      };
+      fechaHoraSalida: buildDateTime(f.fechaSalida, f.horaSalida),
+      fechaHoraLlegada: buildDateTime(f.fechaLlegada, f.horaLlegada)
+    };
+    
     this.busService.getAll(filtro, this.pageIndex, this.pageSize)
       .then((res: Page<BusDto>) => {
-        this.buses = res.content;
-        this.totalElements = res.page.totalElements;
-        this.pageIndex = res.page.number;
-        this.pageSize = res.page.size;
+        console.log('Respuesta del backend:', res); // Debug
+        this.buses = res.content || [];
+        this.totalElements = res.page?.totalElements || 0;
+        this.pageIndex = res.page?.number || 0;
+        this.pageSize = res.page?.size || this.pageSize;
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error('Error al cargar datos:', error);
+        this.materialUtils.showError('Error al cargar los datos. Por favor, intenta nuevamente.');
+        this.buses = [];
+        this.totalElements = 0;
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   onSearch() {
-    this.paginator.firstPage();
+    const f = this.filterForm.value;
+    
+    // 1. Validaciones de asientos
+    if (f.minAsientos !== null && f.maxAsientos !== null) {
+      if (f.minAsientos > f.maxAsientos) {
+        this.materialUtils.showError('El mínimo de asientos no puede ser mayor que el máximo.');
+        return;
+      }
+    }
+    
+    if (f.minAsientos !== null && f.minAsientos < 0) {
+      this.materialUtils.showError('El mínimo de asientos no puede ser negativo.');
+      return;
+    }
+    
+    if (f.maxAsientos !== null && f.maxAsientos < 0) {
+      this.materialUtils.showError('El máximo de asientos no puede ser negativo.');
+      return;
+    }
+    
+    // 2. Validaciones de fechas
+    const tieneFechaSalida = f.fechaSalida !== null;
+    const tieneFechaLlegada = f.fechaLlegada !== null;
+    
+    // Ambas fechas deben estar presentes o ambas ausentes
+    if (tieneFechaSalida !== tieneFechaLlegada) {
+      this.materialUtils.showError('Si especificas fecha de salida, también debes especificar fecha de llegada y viceversa.');
+      return;
+    }
+    
+    // Si hay ambas fechas, validar orden temporal
+    if (tieneFechaSalida && tieneFechaLlegada) {
+      const fechaSalida = new Date(f.fechaSalida);
+      const fechaLlegada = new Date(f.fechaLlegada);
+      
+      // Aplicar horas específicas si están presentes
+      if (f.horaSalida && f.horaLlegada) {
+        const [hSalida, mSalida] = f.horaSalida.split(':').map(Number);
+        const [hLlegada, mLlegada] = f.horaLlegada.split(':').map(Number);
+        
+        fechaSalida.setHours(hSalida, mSalida, 0, 0);
+        fechaLlegada.setHours(hLlegada, mLlegada, 0, 0);
+      }
+      
+      if (fechaLlegada <= fechaSalida) {
+        this.materialUtils.showError('La fecha/hora de llegada debe ser posterior a la fecha/hora de salida.');
+        return;
+      }
+    }
+    
+    // 3. Validaciones de dependencias: Fechas ↔ Ubicación
+    const tieneFechas = tieneFechaSalida && tieneFechaLlegada;
+    const tieneLocalidad = f.localidadId && f.localidadId !== null;
+    
+    if (tieneFechas && !tieneLocalidad) {
+      this.materialUtils.showError('Si especificas fechas de salida y llegada, también debes seleccionar una ubicación del ómnibus.');
+      return;
+    }
+    
+    if (tieneLocalidad && !tieneFechas) {
+      this.materialUtils.showError('Si especificas una ubicación del ómnibus, también debes especificar las fechas de salida y llegada.');
+      return;
+    }
+    
+    // 4. Todas las validaciones pasaron - proceder con la búsqueda
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
     this.loadBuses();
   }
 
   onClear() {
     this.filterForm.reset({
-      matricula: '', localidadId: null,
-      minAsientos: null, maxAsientos: null,
-      activo: null
+      matricula: '', 
+      localidadId: null,
+      minAsientos: null, 
+      maxAsientos: null,
+      activo: null,
+      fechaSalida: null,
+      horaSalida: '',
+      fechaLlegada: null,
+      horaLlegada: ''
     });
     this.onSearch();
   }
@@ -167,8 +327,27 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       .subscribe((alta: AltaBusDto | undefined) => {
         if (!alta) return;
         this.busService.create(alta)
-          .then(() => this.onSearch())
-          .catch(console.error);
+          .then(() => {
+            this.materialUtils.showSuccess('Ómnibus creado exitosamente.');
+            this.onSearch();
+          })
+          .catch((error: HttpErrorResponse | any) => {
+            console.error('Error al crear ómnibus:', error);
+            
+            // Extraer mensaje específico del backend
+            let errorMessage = 'Error al crear el ómnibus. Por favor, intenta nuevamente.';
+            
+            // Para errores HTTP, el mensaje está en error.error.message o error.error
+            if (error?.error?.message) {
+              errorMessage = error.error.message;
+            } else if (typeof error?.error === 'string') {
+              errorMessage = error.error;
+            } else if (error?.message) {
+              errorMessage = error.message;
+            }
+            
+            this.materialUtils.showError(errorMessage);
+          });
       });
   }
 
@@ -184,4 +363,6 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   goToBusDetail(bus: BusDto) {
     this.router.navigate(['/omnibus', bus.id]);
   }
+
+
 }

@@ -35,7 +35,17 @@
         message="Cargando configuraciones..."
         [diameter]="40">
       </app-loading-spinner>
-      <table *ngIf="!isLoading" mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+
+      <!-- Sin resultados -->
+      <div *ngIf="!isLoading && hasSearched && dataSource.data.length === 0" class="no-results-container">
+        <div class="no-results-content">
+          <mat-icon class="no-results-icon">settings</mat-icon>
+          <h3>No se encontraron configuraciones</h3>
+          <p>No hay configuraciones que coincidan con la búsqueda.</p>
+        </div>
+      </div>
+
+      <table *ngIf="!isLoading && !(hasSearched && dataSource.data.length === 0)" mat-table [dataSource]="dataSource" class="mat-elevation-z1">
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
           <td mat-cell *matCellDef="let c">{{ c.id }}</td>
@@ -70,7 +80,7 @@
       </table>
     </div>
     <mat-paginator
-      *ngIf="!isLoading"
+      *ngIf="!isLoading && dataSource.data.length > 0"
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="currentPage"

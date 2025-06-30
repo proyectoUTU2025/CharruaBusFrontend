@@ -7,6 +7,9 @@
     <mat-form-field appearance="outline">
       <mat-label>Parámetro</mat-label>
       <input matInput formControlName="nombre" />
+      <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+        El parámetro es obligatorio.
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -25,7 +28,7 @@
 
     <div class="actions" mat-dialog-actions>
       <button mat-stroked-button class="cancel-btn" type="button" (click)="cancel()">Cancelar</button>
-      <button mat-flat-button class="create-btn" type="button" (click)="save()" [disabled]="!form.valid">Crear</button>
+      <button mat-flat-button class="create-btn" type="button" (click)="save()" [disabled]="!form.valid">Guardar</button>
     </div>
   </form>
 </div>

@@ -48,9 +48,6 @@
       <button mat-button routerLink="/pasaje-history" routerLinkActive="active-link" class="nav-btn">
         <mat-icon class="nav-icon">history</mat-icon> <span class="nav-text">Mis pasajes</span>
       </button>
-      <button mat-button routerLink="/profile-page" routerLinkActive="active-link" class="nav-btn">
-        <mat-icon class="nav-icon">account_circle</mat-icon> <span class="nav-text">Perfil</span>
-      </button>
     </ng-container>
 
     <!-- ADMIN - VENDEDOR: ESTADÍSTICAS -->
@@ -75,6 +72,11 @@
       </mat-menu>
     </ng-container>
 
+    <!-- Botones comunes para todos los usuarios logueados -->
+    <button mat-button routerLink="/perfil" routerLinkActive="active-link" class="nav-btn">
+      <mat-icon class="nav-icon">account_circle</mat-icon> <span class="nav-text">Mi Perfil</span>
+    </button>
+    
     <!-- Cierre de sesión -->
     <button mat-stroked-button class="logout-button" (click)="onLogout()">
       <mat-icon>logout</mat-icon> <span class="logout-text">Cerrar sesión</span>

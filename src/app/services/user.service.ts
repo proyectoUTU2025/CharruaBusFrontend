@@ -72,7 +72,7 @@ export class UserService {
   changePassword(dto: ChangePasswordRequestDto): Promise<void> {
     return firstValueFrom(
       this.http.post<void>(
-        `${environment.apiBaseUrl}/auth/change-password`,
+        `${environment.apiBaseUrl}/usuarios/change-password`,
         dto
       )
     );

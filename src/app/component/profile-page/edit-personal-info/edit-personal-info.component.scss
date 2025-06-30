@@ -1,0 +1,136 @@
+mat-card {
+    width: 100%;
+}
+
+mat-card-header {
+    position: relative;
+}
+
+.card-header-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header-actions {
+    margin-left: auto;
+    padding-left: 16px;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+mat-form-field {
+    flex-grow: 1;
+}
+
+mat-card-actions {
+    margin-top: 16px;
+}
+
+mat-icon[mat-card-avatar] {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #1976d2;
+}
+
+.chip-active {
+    background-color: #e6f4ea !important;
+    color: #2e7d32 !important;
+    border: 1.5px solid #2e7d32;
+    font-weight: 500;
+    padding: 0 12px;
+    border-radius: 16px;
+}
+
+.chip-inactive {
+    background-color: #fdecea !important;
+    color: #c62828 !important;
+    border: 1.5px solid #c62828;
+    font-weight: 500;
+    padding: 0 12px;
+    border-radius: 16px;
+}
+
+.status-chip {
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &.active {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &.inactive {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+}
+
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+}
+
+.save-btn {
+    background-color: var(--primary-color, #1976d2);
+    color: white;
+    text-transform: none;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 8px 20px;
+
+    &:disabled {
+        background-color: rgba(0, 0, 0, 0.12);
+        color: rgba(0, 0, 0, 0.26);
+        cursor: not-allowed;
+    }
+}
+
+.cancel-btn {
+    border-color: var(--primary-color, #1976d2);
+    color: var(--primary-color, #1976d2);
+    text-transform: none;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 8px 20px;
+}
+
+.card-content {
+    padding: 24px;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 250px; /* Ajusta según la altura de tu formulario */
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+
+    & > * {
+        margin-bottom: 12px;
+    }
+
+    & > *:last-child {
+        margin-bottom: 0;
+    }
+} 

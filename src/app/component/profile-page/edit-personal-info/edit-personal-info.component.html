@@ -1,0 +1,87 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar>account_circle</mat-icon>
+    <mat-card-title>Información Personal</mat-card-title>
+    <mat-card-subtitle>Actualizá tus datos personales y de contacto.</mat-card-subtitle>
+    <div class="card-header-actions">
+      <div *ngIf="!isLoadingData" class="status-chip" [ngClass]="{ 'active': user?.activo, 'inactive': !user?.activo }">
+        {{ user?.activo ? 'Activo' : 'Inactivo' }}
+      </div>
+    </div>
+  </mat-card-header>
+  <mat-card-content class="card-content">
+    <div *ngIf="isLoadingData; else formContent" class="loading-container">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
+
+    <ng-template #formContent>
+      <form [formGroup]="form" (ngSubmit)="onSave()" class="form-container">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" required>
+            <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+              El nombre es obligatorio.
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" required>
+            <mat-error *ngIf="form.get('apellido')?.hasError('required')">
+              El apellido es obligatorio.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email">
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Tipo de Documento</mat-label>
+            <mat-select formControlName="tipoDocumento" required>
+              <mat-option *ngFor="let tipo of tipoDocumentoOptions" [value]="tipo">
+                {{ tipo }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('tipoDocumento')?.hasError('required')">
+              El tipo de documento es obligatorio.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Documento</mat-label>
+            <input matInput formControlName="documento" required>
+            <mat-error *ngIf="form.get('documento')?.hasError('required')">
+              El documento es obligatorio.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('required')">
+              La fecha de nacimiento es obligatoria.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Rol</mat-label>
+            <input matInput formControlName="rol">
+          </mat-form-field>
+        </div>
+      </form>
+    </ng-template>
+  </mat-card-content>
+  <mat-card-actions class="card-actions" *ngIf="!isLoadingData">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="form.pristine || form.invalid || isLoading" (click)="onSave()"
+      class="save-btn">Guardar</button>
+  </mat-card-actions>
+</mat-card>

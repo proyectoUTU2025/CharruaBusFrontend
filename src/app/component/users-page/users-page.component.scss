@@ -40,16 +40,19 @@
 
 .page-header {
   margin-bottom: 24px;
-}
 
-.page-header h1 {
-  margin: 0 0 4px;
-  font-size: 1.75rem;
-}
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
 
-.page-header p {
-  margin: 0 0 16px;
-  color: #666;
+  p {
+    margin: 4px 0 0 0;
+    color: #555;
+    font-size: 1rem;
+  }
 }
 
 .users-card {

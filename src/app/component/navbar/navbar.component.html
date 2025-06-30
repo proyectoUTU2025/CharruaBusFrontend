@@ -10,84 +10,206 @@
 
   <span class="spacer"></span>
 
-  <ng-container *ngIf="isLoggedIn">
+  <!-- Menú desktop (pantallas grandes) -->
+  <div class="desktop-menu">
+    <ng-container *ngIf="isLoggedIn">
+      <!-- ADMIN -->
+      <ng-container *ngIf="userRole === 'ADMIN'">
+        <button mat-button routerLink="/usuarios" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">people</mat-icon> <span class="nav-text">Usuarios</span>
+        </button>
+        <button mat-button routerLink="/configuraciones" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">settings</mat-icon> <span class="nav-text">Configuraciones</span>
+        </button>
+      </ng-container>
+
+      <!-- VENDEDOR -->
+      <ng-container *ngIf="userRole === 'VENDEDOR'">
+        <button mat-button routerLink="/omnibus" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">directions_bus</mat-icon> <span class="nav-text">Ómnibus</span>
+        </button>
+        <button mat-button routerLink="/localidades" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">location_city</mat-icon> <span class="nav-text">Localidades</span>
+        </button>
+        <button mat-button routerLink="/viajes" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">event</mat-icon> <span class="nav-text">Viajes</span>
+        </button>
+        <button mat-button routerLink="/comprar" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">shopping_cart</mat-icon> <span class="nav-text">Comprar</span>
+        </button>
+      </ng-container>
+
+      <!-- CLIENTE -->
+      <ng-container *ngIf="userRole === 'CLIENTE'">
+        <button mat-button routerLink="/viajes" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">event</mat-icon> <span class="nav-text">Viajes</span>
+        </button>
+        <button mat-button routerLink="/comprar" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">shopping_cart</mat-icon> <span class="nav-text">Comprar</span>
+        </button>
+        <button mat-button routerLink="/pasaje-history" routerLinkActive="active-link" class="nav-btn">
+          <mat-icon class="nav-icon">history</mat-icon> <span class="nav-text">Mis pasajes</span>
+        </button>
+      </ng-container>
+
+      <!-- ADMIN - VENDEDOR: ESTADÍSTICAS -->
+      <ng-container *ngIf="userRole === 'VENDEDOR' || userRole === 'ADMIN'">
+        <button mat-button [matMenuTriggerFor]="estadisticasMenu" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:false}" class="nav-btn">
+          <mat-icon class="nav-icon">bar_chart</mat-icon> <span class="nav-text">Estadísticas</span>
+        </button>
+        <mat-menu #estadisticasMenu="matMenu">
+          <ng-container *ngIf="userRole === 'VENDEDOR'">
+            <button mat-menu-item (click)="navigateIfNeeded('/estadisticas/viajes-departamento')">
+              Viajes por Departamento
+            </button>
+            <button mat-menu-item routerLink="/estadisticas/viajes-por-omnibus">Viajes por Ómnibus</button>
+            <button mat-menu-item routerLink="/estadisticas/mantenimientos-por-omnibus">Mantenimientos</button>
+            <button mat-menu-item routerLink="/estadisticas/estadisticas-pasajes">Pasajes</button>
+          </ng-container>
+          <ng-container *ngIf="userRole === 'ADMIN'">
+            <button mat-menu-item routerLink="/estadisticas/usuarios-por-tipo">Usuarios</button>
+            <button mat-menu-item routerLink="/estadisticas/compras-clientes">Compras</button>
+            <button mat-menu-item routerLink="/estadisticas/logueos-usuarios">Logueos</button>
+          </ng-container>
+        </mat-menu>
+      </ng-container>
+
+      <!-- Botones comunes para todos los usuarios logueados -->
+      <button mat-button routerLink="/perfil" routerLinkActive="active-link" class="nav-btn">
+        <mat-icon class="nav-icon">account_circle</mat-icon> <span class="nav-text">Mi Perfil</span>
+      </button>
+      
+      <!-- Cierre de sesión -->
+      <button mat-stroked-button class="logout-button" (click)="onLogout()">
+        <mat-icon>logout</mat-icon> <span class="logout-text">Cerrar sesión</span>
+      </button>
+    </ng-container>
+
+    <!-- Login solo si NO hay sesión -->
+    <ng-container *ngIf="!isLoggedIn">
+      <button mat-stroked-button class="logout-button" routerLink="/login">
+        <mat-icon>login</mat-icon>
+        <span class="logout-text">Login</span>
+      </button>
+    </ng-container>
+  </div>
+
+  <!-- Botón hamburger para móvil -->
+  <button mat-icon-button class="mobile-menu-button" (click)="toggleMobileMenu()" *ngIf="isLoggedIn">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <!-- Login móvil -->
+  <button mat-icon-button class="mobile-login-button" routerLink="/login" *ngIf="!isLoggedIn">
+    <mat-icon>login</mat-icon>
+  </button>
+</mat-toolbar>
+
+<!-- Menú móvil (sidebar) -->
+<div class="mobile-menu-overlay" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+<div class="mobile-menu" [class.open]="mobileMenuOpen" *ngIf="isLoggedIn">
+  <div class="mobile-menu-header">
+    <div class="mobile-user-info">
+      <div class="user-welcome">
+        <span class="welcome-text">Bienvenido</span>
+        <mat-chip *ngIf="userRole" [ngClass]="'role-chip ' + getRoleChipClass(userRole)" selected>
+          {{ getUserRoleChipText() }}
+        </mat-chip>
+      </div>
+    </div>
+    <button mat-icon-button (click)="closeMobileMenu()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <nav class="mobile-nav">
     <!-- ADMIN -->
     <ng-container *ngIf="userRole === 'ADMIN'">
-      <button mat-button routerLink="/usuarios" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/usuarios" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">people</mat-icon> <span class="nav-text">Usuarios</span>
       </button>
-      <button mat-button routerLink="/configuraciones" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/configuraciones" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">settings</mat-icon> <span class="nav-text">Configuraciones</span>
       </button>
     </ng-container>
 
     <!-- VENDEDOR -->
     <ng-container *ngIf="userRole === 'VENDEDOR'">
-      <button mat-button routerLink="/omnibus" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/omnibus" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">directions_bus</mat-icon> <span class="nav-text">Ómnibus</span>
       </button>
-      <button mat-button routerLink="/localidades" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/localidades" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">location_city</mat-icon> <span class="nav-text">Localidades</span>
       </button>
-      <button mat-button routerLink="/viajes" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/viajes" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">event</mat-icon> <span class="nav-text">Viajes</span>
       </button>
-      <button mat-button routerLink="/comprar" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/comprar" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">shopping_cart</mat-icon> <span class="nav-text">Comprar</span>
       </button>
     </ng-container>
 
     <!-- CLIENTE -->
     <ng-container *ngIf="userRole === 'CLIENTE'">
-      <button mat-button routerLink="/viajes" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/viajes" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">event</mat-icon> <span class="nav-text">Viajes</span>
       </button>
-      <button mat-button routerLink="/comprar" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/comprar" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">shopping_cart</mat-icon> <span class="nav-text">Comprar</span>
       </button>
-      <button mat-button routerLink="/pasaje-history" routerLinkActive="active-link" class="nav-btn">
+      <button mat-button routerLink="/pasaje-history" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
         <mat-icon class="nav-icon">history</mat-icon> <span class="nav-text">Mis pasajes</span>
       </button>
     </ng-container>
 
-    <!-- ADMIN - VENDEDOR: ESTADÍSTICAS -->
+    <!-- ESTADÍSTICAS -->
     <ng-container *ngIf="userRole === 'VENDEDOR' || userRole === 'ADMIN'">
-      <button mat-button [matMenuTriggerFor]="estadisticasMenu" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:false}" class="nav-btn">
-        <mat-icon class="nav-icon">bar_chart</mat-icon> <span class="nav-text">Estadísticas</span>
-      </button>
-      <mat-menu #estadisticasMenu="matMenu">
-        <ng-container *ngIf="userRole === 'VENDEDOR'">
-          <button mat-menu-item (click)="navigateIfNeeded('/estadisticas/viajes-departamento')">
-            Viajes por Departamento
-          </button>
-          <button mat-menu-item routerLink="/estadisticas/viajes-por-omnibus">Viajes por Ómnibus</button>
-          <button mat-menu-item routerLink="/estadisticas/mantenimientos-por-omnibus">Mantenimientos</button>
-          <button mat-menu-item routerLink="/estadisticas/estadisticas-pasajes">Pasajes</button>
-        </ng-container>
-        <ng-container *ngIf="userRole === 'ADMIN'">
-          <button mat-menu-item routerLink="/estadisticas/usuarios-por-tipo">Usuarios</button>
-          <button mat-menu-item routerLink="/estadisticas/compras-clientes">Compras</button>
-          <button mat-menu-item routerLink="/estadisticas/logueos-usuarios">Logueos</button>
-        </ng-container>
-      </mat-menu>
+      <div class="mobile-submenu">
+        <button mat-button class="mobile-nav-btn submenu-trigger" (click)="toggleEstadisticasSubmenu()">
+          <div class="submenu-left">
+            <mat-icon class="nav-icon">bar_chart</mat-icon> 
+            <span class="nav-text">Estadísticas</span>
+          </div>
+          <mat-icon class="expand-icon">{{ estadisticasSubmenuOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+        <div class="submenu-content" [class.open]="estadisticasSubmenuOpen">
+          <ng-container *ngIf="userRole === 'VENDEDOR'">
+            <button mat-button class="mobile-nav-btn submenu-item" (click)="navigateAndClose('/estadisticas/viajes-departamento')">
+              Viajes por Departamento
+            </button>
+            <button mat-button routerLink="/estadisticas/viajes-por-omnibus" class="mobile-nav-btn submenu-item" (click)="closeMobileMenu()">
+              Viajes por Ómnibus
+            </button>
+            <button mat-button routerLink="/estadisticas/mantenimientos-por-omnibus" class="mobile-nav-btn submenu-item" (click)="closeMobileMenu()">
+              Mantenimientos
+            </button>
+            <button mat-button routerLink="/estadisticas/estadisticas-pasajes" class="mobile-nav-btn submenu-item" (click)="closeMobileMenu()">
+              Pasajes
+            </button>
+          </ng-container>
+          <ng-container *ngIf="userRole === 'ADMIN'">
+            <button mat-button routerLink="/estadisticas/usuarios-por-tipo" class="mobile-nav-btn submenu-item" (click)="closeMobileMenu()">
+              Usuarios
+            </button>
+            <button mat-button routerLink="/estadisticas/compras-clientes" class="mobile-nav-btn submenu-item" (click)="closeMobileMenu()">
+              Compras
+            </button>
+            <button mat-button routerLink="/estadisticas/logueos-usuarios" class="mobile-nav-btn submenu-item" (click)="closeMobileMenu()">
+              Logueos
+            </button>
+          </ng-container>
+        </div>
+      </div>
     </ng-container>
 
-    <!-- Botones comunes para todos los usuarios logueados -->
-    <button mat-button routerLink="/perfil" routerLinkActive="active-link" class="nav-btn">
+    <!-- Mi Perfil -->
+    <button mat-button routerLink="/perfil" routerLinkActive="active-link" class="mobile-nav-btn" (click)="closeMobileMenu()">
       <mat-icon class="nav-icon">account_circle</mat-icon> <span class="nav-text">Mi Perfil</span>
     </button>
     
     <!-- Cierre de sesión -->
-    <button mat-stroked-button class="logout-button" (click)="onLogout()">
+    <button mat-stroked-button class="mobile-logout-button" (click)="onLogout()">
       <mat-icon>logout</mat-icon> <span class="logout-text">Cerrar sesión</span>
     </button>
-  </ng-container>
-
-  <!-- Login solo si NO hay sesión -->
-  <ng-container *ngIf="!isLoggedIn">
-    <button mat-stroked-button class="logout-button" routerLink="/login">
-      <mat-icon>login</mat-icon>
-      <span class="logout-text">Login</span>
-    </button>
-  </ng-container>
-</mat-toolbar>
+  </nav>
+</div>

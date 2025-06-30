@@ -3,16 +3,16 @@ $primary-color: #1976d2;
 .navbar-toolbar {
   background: #fff;
   color: #222;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  padding: 0 32px;
-  min-height: 64px;
+  box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.07);
+  padding: 0 2rem;
+  min-height: 4rem;
   display: flex;
   align-items: center;
 }
 
 .logo {
-  height: 36px;
-  margin-right: 12px;
+  height: 2.25rem;
+  margin-right: 0.75rem;
 }
 
 .brand {
@@ -23,14 +23,14 @@ $primary-color: #1976d2;
 }
 
 .role-chip {
-  margin-right: 24px;
+  margin-right: 1.5rem;
   font-size: 0.95em;
-  height: 28px;
+  height: 1.75rem;
   text-transform: capitalize;
   font-weight: 600;
-  border-radius: 16px;
-  padding: 0 16px;
-  border: 1.5px solid #e0e0e0;
+  border-radius: 1rem;
+  padding: 0 1rem;
+  border: 0.09375rem solid #e0e0e0;
   background: #f5f5f5;
   color: #222;
   display: inline-flex;
@@ -57,32 +57,47 @@ $primary-color: #1976d2;
   flex: 1 1 auto;
 }
 
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+// =============== MENÚ DESKTOP ===============
+.desktop-menu {
+  display: flex;
+  align-items: center;
+}
+
 .nav-btn {
   font-weight: 500;
   color: #1976d2 !important;
-  border-radius: 8px;
-  margin-right: 4px;
+  border-radius: 0.5rem;
+  margin-right: 0.25rem;
   text-transform: none;
   transition: background 0.2s, color 0.2s, font-weight 0.2s;
-  font-size: 16px;
-  padding: 10px 18px;
+  font-size: 1rem;
+  padding: 0.625rem 1.125rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   background: #fff !important;
   box-shadow: none;
-  border: 1.5px solid transparent;
+  border: 0.09375rem solid transparent;
 }
 
 .nav-btn .nav-icon {
-  font-size: 20px;
-  margin-right: 6px;
+  font-size: 1.25rem;
+  margin-right: 0.375rem;
 }
 
 .nav-btn .nav-text {
   font-weight: 500;
-  font-size: 16px;
-  letter-spacing: 0.2px;
+  font-size: 1rem;
+  letter-spacing: 0.0125rem;
 }
 
 .nav-btn.active-link,
@@ -90,29 +105,29 @@ $primary-color: #1976d2;
   color: #1976d2 !important;
   font-weight: 700;
   background: #f5f7fa !important;
-  border-radius: 8px;
-  border: 1.5px solid #1976d2;
+  border-radius: 0.5rem;
+  border: 0.09375rem solid #1976d2;
 }
 
 .nav-btn:hover:not(.active-link) {
   background: #f5f7fa !important;
   color: #1251a3 !important;
-  border-radius: 8px;
-  border: 1.5px solid #1976d2;
+  border-radius: 0.5rem;
+  border: 0.09375rem solid #1976d2;
 }
 
 button[mat-stroked-button].logout-button {
   font-weight: 500;
-  font-size: 17px;
-  padding: 10px 18px;
-  border-radius: 8px;
+  font-size: 1.0625rem;
+  padding: 0.625rem 1.125rem;
+  border-radius: 0.5rem;
   color: #1976d2 !important;
-  border: 2px solid #1976d2 !important;
+  border: 0.125rem solid #1976d2 !important;
   background: #fff !important;
   transition: background 0.2s, color 0.2s, border 0.2s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   box-shadow: none;
 }
 
@@ -123,109 +138,404 @@ button[mat-stroked-button].logout-button:hover {
 }
 
 .logout-text {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125rem;
 }
 
-button[mat-stroked-button] mat-icon,
-button[mat-stroked-button] .mat-icon,
-.nav-btn .nav-icon {
-  font-size: 20px !important;
-  margin-right: 6px;
+// =============== BOTONES MÓVILES ===============
+.mobile-menu-button,
+.mobile-login-button {
+  display: none;
+  color: #1976d2 !important;
 }
 
-@media (max-width: 900px) {
-  .navbar-toolbar {
-    padding: 0 8px;
+// =============== MENÚ MÓVIL ===============
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  backdrop-filter: blur(2px);
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -21.875rem;
+  width: 21.875rem;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -0.3125rem 0 0.9375rem rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  overflow-y: auto;
+  transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.mobile-menu.open {
+  right: 0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.25rem;
+  border-bottom: 0.0625rem solid #e0e0e0;
+  background: #f8f9fa;
+  min-height: 5rem;
+}
+
+.mobile-user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.welcome-text {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.mobile-menu-header .role-chip {
+  margin-right: 0;
+  font-size: 0.9em;
+  height: 1.625rem;
+  padding: 0 0.875rem;
+}
+
+.close-button {
+  color: #1976d2 !important;
+  
+  mat-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+}
+
+.mobile-nav {
+  padding: 1rem 0;
+}
+
+.mobile-nav-btn {
+  width: 100%;
+  justify-content: flex-start !important;
+  font-weight: 500;
+  color: #1976d2 !important;
+  border-radius: 0;
+  margin: 0;
+  text-transform: none;
+  transition: background 0.2s, color 0.2s, font-weight 0.2s;
+  font-size: 1rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fff !important;
+  box-shadow: none;
+  border: none;
+  border-left: 0.25rem solid transparent;
+  min-height: 3.75rem;
+}
+
+.mobile-nav-btn .nav-icon {
+  font-size: 1.375rem;
+  margin-right: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-btn .nav-text {
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.0125rem;
+}
+
+.mobile-nav-btn.active-link,
+.mobile-nav-btn.active-link:focus {
+  color: #1976d2 !important;
+  font-weight: 700;
+  background: #f5f7fa !important;
+  border-left: 0.25rem solid #1976d2;
+}
+
+.mobile-nav-btn:hover:not(.active-link) {
+  background: #f5f7fa !important;
+  color: #1251a3 !important;
+}
+
+// Estilos para el submenú de estadísticas
+.mobile-submenu {
+  .submenu-trigger {
+    justify-content: flex-start !important;
+    padding: 1.25rem 1.5rem !important;
+    min-height: 3.75rem;
+    align-items: center;
+    position: relative;
+    
+    .submenu-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .expand-icon {
+      transition: transform 0.2s;
+      font-size: 1.25rem !important;
+      color: #1976d2;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 1.5rem;
+    }
+
+    .nav-icon {
+      font-size: 1.375rem;
+      margin-right: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-text {
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: 0.0125rem;
+    }
+  }
+
+  .submenu-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+    background: #f8f9fa;
+  }
+
+  .submenu-content.open {
+    max-height: 25rem;
+  }
+
+  .submenu-item {
+    padding: 1.125rem 1.5rem 1.125rem 3.5rem !important;
+    font-size: 0.9375rem !important;
+    color: #555 !important;
+    background: #f8f9fa !important;
+    border-left: 0.25rem solid transparent;
+    min-height: 3.5rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+
+  .submenu-item:hover {
+    background: #e9ecef !important;
+    color: #1976d2 !important;
+  }
+
+  .submenu-item.active-link {
+    color: #1976d2 !important;
+    font-weight: 600;
+    background: #e3f2fd !important;
+    border-left: 0.25rem solid #1976d2;
+  }
+}
+
+.mobile-logout-button {
+  width: calc(100% - 3rem);
+  margin: 1.5rem 1.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 1rem 1.125rem;
+  border-radius: 0.5rem;
+  color: #1976d2 !important;
+  border: 0.125rem solid #1976d2 !important;
+  background: #fff !important;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: none;
+  min-height: 3.25rem;
+}
+
+.mobile-logout-button:hover {
+  background: #f5f7fa !important;
+  color: #1251a3 !important;
+  border-color: #1251a3 !important;
+}
+
+.mobile-logout-button mat-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// =============== MEDIA QUERIES ===============
+@media (min-width: 59.375em) {
+  .desktop-menu {
+    display: flex;
+  }
+
+  .mobile-menu-button,
+  .mobile-login-button {
+    display: none;
+  }
+}
+
+@media (min-width: 59.375em) and (max-width: 75em) {
+  .navbar-toolbar {
+    padding: 0 1rem;
+  }
+
+  .nav-btn, .logout-button {
+    font-size: 0.9375rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .logout-text, .nav-text {
+    font-size: 0.9375rem;
+  }
+}
+
+@media (max-width: 59.374em) {
+  .navbar-toolbar {
+    padding: 0 0.75rem;
+  }
+
+  .brand {
+    font-size: 1.1rem;
+  }
+
+  .role-chip {
+    margin-right: 0.75rem;
+    font-size: 0.85em;
+    height: 1.5rem;
+    padding: 0 0.75rem;
+  }
+
+  // Ocultar menú desktop y mostrar botón móvil
+  .desktop-menu {
+    display: none;
+  }
+
+  .mobile-menu-button,
+  .mobile-login-button {
+    display: flex;
+  }
+
+  .mobile-menu {
+    width: 18.75rem;
+    right: -18.75rem;
+  }
+}
+
+@media (max-width: 30em) {
+  .navbar-toolbar {
+    padding: 0 0.5rem;
+  }
+
   .brand {
     font-size: 1rem;
   }
+
   .role-chip {
-    margin-right: 8px;
+    margin-right: 0.5rem;
+    font-size: 0.8em;
+    height: 1.375rem;
+    padding: 0 0.625rem;
   }
-  .nav-btn, .logout-button {
-    font-size: 15px;
-    padding: 8px 10px;
-  }
-  .logout-text, .nav-text {
-    font-size: 15px;
-  }
-}
-
-.navbar {
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  user-select: none;
-}
-
-.navbar-left {
-  display: flex;
-  align-items: center;
 
   .logo {
-    width: 32px;
-    height: 32px;
-    margin-right: 8px;
+    height: 2rem;
+    margin-right: 0.5rem;
   }
 
-  .brand {
-    font-size: 20px;
-    font-weight: 700;
-    margin-right: 12px;
+  .mobile-menu {
+    width: 17.5rem;
+    right: -17.5rem;
   }
 
-  .role {
-    background-color: $primary-color;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
+  .mobile-nav-btn {
+    padding: 1.125rem 1rem;
+    font-size: 0.9375rem;
+    min-height: 3.5rem;
+  }
+
+  .mobile-nav-btn .nav-icon {
+    font-size: 1.25rem;
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+
+  .mobile-submenu .submenu-trigger {
+    padding: 1.125rem 1rem !important;
+    min-height: 3.5rem;
+    justify-content: flex-start !important;
+    align-items: center;
+    position: relative;
+
+    .submenu-left {
+      gap: 0.625rem;
+    }
+
+    .nav-icon {
+      font-size: 1.25rem;
+      width: 1.625rem;
+      height: 1.625rem;
+    }
+
+    .nav-text {
+      font-size: 0.9375rem;
+    }
+
+    .expand-icon {
+      font-size: 1.125rem !important;
+      width: 1.375rem;
+      height: 1.375rem;
+      position: absolute;
+      right: 1rem;
+    }
+  }
+
+  .mobile-submenu .submenu-item {
+    padding: 1rem 1rem 1rem 2.75rem !important;
+    min-height: 3.25rem;
   }
 }
 
-.nav-button {
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-  text-transform: none !important;
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-
-  mat-icon {
-    margin-right: 4px !important;
-  }
+// =============== ICONOS Y UTILIDADES ===============
+button[mat-stroked-button] mat-icon,
+button[mat-stroked-button] .mat-icon,
+.nav-btn .nav-icon {
+  font-size: 1.25rem !important;
+  margin-right: 0.375rem;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
-.navbar .usuarios-button {
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-  text-transform: none !important;
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-}
-
-.localidades-button,
-.viajes-button,
-.login-button {
-  color: $primary-color !important;
-  background: none !important;
-  border: none !important;
-  text-transform: none !important;
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-
-  mat-icon {
-    margin-right: 4px !important;
-  }
+// Prevenir scroll del body cuando el menú móvil está abierto
+.mobile-menu-open {
+  overflow: hidden;
 }

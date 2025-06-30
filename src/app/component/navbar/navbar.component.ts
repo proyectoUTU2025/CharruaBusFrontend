@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -26,11 +26,37 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
+  mobileMenuOpen = false;
+  estadisticasSubmenuOpen = false;
+
   constructor(
     private router: Router,
     public authService: AuthService,
   ) {}
+
+  ngOnInit() {
+    // Cerrar menú móvil si la pantalla ya es grande al cargar
+    this.checkScreenSize();
+  }
+
+  ngOnDestroy() {
+    // Limpiar clases del body al destruir el componente
+    document.body.classList.remove('mobile-menu-open');
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkScreenSize();
+  }
+
+  private checkScreenSize() {
+    // Usar matchMedia con em (59.375em = 950px con fuente base de 16px)
+    const isDesktop = window.matchMedia('(min-width: 59.375em)').matches;
+    if (isDesktop && this.mobileMenuOpen) {
+      this.closeMobileMenu();
+    }
+  }
 
   navigateIfNeeded(path: string) {
     if (this.router.url !== path) {
@@ -47,10 +73,38 @@ export class NavbarComponent {
   }
 
   onLogout(): void {
+    this.closeMobileMenu();
     this.authService.logout({ 
       message: 'Has cerrado sesión correctamente.', 
       type: 'success' 
     });
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+    this.estadisticasSubmenuOpen = false; // Cerrar submenú al abrir/cerrar menú principal
+    
+    // Prevenir scroll del body cuando el menú está abierto
+    if (this.mobileMenuOpen) {
+      document.body.classList.add('mobile-menu-open');
+    } else {
+      document.body.classList.remove('mobile-menu-open');
+    }
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+    this.estadisticasSubmenuOpen = false;
+    document.body.classList.remove('mobile-menu-open');
+  }
+
+  toggleEstadisticasSubmenu(): void {
+    this.estadisticasSubmenuOpen = !this.estadisticasSubmenuOpen;
+  }
+
+  navigateAndClose(path: string): void {
+    this.navigateIfNeeded(path);
+    this.closeMobileMenu();
   }
 
   get isLoggedIn(): boolean {

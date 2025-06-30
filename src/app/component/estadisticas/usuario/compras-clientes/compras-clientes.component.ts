@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -14,6 +14,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 
 @Component({
     selector: 'app-compras-clientes',
@@ -29,13 +31,17 @@ import { MatInputModule } from '@angular/material/input';
         MatPaginatorModule,
         MatButtonModule,
         MatProgressSpinnerModule,
-        NgChartsModule
+        NgChartsModule,
+        MatIconModule,
+        MatSortModule
     ],
     templateUrl: './compras-clientes.component.html',
     styleUrls: ['./compras-clientes.component.scss']
 })
 
-export class ComprasClientesComponent implements OnInit {
+export class ComprasClientesComponent implements OnInit, AfterViewInit {
+    @ViewChild(MatSort) sort!: MatSort;
+
     data: EstadisticaClienteCompras[] = [];
     total = 0;
     pageSize = 10;
@@ -64,6 +70,15 @@ export class ComprasClientesComponent implements OnInit {
 
     ngOnInit() {
         this.load();
+    }
+
+    ngAfterViewInit() {
+        this.sort.sortChange.subscribe((sort: Sort) => {
+            this.ordenarPor = sort.active || 'totalGastado';
+            this.ascendente = sort.direction === 'asc';
+            this.pageIndex = 0;
+            this.load();
+        });
     }
 
     load(event?: PageEvent) {
@@ -98,16 +113,6 @@ export class ComprasClientesComponent implements OnInit {
             fechaFin: this.fechaFin.value?.toISOString() || null
         }));
         this.pageIndex = 0;
-        this.load();
-    }
-
-    toggleSort(columna: string) {
-        if (this.ordenarPor === columna) {
-            this.ascendente = !this.ascendente;
-        } else {
-            this.ordenarPor = columna;
-            this.ascendente = true;
-        }
         this.load();
     }
 

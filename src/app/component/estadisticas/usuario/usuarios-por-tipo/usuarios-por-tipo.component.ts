@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -9,6 +9,8 @@ import { EstadisticaUsuario } from '../../../../models/estadisticas/usuario/esta
 import { Page } from '../../../../models';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 
 @Component({
     selector: 'app-usuarios-por-tipo',
@@ -19,12 +21,16 @@ import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
         MatPaginatorModule,
         MatButtonModule,
         MatProgressSpinnerModule,
-        NgChartsModule
+        NgChartsModule,
+        MatIconModule,
+        MatSortModule
     ],
     templateUrl: './usuarios-por-tipo.component.html',
     styleUrls: ['./usuarios-por-tipo.component.scss']
 })
-export class UsuariosPorTipoComponent implements OnInit {
+export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
+    @ViewChild(MatSort) sort!: MatSort;
+
     data: EstadisticaUsuario[] = [];
     total = 0;
     pageSize = 10;
@@ -53,6 +59,15 @@ export class UsuariosPorTipoComponent implements OnInit {
         this.load();
     }
 
+    ngAfterViewInit() {
+        this.sort.sortChange.subscribe((sort: Sort) => {
+            this.ordenarPor = sort.active || 'tipo';
+            this.ascendente = sort.direction === 'asc';
+            this.pageIndex = 0;
+            this.load();
+        });
+    }
+
     load() {
         this.svc.getUsuariosPorTipo(this.pageIndex, this.pageSize, this.ordenarPor, this.ascendente)
             .subscribe({
@@ -73,16 +88,6 @@ export class UsuariosPorTipoComponent implements OnInit {
     pageChanged(e: PageEvent) {
         this.pageIndex = e.pageIndex;
         this.pageSize = e.pageSize;
-        this.load();
-    }
-
-    toggleSort(campo: string) {
-        if (this.ordenarPor === campo) {
-            this.ascendente = !this.ascendente;
-        } else {
-            this.ordenarPor = campo;
-            this.ascendente = true;
-        }
         this.load();
     }
 

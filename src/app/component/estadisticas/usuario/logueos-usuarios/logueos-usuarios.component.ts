@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -14,6 +14,8 @@ import { NgChartsModule } from 'ng2-charts';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 
 @Component({
     selector: 'app-logueos-usuarios',
@@ -29,12 +31,16 @@ import { MatInputModule } from '@angular/material/input';
         MatPaginatorModule,
         MatButtonModule,
         MatProgressSpinnerModule,
-        NgChartsModule
+        NgChartsModule,
+        MatIconModule,
+        MatSortModule
     ],
     templateUrl: './logueos-usuarios.component.html',
     styleUrls: ['./logueos-usuarios.component.scss']
 })
-export class LogueosUsuariosComponent implements OnInit {
+export class LogueosUsuariosComponent implements OnInit, AfterViewInit {
+    @ViewChild(MatSort) sort!: MatSort;
+
     data: EstadisticaLogueos[] = [];
     total = 0;
     pageSize = 10;
@@ -65,6 +71,15 @@ export class LogueosUsuariosComponent implements OnInit {
         this.load();
     }
 
+    ngAfterViewInit() {
+        this.sort.sortChange.subscribe((sort: Sort) => {
+            this.ordenarPor = sort.active || 'email';
+            this.ascendente = sort.direction === 'asc';
+            this.pageIndex = 0;
+            this.load();
+        });
+    }
+
     load(event?: PageEvent) {
         if (event) {
             this.pageIndex = event.pageIndex;
@@ -84,7 +99,7 @@ export class LogueosUsuariosComponent implements OnInit {
                 this.total = res.page.totalElements;
                 this.chartLabels = res.content.map(x => x.email);
                 this.chartData = [
-                    { data: res.content.map(x => x.cantidadLogueos), backgroundColor: '#1976d2', label: 'Total Gastado' }
+                    { data: res.content.map(x => x.cantidadLogueos), backgroundColor: '#1976d2', label: 'Cantidad Logueos' }
                 ];
             },
             error: err => console.error('Error cargando:', err)
@@ -103,16 +118,6 @@ export class LogueosUsuariosComponent implements OnInit {
     pageChanged(e: PageEvent) {
         this.pageIndex = e.pageIndex;
         this.pageSize = e.pageSize;
-        this.load();
-    }
-
-    toggleSort(campo: string) {
-        if (this.ordenarPor === campo) {
-            this.ascendente = !this.ascendente;
-        } else {
-            this.ordenarPor = campo;
-            this.ascendente = true;
-        }
         this.load();
     }
 
@@ -157,5 +162,4 @@ export class LogueosUsuariosComponent implements OnInit {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? match[2] : null;
     }
-
 }

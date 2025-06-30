@@ -6,7 +6,7 @@ import { BulkLineResult } from '../../../../models/bulk/bulk-line-result.dto';
 
 @Component({
   standalone: true,
-  selector: 'app-bulk-errors-dialog',
+  selector: 'app-localidades-bulk-errors-dialog',
   templateUrl: './bulk-errors-dialog.component.html',
   styleUrls: ['./bulk-errors-dialog.component.scss'],
   imports: [CommonModule, MatDialogModule, MatButtonModule]

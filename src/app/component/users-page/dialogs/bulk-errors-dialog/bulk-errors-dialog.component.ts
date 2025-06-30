@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   standalone: true,
-  selector: 'app-bulk-errors-dialog',
+  selector: 'app-users-bulk-errors-dialog',
   templateUrl: './bulk-errors-dialog.component.html',
   styleUrls: ['./bulk-errors-dialog.component.scss'],
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]

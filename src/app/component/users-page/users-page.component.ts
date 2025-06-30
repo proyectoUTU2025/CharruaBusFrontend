@@ -47,11 +47,6 @@ export class UsersPageComponent implements OnInit {
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
     if (mp) {
       this.paginator = mp;
-      this.paginator.page.subscribe((event: PageEvent) => {
-        this.pageIndex = event.pageIndex;
-        this.pageSize = event.pageSize;
-        this.loadUsers();
-      });
     }
   }
 
@@ -103,6 +98,18 @@ export class UsersPageComponent implements OnInit {
     this.loadUsers();
   }
 
+  private getCurrentSort(): Sort | undefined {
+    return this.sort?.active && this.sort?.direction ? 
+      { active: this.sort.active, direction: this.sort.direction } as Sort : 
+      undefined;
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadUsers(this.getCurrentSort());
+  }
+
   async loadUsers(sortEvent?: Sort): Promise<void> {
     // Solo mostrar spinner si no viene de un cambio de orden
     const isSortRequest = !!sortEvent;
@@ -150,7 +157,7 @@ export class UsersPageComponent implements OnInit {
     if(this.paginator) {
       this.paginator.firstPage();
     }
-    this.loadUsers();
+    this.loadUsers(this.getCurrentSort());
   }
 
   onClear() {
@@ -166,7 +173,7 @@ export class UsersPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadUsers(); 
+        this.loadUsers(this.getCurrentSort()); 
       }
     });
   }
@@ -180,7 +187,7 @@ export class UsersPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadUsers();
+        this.loadUsers(this.getCurrentSort());
       }
     });
   }
@@ -198,7 +205,7 @@ export class UsersPageComponent implements OnInit {
         try {
           await this.userService.delete(user.id);
           this.materialUtils.showSuccess('Usuario eliminado correctamente.');
-          this.loadUsers();
+          this.loadUsers(this.getCurrentSort());
         } catch (err: any) {
           this.materialUtils.showError(err.error?.message || 'Error al eliminar el usuario.');
         }
@@ -214,7 +221,7 @@ export class UsersPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadUsers();
+        this.loadUsers(this.getCurrentSort());
       }
     });
   }

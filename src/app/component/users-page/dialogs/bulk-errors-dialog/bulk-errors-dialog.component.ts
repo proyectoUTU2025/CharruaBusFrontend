@@ -17,6 +17,7 @@ export class BulkErrorsDialogComponent {
   successCount: number;
   errorCount: number;
   errors: BulkLineResult[];
+  isHeaderError = false;
 
   constructor(
     public dialogRef: MatDialogRef<BulkErrorsDialogComponent>,
@@ -26,6 +27,10 @@ export class BulkErrorsDialogComponent {
     this.errors = this.results.filter(r => !r.creado);
     this.errorCount = this.errors.length;
     this.successCount = this.results.length - this.errorCount;
+
+    if (this.errorCount === 1 && this.errors[0].fila === 0) {
+      this.isHeaderError = true;
+    }
   }
 
   close(): void {

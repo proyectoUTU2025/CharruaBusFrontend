@@ -1,21 +1,27 @@
-<h2 mat-dialog-title>Alta Masiva de Localidades</h2>
+<div class="dialog-header">
+  <h2 class="dialog-title">Alta Masiva de Localidades</h2>
+</div>
 
-<mat-dialog-content class="bulk-content">
-  <p class="intro">Cargue un archivo CSV con los datos de las localidades a crear.</p>
+<mat-dialog-content>
+  <p>Cargue un archivo CSV con los datos de las localidades que desea crear.</p>
 
-  <div class="dropzone-wrapper"
-       (drop)="onFileDrop($event)"
-       (dragover)=" $event.preventDefault() "
-       (click)="fileInput.click()">
-    <div class="icon-wrapper">
-      <mat-icon>upload_file</mat-icon>
-    </div>
-    <div class="dropzone">
-      <p class="drop-text">Arrastre y suelte su archivo CSV aquí</p>
-      <p class="drop-text">o haga clic para seleccionar un archivo</p>
-      <input #fileInput type="file" accept=".csv" (change)="onFileSelect($event)" hidden />
-      <p *ngIf="file" class="filename">{{ file.name }}</p>
-    </div>
+  <div
+    class="dropzone"
+    (drop)="onFileDrop($event)"
+    (dragover)="$event.preventDefault()"
+    (click)="fileInput.click()"
+  >
+    <mat-icon class="drop-icon">add_circle</mat-icon>
+    <p>Arrastre y suelte su archivo CSV aquí</p>
+    <p>o haga clic para seleccionar un archivo</p>
+    <input
+      #fileInput
+      type="file"
+      accept=".csv"
+      (change)="onFileSelect($event)"
+      hidden
+    />
+    <p *ngIf="file" class="filename">{{ file.name }}</p>
   </div>
 
   <p class="template">
@@ -28,6 +34,9 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="process-btn" [disabled]="!file" (click)="process()">Procesar Archivo</button>
+  <button mat-stroked-button class="cancel-btn" (click)="cancel()" [disabled]="loading">Cancelar</button>
+  <button mat-flat-button class="create-btn" [disabled]="!file || loading" (click)="process()">
+    <mat-spinner *ngIf="loading" diameter="24" class="button-spinner"></mat-spinner>
+    <span *ngIf="!loading">Procesar Archivo</span>
+  </button>
 </mat-dialog-actions>

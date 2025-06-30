@@ -12,6 +12,9 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ConfiguracionDelSistemaService } from '../../../../services/configuracion-del-sistema.service';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 export interface AltaConfiguracionRequestDto {
     nombre: string;
@@ -30,15 +33,20 @@ export interface AltaConfiguracionRequestDto {
         MatDialogModule,
         MatFormFieldModule,
         MatInputModule,
-        MatButtonModule
+        MatButtonModule,
+        MatProgressSpinnerModule
     ]
 })
 export class CreateConfiguracionDialogComponent {
     form: FormGroup;
+    loading = false;
+    error: string | null = null;
 
     constructor(
         private fb: FormBuilder,
-        private dialogRef: MatDialogRef<CreateConfiguracionDialogComponent>
+        private dialogRef: MatDialogRef<CreateConfiguracionDialogComponent>,
+        private service: ConfiguracionDelSistemaService,
+        private materialUtils: MaterialUtilsService
     ) {
         this.form = this.fb.group({
             nombre: ['', Validators.required],
@@ -57,12 +65,38 @@ export class CreateConfiguracionDialogComponent {
 
     save() {
         if (this.form.valid) {
+            this.error = null;
+            this.loading = true;
+            
             const dto: AltaConfiguracionRequestDto = {
                 nombre: this.form.value.nombre,
                 valorInt: this.form.value.valorInt,
                 valor: this.form.value.valor
             };
-            this.dialogRef.close(dto);
+            
+            this.service.create(dto).subscribe({
+                next: () => {
+                    this.loading = false;
+                    this.materialUtils.showSuccess('Configuración creada');
+                    this.dialogRef.close(true);
+                },
+                error: (error) => {
+                    this.loading = false;
+                    
+                    // Extraer mensaje de error del backend
+                    let errorMessage = 'Error al crear la configuración. Por favor, intenta nuevamente.';
+                    
+                    if (error?.error?.message) {
+                        errorMessage = error.error.message;
+                    } else if (typeof error?.error === 'string') {
+                        errorMessage = error.error;
+                    } else if (error?.message) {
+                        errorMessage = error.message;
+                    }
+                    
+                    this.error = errorMessage;
+                }
+            });
         }
     }
 

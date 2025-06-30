@@ -22,10 +22,13 @@
   padding-top: 20px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  min-height: 400px;
 
   form {
     display: flex;
     flex-direction: column;
+    min-height: 400px;
   }
 }
 
@@ -71,9 +74,17 @@ mat-form-field {
   margin-top: 10px;
 }
 
-.loading {
-  text-align: center;
-  padding: 2rem;
-  font-style: italic;
-  color: var(--text-secondary, #666);
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 8px;
+  min-height: 400px;
 }

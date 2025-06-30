@@ -1,20 +1,37 @@
-<h2 mat-dialog-title>Crear Localidad</h2>
+<div class="dialog-header">
+  <h2 class="dialog-title">Crear Localidad</h2>
+</div>
 
-<mat-dialog-content [formGroup]="form">
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Nombre</mat-label>
-    <input matInput formControlName="nombre" />
-  </mat-form-field>
+<div mat-dialog-content class="dialog-container">
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
 
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Departamento</mat-label>
-    <mat-select formControlName="departamento">
-      <mat-option *ngFor="let dept of departamentos" [value]="dept">{{ dept }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-</mat-dialog-content>
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" required />
+      <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es obligatorio.</mat-error>
+    </mat-form-field>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button class="cancel-btn" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="save-btn" (click)="save()">Guardar</button>
-</mat-dialog-actions>
+    <mat-form-field appearance="outline">
+      <mat-label>Departamento</mat-label>
+      <mat-select formControlName="departamento" required>
+        <mat-option *ngFor="let dept of departamentos" [value]="dept.value">{{ dept.viewValue }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('departamento')?.hasError('required')">El departamento es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <div *ngIf="error" class="error-banner">
+      {{ error }}
+    </div>
+
+    <div class="actions" mat-dialog-actions>
+      <button mat-stroked-button class="cancel-btn" type="button" (click)="cancel()" [disabled]="loading">Cancelar</button>
+      <button mat-flat-button class="create-btn" type="submit" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LocalidadService } from '../../../../services/localidades.service';
+import { BulkResponseDto } from '../../../../models/bulk/bulk-response.dto';
+import { BulkLineResult } from '../../../../models/bulk/bulk-line-result.dto';
 
 @Component({
   standalone: true,
@@ -13,38 +18,70 @@ import { MatIconModule } from '@angular/material/icon';
     CommonModule,
     MatDialogModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ]
 })
 export class BulkUploadLocalidadDialogComponent {
   file: File | null = null;
+  loading = false;
 
-  constructor(private dialogRef: MatDialogRef<BulkUploadLocalidadDialogComponent>) {}
+  constructor(
+    private dialogRef: MatDialogRef<BulkUploadLocalidadDialogComponent>,
+    private localidadService: LocalidadService,
+    private snackBar: MatSnackBar
+  ) {}
 
   onFileDrop(event: DragEvent) {
     event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length) this.file = files[0];
+    if (event.dataTransfer?.files.length) {
+      this.file = event.dataTransfer.files[0];
+    }
   }
 
   onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files?.length) this.file = input.files[0];
+    if (input.files?.length) {
+      this.file = input.files[0];
+    }
   }
 
   downloadTemplate() {
-    const header = 'departamento,nombre,codigo\n';
-    const blob = new Blob([header], { type: 'text/csv' });
+    const header = 'nombre,departamento\n';
+    const content = 'Ejemplo Localidad,MONTEVIDEO\n';
+    const blob = new Blob([header, content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'plantilla_localidades.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'plantilla_localidades.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   process() {
-    this.dialogRef.close(this.file);
+    if (!this.file) return;
+
+    this.loading = true;
+
+    this.localidadService.bulkUpload(this.file).subscribe({
+      next: (resp: BulkResponseDto) => {
+        this.loading = false;
+        const errors = resp.results.filter((r: BulkLineResult) => !r.creado);
+        if (errors.length > 0) {
+          this.dialogRef.close({ errors });
+        } else {
+          this.snackBar.open('Archivo procesado con éxito', 'OK', { duration: 3000 });
+          this.dialogRef.close({ success: true });
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        this.snackBar.open(err.error?.message || 'Error al procesar el archivo', 'Cerrar', { duration: 4000 });
+      }
+    });
   }
 
   cancel() {

@@ -12,23 +12,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
-import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
-import { AltaBusDto, FiltroBusquedaBusDto, BusDto, Page } from '../../models';
-import { BulkResponseDto } from '../../models/bulk/bulk-response.dto';
-import { BulkLineResult } from '../../models/bulk/bulk-line-result.dto';
+import { FiltroBusquedaBusDto, BusDto, Page } from '../../models';
 import { BusService } from '../../services/bus.service';
 import { AddBusDialogComponent } from './dialogs/add-bus-dialog/add-bus-dialog.component';
 import { BulkUploadBusDialogComponent } from './dialogs/bulk-upload-bus-dialog/bulk-upload-bus-dialog.component';
-import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-errors-dialog.component';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { LocalidadService } from '../../services/localidades.service';
 import { firstValueFrom } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-buses-page',
@@ -52,15 +49,31 @@ import { HttpErrorResponse } from '@angular/common/http';
     MatSnackBarModule,
     LoadingSpinnerComponent,
     AddBusDialogComponent,
-    BulkUploadBusDialogComponent,
-    BulkErrorsDialogComponent
+    BulkUploadBusDialogComponent
   ],
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
 })
-export class BusesPageComponent implements OnInit, AfterViewInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class BusesPageComponent implements OnInit {
+  private paginator!: MatPaginator;
+  private sort!: MatSort;
+  
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    if (mp) {
+      this.paginator = mp;
+    }
+  }
+
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    if (ms) {
+      this.sort = ms;
+      this.sort.sortChange.subscribe((event: Sort) => {
+        console.log('SortChange event', event);
+        this.pageIndex = 0;
+        this.loadBuses(event);
+      });
+    }
+  }
 
   filterForm: FormGroup;
   buses: BusDto[] = [];
@@ -69,7 +82,7 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   pageSize = 5;
   columns = ['id', 'matricula', 'capacidad','ubicacionActual', 'activo', 'acciones'];
   localidades: LocalidadNombreDepartamentoDto[] = [];
-  isLoading = false;
+  isLoading = true;
   hasSearched = false;
   
   horasDisponibles = this.generateTimeOptions();
@@ -111,24 +124,23 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
 
   async ngOnInit() { 
     this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
+    // Cargar datos iniciales sin filtros
+    this.loadInitialData();
   }
 
-  ngAfterViewInit() {
-    if (this.paginator) {
-      this.paginator.page.subscribe((e: PageEvent) => {
-        this.pageIndex = e.pageIndex;
-        this.pageSize = e.pageSize;
-        // Solo recargar si ya se hizo una búsqueda previa
-        if (this.hasSearched) {
-          this.loadBuses();
-        }
-      });
+  private getCurrentSort(): Sort | undefined {
+    return this.sort?.active && this.sort?.direction ? 
+      { active: this.sort.active, direction: this.sort.direction } as Sort : 
+      undefined;
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    // Solo recargar si ya se hizo una búsqueda previa
+    if (this.hasSearched) {
+      this.loadBuses(this.getCurrentSort());
     }
-    
-    // Cargar datos iniciales sin filtros
-    setTimeout(() => {
-      this.loadInitialData();
-    });
   }
 
   loadInitialData() {
@@ -136,7 +148,7 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     const filtro: FiltroBusquedaBusDto = {};
     
-    this.busService.getAll(filtro, 0, this.pageSize)
+    this.busService.getAll(filtro, 0, this.pageSize, 'matricula,asc')
       .then((res: Page<BusDto>) => {
         console.log('Respuesta del backend:', res); // Debug
         this.buses = res.content || [];
@@ -156,8 +168,11 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private loadBuses() {
-    this.isLoading = true;
+  private loadBuses(sortEvent?: Sort) {
+    const isSortRequest = !!sortEvent;
+    if (!isSortRequest) {
+      this.isLoading = true;
+    }
     this.hasSearched = true;
     const f = this.filterForm.value;
     
@@ -191,8 +206,19 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       fechaHoraSalida: buildDateTime(f.fechaSalida, f.horaSalida),
       fechaHoraLlegada: buildDateTime(f.fechaLlegada, f.horaLlegada)
     };
+
+    let sortParam = 'matricula,asc';
+    const activeField = sortEvent?.active || this.sort?.active;
+    const direction = sortEvent?.direction || this.sort?.direction;
+    if (activeField && direction) {
+      // Mapear "capacidad" a "cantidadAsientos" para el backend
+      const backendField = activeField === 'capacidad' ? 'cantidadAsientos' : activeField;
+      sortParam = `${backendField},${direction.toUpperCase()}`;
+    }
+
+    console.log('Sort param enviado al backend:', sortParam);
     
-    this.busService.getAll(filtro, this.pageIndex, this.pageSize)
+    this.busService.getAll(filtro, this.pageIndex, this.pageSize, sortParam)
       .then((res: Page<BusDto>) => {
         console.log('Respuesta del backend:', res); // Debug
         this.buses = res.content || [];
@@ -207,7 +233,9 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
         this.totalElements = 0;
       })
       .finally(() => {
-        this.isLoading = false;
+        if (!isSortRequest) {
+          this.isLoading = false;
+        }
         this.changeDetectorRef.detectChanges();
       });
   }
@@ -278,10 +306,11 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     }
     
     // 4. Todas las validaciones pasaron - proceder con la búsqueda
+    this.pageIndex = 0;
     if (this.paginator) {
       this.paginator.firstPage();
     }
-    this.loadBuses();
+    this.loadBuses(this.getCurrentSort());
   }
 
   onClear() {
@@ -300,23 +329,16 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   }
 
   openBulkUpload() {
-    this.dialog.open(BulkUploadBusDialogComponent, { width: '600px' })
-      .afterClosed()
-      .subscribe((file: File | undefined) => {
-        if (!file) return;
-        this.busService.bulkUpload(file)
-          .then((resp: BulkResponseDto) => {
-            const errores = resp.results.filter((r: BulkLineResult) => !r.creado);
-            if (errores.length) {
-              this.dialog.open(BulkErrorsDialogComponent, {
-                width: '600px', data: errores
-              });
-            } else {
-              this.loadBuses();
-            }
-          })
-          .catch(console.error);
-      });
+    const dialogRef = this.dialog.open(BulkUploadBusDialogComponent, { 
+      width: '600px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadBuses(this.getCurrentSort());
+      }
+    });
   }
 
   add() {
@@ -324,36 +346,17 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       width: '450px', maxHeight: '95vh'
     })
       .afterClosed()
-      .subscribe((alta: AltaBusDto | undefined) => {
-        if (!alta) return;
-        this.busService.create(alta)
-          .then(() => {
-            this.materialUtils.showSuccess('Ómnibus creado exitosamente.');
-            this.onSearch();
-          })
-          .catch((error: HttpErrorResponse | any) => {
-            console.error('Error al crear ómnibus:', error);
-            
-            // Extraer mensaje específico del backend
-            let errorMessage = 'Error al crear el ómnibus. Por favor, intenta nuevamente.';
-            
-            // Para errores HTTP, el mensaje está en error.error.message o error.error
-            if (error?.error?.message) {
-              errorMessage = error.error.message;
-            } else if (typeof error?.error === 'string') {
-              errorMessage = error.error;
-            } else if (error?.message) {
-              errorMessage = error.message;
-            }
-            
-            this.materialUtils.showError(errorMessage);
-          });
+      .subscribe((result: boolean | undefined) => {
+        if (result) {
+          this.materialUtils.showSuccess('Ómnibus creado exitosamente.');
+          this.onSearch();
+        }
       });
   }
 
   toggleActive(bus: BusDto) {
     this.busService.cambiarEstado(bus.id, !bus.activo)
-      .then(() => this.loadBuses())
+      .then(() => this.loadBuses(this.getCurrentSort()))
       .catch(console.error);
   }
   localidadNombre(id: number): string {

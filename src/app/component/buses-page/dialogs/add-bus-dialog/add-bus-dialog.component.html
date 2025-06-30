@@ -3,10 +3,11 @@
 </div>
 
 <div mat-dialog-content class="dialog-container">
+  <div *ngIf="loading" class="loading-overlay">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+  </div>
+  
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div *ngIf="loading" class="loading-overlay">
-      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
-    </div>
 
     <mat-form-field appearance="outline">
       <mat-label>Matrícula</mat-label>

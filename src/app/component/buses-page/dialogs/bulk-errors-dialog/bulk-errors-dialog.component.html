@@ -3,34 +3,49 @@
 </div>
 
 <mat-dialog-content class="summary-content">
-  <h3 class="summary-title">Proceso Finalizado</h3>
-  <p class="summary-line">
-    <mat-icon class="line-icon">folder_open</mat-icon>
-    <span>Se procesaron</span>
-    <strong>{{ results.length }}</strong>
-    <span>registros en total.</span>
-  </p>
-  <p class="summary-line success">
-    <mat-icon class="line-icon">check_circle_outline</mat-icon>
-    <strong>{{ successCount }}</strong>
-    <span>ómnibus fueron creados exitosamente.</span>
-  </p>
-  <p class="summary-line error" *ngIf="errorCount > 0">
-    <mat-icon class="line-icon">highlight_off</mat-icon>
-    <strong>{{ errorCount }}</strong>
-    <span>registros tuvieron errores.</span>
-  </p>
-  
-  <p class="instruction" *ngIf="errorCount > 0">
-    Descargue el archivo CSV para ver el detalle completo de cada registro.
-  </p>
-  <p class="instruction" *ngIf="errorCount === 0">
-    ¡Excelente! Todos los registros se procesaron sin problemas.
-  </p>
+  <!-- Mensaje especial para error de encabezado -->
+  <div *ngIf="isHeaderError" class="header-error-container">
+    <mat-icon class="header-error-icon">error_outline</mat-icon>
+    <h3 class="header-error-title">Error en el archivo CSV</h3>
+    <p class="header-error-message">
+      El archivo no pudo ser procesado porque los encabezados (la primera fila) no coinciden con la plantilla esperada.
+    </p>
+    <p class="header-error-suggestion">
+      Asegúrese de que las columnas sean exactamente: <strong>matricula,cantidadAsientos,localidadId</strong>
+    </p>
+  </div>
+
+  <!-- Resumen general (se oculta si es error de encabezado) -->
+  <div *ngIf="!isHeaderError">
+    <h3 class="summary-title">Proceso Finalizado</h3>
+    <p class="summary-line">
+      <mat-icon class="line-icon">folder_open</mat-icon>
+      <span>Se procesaron</span>
+      <strong>{{ results.length }}</strong>
+      <span>registros en total.</span>
+    </p>
+    <p class="summary-line success">
+      <mat-icon class="line-icon">check_circle_outline</mat-icon>
+      <strong>{{ successCount }}</strong>
+      <span>ómnibus fueron creados exitosamente.</span>
+    </p>
+    <p class="summary-line error" *ngIf="errorCount > 0">
+      <mat-icon class="line-icon">highlight_off</mat-icon>
+      <strong>{{ errorCount }}</strong>
+      <span>registros tuvieron errores.</span>
+    </p>
+    
+    <p class="instruction" *ngIf="errorCount > 0">
+      Descargue el archivo CSV para ver el detalle completo de cada registro.
+    </p>
+    <p class="instruction" *ngIf="errorCount === 0">
+      ¡Excelente! Todos los registros se procesaron sin problemas.
+    </p>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-stroked-button class="cancel-btn" (click)="downloadCsv()">
+  <button *ngIf="!isHeaderError" mat-stroked-button class="cancel-btn" (click)="downloadCsv()">
     <mat-icon>download</mat-icon>
     Descargar Detalle CSV
   </button>

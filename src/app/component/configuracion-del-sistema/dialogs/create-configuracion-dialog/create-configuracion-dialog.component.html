@@ -4,6 +4,10 @@
 
 <div class="edit-container" mat-dialog-content>
   <form [formGroup]="form">
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
+
     <mat-form-field appearance="outline">
       <mat-label>Parámetro</mat-label>
       <input matInput formControlName="nombre" />
@@ -26,9 +30,16 @@
       Debe especificar valor numérico o de texto, pero no ambos.
     </div>
 
+    <div *ngIf="error" class="error-banner">
+      {{ error }}
+    </div>
+
     <div class="actions" mat-dialog-actions>
-      <button mat-stroked-button class="cancel-btn" type="button" (click)="cancel()">Cancelar</button>
-      <button mat-flat-button class="create-btn" type="button" (click)="save()" [disabled]="!form.valid">Guardar</button>
+      <button mat-stroked-button class="cancel-btn" type="button" (click)="cancel()" [disabled]="loading">Cancelar</button>
+      <button mat-flat-button class="create-btn" type="button" (click)="save()" [disabled]="!form.valid || loading">
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
     </div>
   </form>
 </div>

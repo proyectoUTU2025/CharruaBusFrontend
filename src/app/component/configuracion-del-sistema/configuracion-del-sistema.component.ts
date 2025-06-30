@@ -97,17 +97,9 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
         const ref = this.dialog.open(CreateConfiguracionDialogComponent, {
             width: '400px'
         });
-        ref.afterClosed().subscribe((dto) => {
-            if (dto) {
-                this.service.create(dto).subscribe({
-                    next: () => {
-                        this.materialUtils.showSuccess('Configuración creada');
-                        this.load(this.currentPage, this.pageSize);
-                    },
-                    error: () => {
-                        this.materialUtils.showError('Error al crear configuración');
-                    }
-                });
+        ref.afterClosed().subscribe((success) => {
+            if (success) {
+                this.load(this.currentPage, this.pageSize);
             }
         });
     }

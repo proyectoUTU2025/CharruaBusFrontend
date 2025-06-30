@@ -21,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UsuarioDto } from '../../../../models/users/usuario.dto.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -37,7 +38,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatButtonModule,
     MatIconModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './edit-user-dialog.component.html',
   styleUrls: ['./edit-user-dialog.component.scss']

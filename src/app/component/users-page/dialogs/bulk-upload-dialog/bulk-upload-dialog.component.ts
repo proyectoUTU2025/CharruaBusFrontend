@@ -65,25 +65,16 @@ export class BulkUploadDialogComponent {
   process() {
     if (!this.file) return;
     
-    this.loading = true; // Inicia la carga
+    this.loading = true;
 
     this.userService.bulkUpload(this.file)
       .then((resp: BulkResponseDto) => {
         this.loading = false;
-
-        const schemaError = resp.results.find(r => r.fila === 0 && !r.creado);
-
-        if (schemaError) {
-          this.materialUtils.showError(schemaError.mensaje, { duration: 4000 });
-          this.dialogRef.close();
-        } else {
-          this.dialogRef.close(true);
-          this.dialog.open(BulkErrorsDialogComponent, {
-            width: '500px',
-            data: resp.results,
-            disableClose: true,
-          });
-        }
+        this.dialogRef.close(true);
+        this.dialog.open(BulkErrorsDialogComponent, {
+          data: resp.results,
+          disableClose: true,
+        });
       })
       .catch((error: HttpErrorResponse) => {
         this.loading = false;

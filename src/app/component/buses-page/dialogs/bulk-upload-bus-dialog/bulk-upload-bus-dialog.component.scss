@@ -113,6 +113,11 @@ mat-dialog-actions {
   min-width: 150px;
 }
 
+.create-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cancel-btn {
   border-color: var(--primary-color, #1976d2);
   color: var(--primary-color, #1976d2);

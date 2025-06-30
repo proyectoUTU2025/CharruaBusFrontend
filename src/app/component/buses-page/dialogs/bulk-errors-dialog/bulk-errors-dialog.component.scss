@@ -185,3 +185,34 @@ mat-dialog-actions {
   font-size: 0.9rem;
   color: var(--text-secondary, #757575);
 }
+
+.header-error-container {
+  text-align: center;
+  
+  .header-error-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #c62828;
+    margin-bottom: 16px;
+  }
+
+  .header-error-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .header-error-message, .header-error-suggestion {
+    font-size: 0.95rem;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  .header-error-suggestion {
+    margin-top: 16px;
+    background-color: #fce8e6;
+    padding: 8px;
+    border-radius: 4px;
+  }
+}

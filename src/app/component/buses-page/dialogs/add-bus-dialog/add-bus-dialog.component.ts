@@ -9,8 +9,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AltaBusDto } from '../../../../models/buses/bus.model.dto';
 import { LocalidadService } from '../../../../services/localidades.service';
+import { BusService } from '../../../../services/bus.service';
 import { LocalidadNombreDepartamentoDto } from '../../../../models/localidades/localidad-nombre-departamento-dto.model';
 
 @Component({
@@ -40,7 +42,8 @@ export class AddBusDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddBusDialogComponent>,
-    private localidadService: LocalidadService
+    private localidadService: LocalidadService,
+    private busService: BusService
   ) {
     this.form = this.fb.group({
       matricula: ['', Validators.required],
@@ -63,13 +66,36 @@ export class AddBusDialogComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.valid && !this.loading) {
+      this.loading = true;
+      this.error = null;
+
       const alta: AltaBusDto = {
         matricula: this.form.value.matricula,
         cantidadAsientos: this.form.value.cantidadAsientos,
         localidadId: this.form.value.localidadId
       };
       
-      this.dialogRef.close(alta);
+      this.busService.create(alta)
+        .then(() => {
+          this.dialogRef.close(true); // Cierra con éxito
+        })
+        .catch((error: HttpErrorResponse | any) => {
+          console.error('Error al crear ómnibus:', error);
+          
+          // Extraer mensaje específico del backend
+          if (error?.error?.message) {
+            this.error = error.error.message;
+          } else if (typeof error?.error === 'string') {
+            this.error = error.error;
+          } else if (error?.message) {
+            this.error = error.message;
+          } else {
+            this.error = 'Error al crear el ómnibus. Por favor, intenta nuevamente.';
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     }
   }
 
@@ -77,7 +103,7 @@ export class AddBusDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  // Método legacy para compatibilidad
+  // Métodos legacy para compatibilidad
   save(): void {
     this.onSubmit();
   }

@@ -34,40 +34,15 @@
   gap: 12px;
 }
 
-.intro {
+mat-dialog-content {
+  padding: 16px 24px;
+}
+
+mat-dialog-content p {
   margin: 0 0 16px;
   font-size: 0.95rem;
   color: var(--text-secondary, rgba(0, 0, 0, 0.8));
   text-align: center;
-}
-
-.dropzone-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 16px;
-  cursor: pointer;
-}
-
-.icon-wrapper {
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  border: 2px solid #1976d2;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-.icon-wrapper mat-icon {
-  font-size: 24px;
-  color: var(--primary-color, #1976d2);
 }
 
 .dropzone {
@@ -76,9 +51,18 @@
   border-radius: 12px;
   background: #fafafa;
   text-align: center;
+  cursor: pointer;
+  margin-bottom: 16px;
 }
 
-.drop-text {
+.drop-icon {
+  color: var(--primary-color, #1976d2);
+  position: relative;
+  top: -8px;  
+  font-size: 25px;
+}
+
+.dropzone p {
   font-size: 0.9rem;
   color: var(--text-secondary, rgba(0, 0, 0, 0.6));
   line-height: 1.4;
@@ -112,25 +96,6 @@ mat-dialog-actions {
   padding: 0 24px 16px;
 }
 
-.bulk-cancel {
-  color: rgba(0, 0, 0, 0.54);
-  border-radius: 20px;
-}
-
-.bulk-process {
-  background-color: #1976d2;
-  color: white;
-  text-transform: none;
-  border-radius: 20px;
-}
-
-.drop-icon {
-  color: var(--primary-color, #1976d2);
-  position: relative;
-  top: -8px;  
-  font-size: 25px;
-}
-
 .cancel-btn,
 .create-btn {
   text-transform: none;
@@ -146,6 +111,11 @@ mat-dialog-actions {
   align-items: center;
   justify-content: center;
   min-width: 150px;
+}
+
+.create-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .cancel-btn {

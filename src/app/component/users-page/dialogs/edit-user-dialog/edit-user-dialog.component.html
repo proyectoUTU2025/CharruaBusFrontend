@@ -2,8 +2,12 @@
   <h2 class="dialog-title">Editar Perfil</h2>
 </div>
 
-<div class="edit-container" *ngIf="!loading; else loadingTpl" mat-dialog-content>
+<div class="edit-container" mat-dialog-content>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
+
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
       <input matInput formControlName="nombre" />
@@ -41,7 +45,7 @@
       <mat-error *ngIf="form.get('documento')?.hasError('required')">El documento es obligatorio.</mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" *ngIf="user.rol === 'CLIENTE'">
+    <mat-form-field appearance="outline" *ngIf="user?.rol === 'CLIENTE'">
       <mat-label>Situación Laboral</mat-label>
       <mat-select formControlName="situacionLaboral">
         <mat-option value="">— Ninguna —</mat-option>
@@ -54,12 +58,11 @@
     <div *ngIf="error" class="error">{{ error }}</div>
 
     <div class="actions" mat-dialog-actions>
-      <button mat-stroked-button class="cancel-btn" type="button" (click)="onCancel()">Cancelar</button>
-      <button mat-flat-button class="create-btn" type="submit" [disabled]="form.invalid">Guardar</button>
+      <button mat-stroked-button class="cancel-btn" type="button" (click)="onCancel()" [disabled]="loading">Cancelar</button>
+      <button mat-flat-button class="create-btn" type="submit" [disabled]="form.invalid || loading">
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
     </div>
   </form>
 </div>
-
-<ng-template #loadingTpl>
-  <div class="loading">Cargando datos…</div>
-</ng-template>

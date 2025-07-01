@@ -83,12 +83,18 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="ojito">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let b">
+        <button mat-icon-button color="primary" (click)="onAction(b, 'view')">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="acciones">
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
       <td mat-cell *matCellDef="let b">
-        <button mat-icon-button color="accent" (click)="onAction(b, 'view')">
-          <mat-icon>visibility</mat-icon>
-        </button>
         <button mat-icon-button color="warn" (click)="onAction(b, 'toggle')">
           <mat-icon>{{ b.activo ? 'toggle_off' : 'toggle_on' }}</mat-icon>
         </button>
@@ -99,11 +105,7 @@
     <tr mat-row *matRowDef="let row; columns: columns;"></tr>
   </table>
 
-  <mat-paginator
-    [length]="totalElements"
-    [pageSize]="pageSize"
-    [pageIndex]="pageIndex"
-    [pageSizeOptions]="[5, 10, 25]"
+  <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="[5, 10, 25]"
     showFirstLastButtons>
   </mat-paginator>
 </div>

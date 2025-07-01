@@ -24,6 +24,8 @@ import { BulkErrorsDialogComponent } from './dialogs/bulk-errors-dialog/bulk-err
 import { ConfirmDialogComponent } from '../viajes-page/alta-viaje-expreso/dialogs/confirm-warning-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
+import { BusDialogComponent } from './bus-dialog/bus-dialog.component';
+
 @Component({
     selector: 'app-buses-page',
     standalone: true,
@@ -43,7 +45,15 @@ export class BusesPageComponent implements OnInit {
     totalElements = 0;
     pageIndex = 0;
     pageSize = 5;
-    columns = ['id', 'matricula', 'capacidad', 'activo', 'acciones'];
+    columns = [
+        'id',
+        'matricula',
+        'ubicacionActual',
+        'capacidad',
+        'activo',
+        'ojito',
+        'acciones'
+    ];
 
     localidades: LocalidadDto[] = [];
 
@@ -151,10 +161,19 @@ export class BusesPageComponent implements OnInit {
             });
     }
 
+    abrirDialogBus(bus: BusDto): void {
+        this.dialog.open(BusDialogComponent, {
+            data: { busId: bus.id },
+            width: '95vw',
+            maxHeight: '95vh'
+        });
+    }
+
+
     onAction(row: BusDto, action: string): void {
         switch (action) {
             case 'view':
-                this.router.navigate(['/omnibus', row.id]);
+                this.abrirDialogBus(row);
                 break;
             case 'toggle':
                 this.cambiarEstado(row);

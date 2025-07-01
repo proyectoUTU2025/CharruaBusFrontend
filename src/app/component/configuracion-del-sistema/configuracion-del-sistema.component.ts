@@ -95,7 +95,8 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
 
     create() {
         const ref = this.dialog.open(CreateConfiguracionDialogComponent, {
-            width: '400px'
+            width: '400px',
+            disableClose: true
         });
         ref.afterClosed().subscribe((success) => {
             if (success) {
@@ -107,7 +108,8 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
     edit(conf: Configuracion) {
         const ref = this.dialog.open(EditConfiguracionDialogComponent, {
             width: '400px',
-            data: conf
+            data: conf,
+            disableClose: true
         });
         ref.afterClosed().subscribe((updated: Configuracion) => {
             if (updated) {
@@ -133,7 +135,8 @@ export class ConfiguracionDelSistemaComponent implements OnInit {
                 cancelText: 'Cancelar',
                 type: 'warning'
             },
-            width: '400px'
+            width: '400px',
+            disableClose: true
         });
         ref.afterClosed().subscribe(confirmed => {
             if (confirmed) {

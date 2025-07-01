@@ -1,29 +1,82 @@
-:host ::ng-deep .create-btn {
-  background-color: #675992 !important;
-  color: white !important;
-  border-radius: 18px;
-  padding: 0 20px;
-  height: 36px;
-  text-transform: none;
-  font-weight: 500;
-  border: none;
+:host {
+  display: block;
+}
 
-  &:hover {
-    background-color: #5c4d84 !important;
+.dialog-container {
+  padding: 0;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+
+  .dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+
+    .title-icon {
+      color: #f44336;
+    }
+  }
+
+  .close-button {
+    color: #666;
+    &:hover {
+      background-color: #e0e0e0;
+    }
   }
 }
 
-:host ::ng-deep .outline-btn {
-  border: 1px solid #675992 !important;
-  color: #675992 !important;
-  background-color: white !important;
-  border-radius: 18px;
-  padding: 0 20px;
-  height: 36px;
-  text-transform: none;
-  font-weight: 500;
+.dialog-content {
+  padding: 24px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #555;
+  margin: 0;
+}
 
-  &:hover {
-    background-color: rgba(103, 89, 146, 0.1) !important;
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 20px;
+    text-transform: none;
+    font-weight: 600;
+    min-width: 110px;
+  }
+
+  .primary-btn {
+    background-color: #1976d2;
+    color: white;
+
+    &:hover {
+      background-color: #1565c0;
+    }
+  }
+
+  .secondary-btn {
+    border-color: #666;
+    color: #666;
+
+    &:hover {
+      background-color: #f5f5f5;
+      border-color: #333;
+      color: #333;
+    }
   }
 }

@@ -197,7 +197,8 @@ export class UsersPageComponent implements OnInit {
       data: {
         title: 'Confirmar Eliminación',
         message: `¿Está seguro de que desea eliminar al usuario ${user.nombre} ${user.apellido}?`
-      }
+      },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(async confirmed => {

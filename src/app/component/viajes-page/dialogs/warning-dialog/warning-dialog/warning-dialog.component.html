@@ -1,13 +1,20 @@
-<h2 mat-dialog-title>
-  <mat-icon color="warn" style="vertical-align: middle; margin-right: 8px;">warning</mat-icon>
-  El viaje tiene conflictos
-</h2>
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon class="title-icon" color="warn">warning</mat-icon>
+      <span>El viaje tiene conflictos</span>
+    </h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content class="message">
-  {{ data.message }}
-</mat-dialog-content>
+  <mat-dialog-content class="dialog-content">
+    <p>{{ data.message }}</p>
+  </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button (click)="cancelar()" class="outline-btn">Cancelar</button>
-  <button mat-flat-button (click)="confirmar()" class="create-btn">Confirmar</button>
-</mat-dialog-actions>
+  <mat-dialog-actions class="dialog-actions" align="end">
+    <button mat-stroked-button (click)="cancelar()" class="secondary-btn">Cancelar</button>
+    <button mat-flat-button (click)="confirmar()" class="primary-btn" cdkFocusInitial>Confirmar</button>
+  </mat-dialog-actions>
+</div>

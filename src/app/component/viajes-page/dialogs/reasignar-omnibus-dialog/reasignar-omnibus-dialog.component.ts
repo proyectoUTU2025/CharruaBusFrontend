@@ -58,38 +58,39 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
     });
   }
   confirmarReasignacion(): void {
-  if (!this.omnibusSeleccionadoId) return;
-  const body = { nuevoOmnibusId: this.omnibusSeleccionadoId, confirm: false };
+    if (!this.omnibusSeleccionadoId) return;
+    const body = { nuevoOmnibusId: this.omnibusSeleccionadoId, confirm: false };
 
-  this.viajeService
-    .reasignar(this.data.viaje.id, body)
-    .then(() => this.dialogRef.close(true))
-    .catch((err: any) => {
-      const resp = err.error || {};
-      const message =
-        typeof resp === 'string'
-          ? resp
-          : resp.message || 'Error inesperado al reasignar';
-      this.dialog
-        .open(WarningDialogComponent, { data: { message } })
-        .afterClosed()
-        .subscribe((confirmed) => {
-          if (!confirmed) return;
-          this.viajeService
-            .reasignar(this.data.viaje.id, { ...body, confirm: true })
-            .then(() => this.dialogRef.close(true))
-            .catch((err2: any) => {
-              const resp2 = err2.error || {};
-              const message2 =
-                typeof resp2 === 'string'
-                  ? resp2
-                  : resp2.message || 'Error al confirmar reasignación';
-              this.dialog.open(WarningDialogComponent, {
-                data: { message: message2 },
+    this.viajeService
+      .reasignar(this.data.viaje.id, body)
+      .then(() => this.dialogRef.close(true))
+      .catch((err: any) => {
+        const resp = err.error || {};
+        const message =
+          typeof resp === 'string'
+            ? resp
+            : resp.message || 'Error inesperado al reasignar';
+        this.dialog
+          .open(WarningDialogComponent, { data: { message }, disableClose: true })
+          .afterClosed()
+          .subscribe((confirmed) => {
+            if (!confirmed) return;
+            this.viajeService
+              .reasignar(this.data.viaje.id, { ...body, confirm: true })
+              .then(() => this.dialogRef.close(true))
+              .catch((err2: any) => {
+                const resp2 = err2.error || {};
+                const message2 =
+                  typeof resp2 === 'string'
+                    ? resp2
+                    : resp2.message || 'Error al confirmar reasignación';
+                this.dialog.open(WarningDialogComponent, {
+                  data: { message: message2 },
+                  disableClose: true
+                });
               });
-            });
-        });
-    });
+          });
+      });
   }
   cancelar(): void {
     this.dialogRef.close();

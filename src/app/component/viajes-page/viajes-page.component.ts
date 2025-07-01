@@ -1,6 +1,6 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +11,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 import { AltaViajeDetailsDialogComponent } from './dialogs/alta-viaje/alta-viaje-details/alta-viaje-details-dialog.component';
 import { ViajeDetalleDialogComponent } from './dialogs/viaje-detalle-dialog/viaje-detalle-dialog.component';
 import { FiltroBusquedaViajeDto, ViajeDisponibleDto, AltaViajeDto } from '../../models/viajes';
@@ -24,7 +27,7 @@ import { Page } from '../../models';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     MatTableModule,
     MatPaginatorModule,
     MatFormFieldModule,
@@ -35,12 +38,15 @@ import { Page } from '../../models';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatSortModule,
+    MatTooltipModule,
+    LoadingSpinnerComponent,
     ViajeDetalleDialogComponent
   ],
   templateUrl: './viajes-page.component.html',
   styleUrls: ['./viajes-page.component.scss']
 })
-export class ViajesPageComponent implements OnInit, AfterViewInit {
+export class ViajesPageComponent implements OnInit {
   columns = [
     'nombreLocalidadOrigen',
     'nombreLocalidadDestino',
@@ -50,88 +56,127 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
     'asientosDisponibles',
     'acciones'
   ];
-  dataSource = new MatTableDataSource<ViajeDisponibleDto>();
+  
+  filterForm: FormGroup;
+  viajes: ViajeDisponibleDto[] = [];
   totalElements = 0;
   localidades: LocalidadNombreDepartamentoDto[] = [];
-  filtro: {
-    localidadOrigenId: number | null;
-    localidadDestinoId: number | null;
-    fechaDesde: string | Date;
-    fechaHasta: string | Date;
-    } = {
-      localidadOrigenId: null,
-      localidadDestinoId: null,
-      fechaDesde: '',
-      fechaHasta: ''
-    };
   pageIndex = 0;
   pageSize = 5;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  isLoading = true;
+  hasSearched = false;
+  
+  private paginator!: MatPaginator;
+  private sort!: MatSort;
+  
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    if (mp) {
+      this.paginator = mp;
+    }
+  }
+
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    if (ms) {
+      this.sort = ms;
+      this.sort.sortChange.subscribe((event: Sort) => {
+        console.log('SortChange event', event);
+        this.pageIndex = 0;
+        this.buscar(event);
+      });
+    }
+  }
 
   constructor(
+    private fb: FormBuilder,
     private viajeService: ViajeService,
     private dialog: MatDialog,
     private localidadService: LocalidadService
-  ) { }
+  ) {
+    this.filterForm = this.fb.group({
+      localidadOrigenId: [null],
+      localidadDestinoId: [null],
+      fechaDesde: [null],
+      fechaHasta: [null]
+    });
+  }
 
   ngOnInit(): void {
     this.localidadService.getAllFlat().subscribe(ls => this.localidades = ls);
-  }
-
-  ngAfterViewInit(): void {
     this.buscar();
   }
 
-  buscar(): void {
-    const fechaDesde = this.filtro.fechaDesde instanceof Date
-      ? this.filtro.fechaDesde.toISOString()
-      : this.filtro.fechaDesde;
-    const fechaHasta = this.filtro.fechaHasta instanceof Date
-      ? this.filtro.fechaHasta.toISOString()
-      : this.filtro.fechaHasta;
+  private getCurrentSort(): Sort | undefined {
+    return this.sort?.active && this.sort?.direction ? 
+      { active: this.sort.active, direction: this.sort.direction } as Sort : 
+      undefined;
+  }
+
+  buscar(sortEvent?: Sort): void {
+    const isSortRequest = !!sortEvent;
+    if (!isSortRequest) {
+      this.isLoading = true;
+    }
+    this.hasSearched = true;
+
+    const f = this.filterForm.value;
+    const fechaDesde = f.fechaDesde instanceof Date
+      ? f.fechaDesde.toISOString()
+      : f.fechaDesde;
+    const fechaHasta = f.fechaHasta instanceof Date
+      ? f.fechaHasta.toISOString()
+      : f.fechaHasta;
+    
     const filtroTransformado: FiltroBusquedaViajeDto = {
-      localidadOrigenId: this.filtro.localidadOrigenId ?? undefined,
-      localidadDestinoId: this.filtro.localidadDestinoId ?? undefined,
+      localidadOrigenId: f.localidadOrigenId ?? undefined,
+      localidadDestinoId: f.localidadDestinoId ?? undefined,
       fechaDesde,
       fechaHasta
     };
 
     this.viajeService.buscar(filtroTransformado, this.pageIndex, this.pageSize)
       .then((res: Page<ViajeDisponibleDto>) => {
-        this.dataSource.data = res.content;
+        this.viajes = res.content;
         this.totalElements = res.page.totalElements;
         this.pageIndex = res.page.number;
-
-        this.paginator.length = res.page.totalElements;
-        this.paginator.pageIndex = res.page.number;
       })
-      .catch(err => console.error('Error al buscar viajes', err));
+      .catch(err => console.error('Error al buscar viajes', err))
+      .finally(() => {
+        if (!isSortRequest) {
+          this.isLoading = false;
+        }
+      });
+  }
+
+  onSearch(): void {
+    this.pageIndex = 0;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.buscar(this.getCurrentSort());
+  }
+
+  onClear(): void {
+    this.filterForm.reset({
+      localidadOrigenId: null,
+      localidadDestinoId: null,
+      fechaDesde: null,
+      fechaHasta: null
+    });
+    this.pageIndex = 0;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.buscar(this.getCurrentSort());
   }
 
   cambiarPagina(e: PageEvent): void {
     this.pageIndex = e.pageIndex;
     this.pageSize = e.pageSize;
-    this.buscar();
-  }
-
-  limpiarFiltros(): void {
-    this.filtro = {
-      localidadOrigenId: null,
-      localidadDestinoId: null,
-      fechaDesde: '',
-      fechaHasta: ''
-    };
-    this.buscar();
+    this.buscar(this.getCurrentSort());
   }
 
   crearViaje(): void {
-    this.dialog.open(AltaViajeDetailsDialogComponent, {
-      width: '80vw',
-      maxWidth: '700px'
-    }).afterClosed().subscribe((alta: AltaViajeDto) => {
-      if (!alta) return;
-      this.buscar();
-    });
+    this.openAltaViajeDialog();
   }
 
   verDetallesViaje(v: ViajeDisponibleDto): void {
@@ -142,6 +187,20 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
       }).afterClosed().subscribe(r => {
         if (r?.reasignado) this.buscar();
       });
+    });
+  }
+
+  openAltaViajeDialog(): void {
+    const dialogRef = this.dialog.open(AltaViajeDetailsDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.buscar();
+      }
     });
   }
 }

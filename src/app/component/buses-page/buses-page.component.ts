@@ -343,7 +343,8 @@ export class BusesPageComponent implements OnInit {
 
   add() {
     this.dialog.open(AddBusDialogComponent, {
-      width: '450px', maxHeight: '95vh'
+      width: '450px', maxHeight: '95vh',
+      disableClose: true
     })
       .afterClosed()
       .subscribe((result: boolean | undefined) => {

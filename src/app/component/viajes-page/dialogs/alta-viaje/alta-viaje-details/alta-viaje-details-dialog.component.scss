@@ -4,201 +4,742 @@ $default-color: #ccc;
 
 :host {
   display: block;
+  position: relative;
 }
 
-.dialog-content {
+.dialog-header {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-right: 16px;
-}
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 0;
 
-.step {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-
-  h3 {
-    grid-column: 1 / -1;
-    margin-bottom: 8px;
-    color: $primary-color;
-    font-size: 18px;
+  .dialog-title {
+    margin: 0;
+    font-size: 1.5rem;
     font-weight: 600;
+    color: #333;
+  }
+
+  .close-button {
+    color: #666;
+    
+    &:hover {
+      color: #333;
+      background-color: #f5f5f5;
+    }
   }
 }
 
-.paradas-step {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.stepper-container {
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
 
-  .parada-select {
-    max-width: 300px;
-  }
-
-  .paradas-grid {
+  .step-indicators {
     display: flex;
-    flex-direction: row;
-    gap: 32px;
-    margin-top: 16px;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
 
-    .paradas-listado,
-    .paradas-resumen {
-      flex: 1;
-      min-width: 0;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: #e0e0e0;
+      z-index: 1;
+    }
 
-      h4 {
+    .step-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      background: #f8f9fa;
+      padding: 0 8px;
+
+      .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
         margin-bottom: 8px;
-        color: $primary-color;
-        font-size: 16px;
-        font-weight: 500;
+        transition: all 0.3s ease;
       }
 
-      ul, ol {
-        padding-left: 16px;
-        margin-top: 0;
+      .step-label {
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+        font-weight: 500;
+        line-height: 1.2;
+      }
 
-        li {
-          margin-bottom: 6px;
+      &.active {
+        .step-number {
+          background: #1976d2;
+          color: white;
+        }
+        
+        .step-label {
+          color: #1976d2;
+          font-weight: 600;
+        }
+      }
+
+      &.completed {
+        .step-number {
+          background: #4caf50;
+          color: white;
+        }
+        
+        .step-label {
+          color: #4caf50;
         }
       }
     }
   }
 }
 
-mat-form-field {
-  width: 100%;
-}
-
-mat-selection-list {
-  grid-column: 1 / -1;
-  max-height: 200px;
+.dialog-content {
+  padding: 32px 24px 24px 24px;
+  max-height: 60vh;
   overflow-y: auto;
 }
 
-mat-list-option {
-  border: 1px solid #ccc;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  padding: 8px 12px;
-
-  &:hover {
-    background-color: #f3f0fa;
-    cursor: pointer;
-  }
-
-  &.mat-selected {
-    background-color: $primary-color;
-    color: white;
+.step-content {
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 24px;
   }
 }
 
-.sin-buses {
-  grid-column: 1 / -1;
-  font-style: italic;
-  color: #777;
+// Step 1: Detalles del viaje
+.form-section {
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 4px;
+
+    .field-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      mat-form-field.full-width {
+        width: 100%;
+      }
+
+      mat-error {
+        font-size: 12px;
+        margin-top: -12px;
+        margin-bottom: 12px;
+      }
+    }
+
+    .half-width {
+      flex: 1;
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 0;
+    }
+  }
 }
 
-.stepper {
+// Estilos para campos con errores
+.error-field .mat-mdc-form-field-outline-thick {
+  color: #f44336 !important;
+}
+
+.error-field .mdc-floating-label {
+  color: #f44336 !important;
+}
+
+.error-row {
+  margin-top: -8px;
   margin-bottom: 16px;
 }
 
-::ng-deep .mat-horizontal-stepper-header {
-  .mat-step-icon {
-    background-color: $default-color;
-    color: white;
-  }
+// Mensajes de error personalizados
+.error-message {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  margin-left: 0;
+  padding: 0;
+  min-height: 16px;
+  font-family: 'Roboto', sans-serif;
+  display: block;
+}
 
-  &[aria-selected='true'] .mat-step-icon {
-    background-color: $primary-color;
-  }
+mat-form-field {
+  width: 100%;
 
-  &[aria-disabled='false']:not([aria-selected='true']) .mat-step-icon {
-    background-color: $completed-color;
-  }
-
-  .mat-step-label {
-    color: #444;
-    font-weight: 500;
-  }
-
-  &[aria-selected='true'] .mat-step-label {
-    color: $primary-color;
-  }
-
-  &[aria-disabled='false']:not([aria-selected='true']) .mat-step-label {
-    color: $completed-color;
+  .mat-form-field-wrapper {
+    margin-bottom: 8px;
   }
 }
 
-::ng-deep .mat-horizontal-stepper-line {
-  border-top-width: 2px;
-  border-top-style: solid;
-  border-color: $default-color;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-disabled='false'] + .mat-horizontal-stepper-line {
-  border-color: $completed-color;
-}
-
-::ng-deep .mat-horizontal-stepper-header[aria-selected='true'] + .mat-horizontal-stepper-line {
-  border-color: $primary-color;
-}
-
-mat-dialog-actions {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-
-  button {
-    height: 36px;
-    padding: 0 20px;
-    border-radius: 18px;
-    text-transform: none;
-    font-weight: 500;
-  }
-
-  .mat-stroked-button {
-    border-color: $primary-color;
-    color: $primary-color;
-    background-color: white;
-
-    &:hover {
-      background-color: #f3f0fa;
+// Step 2: Paradas (mantener el estilo existente mejorado)
+.paradas-step {
+  .section-title {
+    margin-bottom: 24px;
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    p {
+      font-size: 0.95rem;
+      color: #666;
+      margin: 0;
     }
   }
 
-  .create-btn {
-    background-color: $primary-color;
+  .parada-select {
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 24px;
+  }
+
+  .paradas-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .paradas-listado,
+    .paradas-resumen {
+      background: #f8f9fa;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #e9ecef;
+    }
+
+    h4 {
+      margin: 0 0 20px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #343a40;
+    }
+  }
+}
+
+.paradas-listado {
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    padding: 32px 0;
+    text-align: center;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+    }
+    span {
+      font-size: 1rem;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e9ecef;
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .stop-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+      }
+      .stop-icon {
+        color: #6c757d;
+      }
+      .drag-handle {
+        cursor: move;
+        color: #adb5bd;
+        margin-right: 8px;
+      }
+      button {
+        color: #e53935;
+      }
+    }
+  }
+}
+
+.paradas-resumen {
+  .ruta-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      position: relative;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    .timeline-icon, .timeline-icon-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 16px;
+      z-index: 1;
+      background: #f8f9fa;
+    }
+    
+    .timeline-icon mat-icon {
+      font-size: 24px;
+    }
+
+    .stop-origen .timeline-icon { color: #1976d2; }
+    .stop-destino .timeline-icon { color: #4caf50; }
+    .stop-intermedia .timeline-icon-line mat-icon { color: #adb5bd; font-size: 18px; }
+
+    .timeline-icon-line {
+      .line {
+        width: 2px;
+        height: 8px;
+        background-color: #dee2e6;
+      }
+    }
+
+    .timeline-content {
+      padding-top: 2px;
+      font-weight: 500;
+      .stop-label {
+        color: #6c757d;
+        font-weight: 400;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Step 3: Selección de ómnibus
+.bus-selection-section {
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 20px;
+    color: #6c757d;
+    font-size: 1rem;
+    min-height: 300px;
+  }
+
+  .bus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .bus-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &:hover {
+        border-color: #1976d2;
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+      }
+
+      &.selected {
+        border-color: #1976d2;
+        background: #f3f8ff;
+      }
+
+      .bus-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .bus-icon-plate {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 600;
+          font-size: 1.1rem;
+          color: #333;
+        }
+
+        .bus-capacity {
+          color: #666;
+          font-size: 0.9rem;
+        }
+      }
+
+      .select-button {
+        width: 100%;
+        height: 36px;
+        border: 1px solid #1976d2;
+        background: white;
+        color: #1976d2;
+        border-radius: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #f3f8ff;
+        }
+
+        &.selected {
+          background: #1976d2;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .selection-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    color: #2e7d32;
+
+    .info-icon {
+      color: #4caf50;
+      font-size: 20px;
+    }
+  }
+
+  .no-buses-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      color: #adb5bd;
+    }
+
+    h4 {
+      margin: 0 0 8px 0;
+      color: #495057;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      max-width: 400px;
+    }
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+// Step 4: Confirmación
+.confirmation-section {
+  .confirmation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+    margin-bottom: 24px;
+
+    .confirmation-item {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        display: block;
+        font-size: 0.875rem;
+        color: #666;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .value {
+        display: block;
+        font-size: 1rem;
+        color: #333;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .confirmation-notice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    color: #2e7d32;
+
+    .check-icon {
+      color: #4caf50;
+      font-size: 20px;
+    }
+  }
+}
+
+// Acciones del diálogo
+.dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid #e0e0e0;
+  gap: 16px;
+
+  .actions-left,
+  .actions-right {
+    display: flex;
+    gap: 12px;
+  }
+
+  button {
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 20px;
+    text-transform: none;
+    font-weight: 500;
+    min-width: 100px;
+  }
+
+  .secondary-btn {
+    border-color: #666;
+    color: #666;
+    background: white;
+
+    &:hover {
+      background: #f5f5f5;
+      border-color: #333;
+      color: #333;
+    }
+  }
+
+  .primary-btn {
+    background: #1976d2;
     color: white;
 
     &:hover {
-      background-color: darken($primary-color, 8%);
+      background: #1565c0;
+    }
+
+    &:disabled {
+      background: #ccc;
+      color: #999;
+      cursor: not-allowed;
     }
   }
 }
 
 .outline-btn {
-  border: 1px solid $primary-color;
-  color: $primary-color;
+  border: 1px solid #1976d2;
+  color: #1976d2;
+  background: white;
   border-radius: 18px;
   padding: 0 20px;
   height: 36px;
   text-transform: none;
   font-weight: 500;
+  cursor: pointer;
 
   &:hover {
-    background-color: rgba(103, 89, 146, 0.1);
+    background: #f3f8ff;
+  }
+
+  &:disabled {
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+
+    &:hover {
+      background: white;
+    }
   }
 }
 
-:host ::ng-deep .mat-dialog-container {
-  width: 80vw !important;
-  max-width: 700px !important;
-  height: auto !important;
-  max-height: 80vh !important;
-  padding: 0;
+// Responsive
+@media (max-width: 768px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .stepper-container {
+    padding: 16px;
+
+    .step-indicators {
+      .step-indicator {
+        .step-number {
+          width: 32px;
+          height: 32px;
+          font-size: 12px;
+        }
+
+        .step-label {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .actions-left,
+    .actions-right {
+      justify-content: center;
+    }
+
+    .actions-left {
+      order: 2;
+    }
+
+    .actions-right {
+      order: 1;
+    }
+  }
+}
+
+.simple-error-message {
+  color: #f44336;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Roboto', sans-serif;
+}
+
+// === Estilos para Drag & Drop ===
+// 1. Estilo del "fantasma" que se arrastra
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+// 2. Estilo del espacio donde se puede soltar el elemento
+.cdk-drag-placeholder {
+  background: #eef2ff;
+  border: 1px dashed #799dff;
+  min-height: 58px;
+  border-radius: 8px;
+  margin: 4px 0;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  opacity: 1 !important;
+}
+
+// 3. Estilo del elemento original en la lista mientras se arrastra
+li.cdk-drag-dragging {
+  opacity: 0.4;
+  background: #f8f9fa;
+}
+
+// 4. Animaciones suaves
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-animating {
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Loading overlay styles
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: 4px;
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    .loading-text {
+      font-size: 1rem;
+      color: #333;
+      font-weight: 500;
+    }
+  }
 }

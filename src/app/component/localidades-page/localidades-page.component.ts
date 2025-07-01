@@ -174,7 +174,9 @@ export class LocalidadesPageComponent implements OnInit {
   }
 
   openAltaMasivaDialog() {
-    this.dialog.open(BulkUploadLocalidadDialogComponent)
+    this.dialog.open(BulkUploadLocalidadDialogComponent, {
+      disableClose: true
+    })
       .afterClosed()
       .subscribe(result => {
         if (result?.errors) {
@@ -186,7 +188,11 @@ export class LocalidadesPageComponent implements OnInit {
   }
 
   openAgregarDialog() {
-    const dialogRef = this.dialog.open(AddLocalidadDialogComponent, { width: '400px', maxHeight: '95vh' });
+    const dialogRef = this.dialog.open(AddLocalidadDialogComponent, { 
+      width: '400px', 
+      maxHeight: '95vh',
+      disableClose: true
+    });
     
     dialogRef.afterClosed().subscribe(loc => {
       if (!loc) return;

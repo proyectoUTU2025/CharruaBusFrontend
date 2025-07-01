@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import {
   MatDialog,
   MatDialogModule,
@@ -15,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { firstValueFrom } from 'rxjs';
 import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
@@ -32,6 +34,8 @@ import { LocalidadNombreDepartamentoDto } from '../../../../../models/localidade
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
+    DragDropModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -42,6 +46,7 @@ import { LocalidadNombreDepartamentoDto } from '../../../../../models/localidade
     MatListModule,
     MatStepperModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     WarningDialogComponent
   ]
 })
@@ -61,20 +66,189 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   paradasIntermedias: number[] = [];
   busSeleccionado: OmnibusDisponibleDto | null = null;
   busSeleccionadoArray: OmnibusDisponibleDto[] = [];
+  fechaMinima: Date = new Date();
+  fechaMinimallegada: Date = new Date();
+  horasDisponibles: string[] = [];
+  horasLlegadaDisponibles: string[] = [];
+  isLoadingBuses = false;
+  isLoadingConfirm = false;
 
   constructor(
     private dialogRef: MatDialogRef<AltaViajeDetailsDialogComponent>,
     private busService: BusService,
     private localidadesService: LocalidadService,
     private viajeService: ViajeService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private fb: FormBuilder
   ) { }
 
   async ngOnInit(): Promise<void> {
     this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
+    // Establecer fecha mínima como hoy
+    this.fechaMinima.setHours(0, 0, 0, 0);
+    this.updateFechaMinimallegada();
+    this.generarHorasDisponibles();
+    this.generarHorasLlegadaDisponibles();
+  }
+
+  generarHorasDisponibles(): void {
+    this.horasDisponibles = [];
+    const ahora = new Date();
+    const esHoy = this.fechaSalida && this.compararSoloFechas(this.fechaSalida, ahora) === 0;
+
+    for (let hora = 0; hora < 24; hora++) {
+      for (let minuto = 0; minuto < 60; minuto += 5) {
+        // Solo filtrar horarios si la fecha seleccionada es hoy
+        if (esHoy && hora === ahora.getHours()) {
+          const minutoActual = ahora.getMinutes();
+          // Solo incluimos horarios que sean al menos 5 minutos en el futuro
+          if (minuto <= minutoActual + 5) {
+            continue;
+          }
+        } else if (esHoy && hora < ahora.getHours()) {
+          // Si es hoy y la hora ya pasó, no la incluimos
+          continue;
+        }
+        
+        const horaStr = hora.toString().padStart(2, '0');
+        const minutoStr = minuto.toString().padStart(2, '0');
+        this.horasDisponibles.push(`${horaStr}:${minutoStr}`);
+      }
+    }
+  }
+
+  generarHorasLlegadaDisponibles(): void {
+    this.horasLlegadaDisponibles = [];
+    const ahora = new Date();
+    const esHoy = this.fechaLlegada && this.compararSoloFechas(this.fechaLlegada, ahora) === 0;
+
+    for (let hora = 0; hora < 24; hora++) {
+      for (let minuto = 0; minuto < 60; minuto += 5) {
+        // Solo filtrar horarios si la fecha seleccionada es hoy
+        if (esHoy && hora === ahora.getHours()) {
+          const minutoActual = ahora.getMinutes();
+          // Solo incluimos horarios que sean al menos 5 minutos en el futuro
+          if (minuto <= minutoActual + 5) {
+            continue;
+          }
+        } else if (esHoy && hora < ahora.getHours()) {
+          // Si es hoy y la hora ya pasó, no la incluimos
+          continue;
+        }
+        
+        const horaStr = hora.toString().padStart(2, '0');
+        const minutoStr = minuto.toString().padStart(2, '0');
+        this.horasLlegadaDisponibles.push(`${horaStr}:${minutoStr}`);
+      }
+    }
+  }
+
+  updateFechaMinimallegada() {
+    if (this.fechaSalida) {
+      this.fechaMinimallegada = new Date(this.fechaSalida);
+    } else {
+      this.fechaMinimallegada = new Date(this.fechaMinima);
+    }
+  }
+
+  onFechaSalidaChange() {
+    this.updateFechaMinimallegada();
+    this.generarHorasDisponibles(); // Recalcular horas disponibles
+
+    // Si la fecha de llegada es anterior a la nueva fecha mínima, resetearla
+    if (this.fechaLlegada && this.fechaSalida && this.compararSoloFechas(this.fechaLlegada, this.fechaSalida) < 0) {
+      this.fechaLlegada = null;
+      this.horaLlegada = '';
+    }
+
+    // Resetear la hora de salida si ya no es válida
+    if (this.horaSalida && !this.horasDisponibles.includes(this.horaSalida)) {
+      this.horaSalida = '';
+    }
+  }
+
+  onFechaLlegadaChange() {
+    this.generarHorasLlegadaDisponibles();
+    
+    // Resetear la hora de llegada si ya no es válida
+    if (this.horaLlegada && !this.horasLlegadaDisponibles.includes(this.horaLlegada)) {
+      this.horaLlegada = '';
+    }
+  }
+
+  // Método para forzar la validación visual cuando hay errores críticos
+  hasOrigenDestinoError(): boolean {
+    return !!(this.origenId && this.destinoId && this.origenId === this.destinoId);
+  }
+
+  hasFechaSalidaError(): boolean {
+    return !!(this.fechaSalida && !this.esFechaValidaSalida());
+  }
+
+  hasFechaLlegadaError(): boolean {
+    return !!(this.fechaLlegada && this.fechaSalida && !this.esFechaValidaLlegada());
+  }
+
+  hasHorarioError(): boolean {
+    if (!this.fechaSalida || !this.fechaLlegada || !this.horaSalida || !this.horaLlegada) {
+      return false;
+    }
+
+    // Solo validamos horario si es el mismo día
+    if (this.compararSoloFechas(this.fechaSalida, this.fechaLlegada) === 0) {
+      const salidaCompleta = this.getCombinedDateTime(this.fechaSalida, this.horaSalida);
+      const llegadaCompleta = this.getCombinedDateTime(this.fechaLlegada, this.horaLlegada);
+
+      if (salidaCompleta && llegadaCompleta) {
+        return llegadaCompleta.getTime() <= salidaCompleta.getTime();
+      }
+    }
+
+    return false;
+  }
+
+  private getCombinedDateTime(date: Date, time: string): Date | null {
+    if (!date || !time) return null;
+    const [hours, minutes] = time.split(':').map(Number);
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes, 0, 0);
+    return newDate;
+  }
+
+  private compararSoloFechas(fecha1: Date, fecha2: Date): number {
+    const f1 = new Date(fecha1.getFullYear(), fecha1.getMonth(), fecha1.getDate());
+    const f2 = new Date(fecha2.getFullYear(), fecha2.getMonth(), fecha2.getDate());
+    return f1.getTime() - f2.getTime();
+  }
+
+  esFechaValidaSalida(): boolean {
+    if (!this.fechaSalida) return false;
+    return this.compararSoloFechas(this.fechaSalida, this.fechaMinima) >= 0;
+  }
+
+  esFechaValidaLlegada(): boolean {
+    if (!this.fechaLlegada || !this.fechaSalida) return false;
+    return this.compararSoloFechas(this.fechaLlegada, this.fechaSalida) >= 0;
+  }
+
+  get fechaSalidaFormateada(): string {
+    if (!this.fechaSalida) return '';
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
+    return this.fechaSalida.toLocaleDateString('es-ES', options);
+  }
+
+  get fechaLlegadaFormateada(): string {
+    if (!this.fechaLlegada) return '';
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
+    return this.fechaLlegada.toLocaleDateString('es-ES', options);
   }
 
   siguiente(): void {
+    // Si pasamos de los detalles a las paradas, validamos la lista.
+    if (this.step === 0) {
+      this.validarParadasExistentes();
+    }
+    
     this.completedSteps[this.step] = true;
     this.step++;
     if (this.step === 2) this.cargarBuses();
@@ -130,26 +304,46 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       confirm: false
     };
 
+    this.isLoadingConfirm = true;
     this.viajeService.altaViaje(alta)
-      .then(() => this.dialogRef.close(alta))
-      .catch(mensaje => {
-        this.dialog.open(WarningDialogComponent, { data: { message: mensaje } })
-          .afterClosed().subscribe((confirmado: boolean) => {
-            if (!confirmado) return;
+      .then(() => {
+        this.isLoadingConfirm = false;
+        this.dialogRef.close(true);
+      })
+      .catch(err => {
+        this.isLoadingConfirm = false;
+        // El backend devuelve un string con el mensaje de conflicto
+        const mensaje = typeof err === 'string' ? err : (err?.message || 'Error inesperado al crear el viaje.');
+        
+        const dialogRef = this.dialog.open(WarningDialogComponent, {
+          data: { message: mensaje },
+          disableClose: true,
+        });
+
+        dialogRef.afterClosed().subscribe(confirmado => {
+          if (confirmado) {
+            // El usuario confirma, reenviamos la solicitud con `confirm: true`
+            this.isLoadingConfirm = true;
             this.viajeService.altaViaje({ ...alta, confirm: true })
-              .then(() => this.dialogRef.close(alta))
-              .catch(err => {
-                const fallback = typeof err === 'string'
-                  ? err
-                  : (err?.message || 'Error al confirmar el viaje');
-                this.dialog.open(WarningDialogComponent, { data: { message: fallback } });
+              .then(() => {
+                this.isLoadingConfirm = false;
+                this.dialogRef.close(true);
+              })
+              .catch(finalErr => {
+                this.isLoadingConfirm = false;
+                const fallback = typeof finalErr === 'string' ? finalErr : (finalErr?.message || 'Error al confirmar el viaje');
+                this.dialog.open(WarningDialogComponent, { data: { message: fallback }, disableClose: true });
               });
-          });
+          }
+        });
       });
   }
 
   cargarBuses(): void {
     if (!this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0) return;
+
+    this.isLoadingBuses = true;
+    this.buses = []; // Limpiamos la lista anterior para evitar mostrar datos viejos
 
     const filtro: FiltroDisponibilidadOmnibusDto = {
       origenId: this.origenId,
@@ -157,17 +351,22 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
       fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada),
       minAsientos: 1
-
     };
 
     this.busService.getDisponibles(filtro)
       .then(buses => this.buses = buses)
-      .catch(() => this.buses = []);
+      .catch(() => this.buses = [])
+      .finally(() => this.isLoadingBuses = false);
   }
 
 
   onBusSeleccionadoChange(): void {
     this.busSeleccionado = this.busSeleccionadoArray[0] ?? null;
+  }
+
+  seleccionarBus(bus: OmnibusDisponibleDto): void {
+    this.busSeleccionado = bus;
+    this.busSeleccionadoArray = [bus];
   }
 
   localidadNombre(id: number): string {
@@ -176,13 +375,33 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   deberiaDeshabilitarSiguiente(): boolean {
     if (this.step === 0) {
-      return !this.origenId
-        || !this.destinoId
-        || !this.fechaSalida
-        || !this.horaSalida
-        || !this.fechaLlegada
-        || !this.horaLlegada
-        || this.precio <= 0;
+      // Validaciones básicas
+      if (!this.origenId || !this.destinoId || !this.fechaSalida || !this.horaSalida || 
+          !this.fechaLlegada || !this.horaLlegada || this.precio <= 0) {
+        return true;
+      }
+      
+      // Validación de origen diferente de destino
+      if (this.origenId === this.destinoId) {
+        return true;
+      }
+      
+      // Validación de fecha de salida no anterior a hoy
+      if (!this.esFechaValidaSalida()) {
+        return true;
+      }
+      
+      // Validación de fecha de llegada posterior o igual a fecha de salida
+      if (!this.esFechaValidaLlegada()) {
+        return true;
+      }
+      
+      // Validación de horario
+      if (this.hasHorarioError()) {
+        return true;
+      }
+      
+      return false;
     }
     if (this.step === 2) {
       return !this.busSeleccionado;
@@ -237,6 +456,24 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     const d = new Date(this.fechaLlegada);
     d.setHours(hh, mm, 0, 0);
     return d;
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.paradasIntermedias, event.previousIndex, event.currentIndex);
+  }
+
+  validarParadasExistentes(): void {
+    this.paradasIntermedias = this.paradasIntermedias.filter(
+      paradaId => paradaId !== this.origenId && paradaId !== this.destinoId
+    );
+  }
+
+  get isHoraSalidaDisabled(): boolean {
+    return !this.fechaSalida;
+  }
+
+  get isHoraLlegadaDisabled(): boolean {
+    return !this.fechaLlegada;
   }
 }
 

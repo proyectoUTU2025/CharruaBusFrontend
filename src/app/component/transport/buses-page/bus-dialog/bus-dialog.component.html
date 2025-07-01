@@ -1,0 +1,8 @@
+<mat-tab-group>
+    <mat-tab label="Detalle">
+        <app-bus-detail [busId]="data.busId"></app-bus-detail>
+    </mat-tab>
+    <mat-tab label="Historial de Movimientos">
+        <app-omnibus-history [busId]="data.busId"></app-omnibus-history>
+    </mat-tab>
+</mat-tab-group>

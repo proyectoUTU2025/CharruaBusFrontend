@@ -1,0 +1,20 @@
+:host {
+    display: block;
+    width: 100%;
+    max-width: 95vw;
+}
+
+mat-tab-group {
+    width: 100%;
+}
+
+mat-tab-body {
+    padding: 16px 0;
+}
+
+@media (max-width: 650px) {
+    :host {
+        width: 98vw;
+        min-width: 0;
+    }
+}

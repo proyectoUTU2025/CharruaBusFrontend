@@ -1,38 +1,48 @@
-import { MantenimientoService } from './../../../../services/mantenimiento.service';
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatNativeDateModule } from '@angular/material/core';
-import { CommonModule } from '@angular/common';
-import { AsignarMantenimientoDto } from '../../../../models/buses/asignar-mantenimiento-dto.model';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { MantenimientoService } from '../../../../services/mantenimiento.service';
+import { AsignarMantenimientoDto } from '../../../../models/buses/asignar-mantenimiento-dto.model';
+import { ApiResponse } from '../../../../models';
+import { MantenimientoDto } from '../../../../models/buses/mantenimiento-dto';
 
 @Component({
     selector: 'app-asignar-mantenimiento',
     standalone: true,
-    templateUrl: './asignar-mantenimiento.component.html',
-    styleUrls: ['./asignar-mantenimiento.component.scss'],
     imports: [
-        CommonModule, ReactiveFormsModule, MatButtonModule,
-        MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule, MatDialogModule, MatSelectModule,
-    ]
+        CommonModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatDialogModule
+    ],
+    templateUrl: './asignar-mantenimiento.component.html',
+    styleUrls: ['./asignar-mantenimiento.component.scss']
 })
 export class AsignarMantenimientoComponent implements OnInit {
     form: FormGroup;
     isLoading = false;
     horas: string[] = [];
 
-    private snackBar = inject(MatSnackBar);
-    private mantenimientoService = inject(MantenimientoService);
-    private dialogRef = inject(MatDialogRef<AsignarMantenimientoComponent>);
-    private fb = inject(FormBuilder);
-
-    constructor(@Inject(MAT_DIALOG_DATA) public data: { omnibusId: number }) {
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: { omnibusId: number },
+        private fb: FormBuilder,
+        private mantenimientoService: MantenimientoService,
+        private snackBar: MatSnackBar,
+        private dialogRef: MatDialogRef<AsignarMantenimientoComponent>
+    ) {
         this.form = this.fb.group({
             motivo: ['', [Validators.required, Validators.maxLength(255)]],
             fechaInicio: [null, Validators.required],
@@ -50,32 +60,38 @@ export class AsignarMantenimientoComponent implements OnInit {
         }
     }
 
-    ngOnInit() { }
+    ngOnInit(): void { }
 
-    onSubmit() {
+    onSubmit(): void {
         if (this.form.invalid) {
             this.form.markAllAsTouched();
             this.showSnackbar('Completa todos los campos obligatorios');
             return;
         }
-        const values = this.form.value;
+        const v = this.form.value;
         const dto: AsignarMantenimientoDto = {
             idOmnibus: this.data.omnibusId,
-            motivo: values.motivo,
-            fechaInicio: this.combinarFechaHora(values.fechaInicio, values.horaInicio),
-            fechaFin: this.combinarFechaHora(values.fechaFin, values.horaFin)
+            motivo: v.motivo,
+            fechaInicio: this.combinarFechaHora(v.fechaInicio, v.horaInicio),
+            fechaFin: this.combinarFechaHora(v.fechaFin, v.horaFin)
         };
 
         this.isLoading = true;
+        this.form.disable();
+
         this.mantenimientoService.asignarMantenimiento(dto).subscribe({
-            next: (resp) => {
+            next: (resp: ApiResponse<MantenimientoDto>) => {
                 this.isLoading = false;
-                this.showSnackbar(resp.message || 'Mantenimiento creado con éxito');
+                this.form.enable();
+                this.showSnackbar(resp.message);
                 this.dialogRef.close('mantenimientoCreado');
             },
-            error: (err) => {
+            error: err => {
                 this.isLoading = false;
-                if (err.error?.errores) {
+                this.form.enable();
+                if (err.status === 409) {
+                    this.showSnackbar('El ómnibus ya tiene un viaje o mantenimiento en ese rango de fechas.');
+                } else if (err.error?.errores) {
                     let msg = '';
                     for (const field in err.error.errores) {
                         if (Array.isArray(err.error.errores[field])) {
@@ -92,31 +108,29 @@ export class AsignarMantenimientoComponent implements OnInit {
         });
     }
 
-    combinarFechaHora(fecha: string | Date, hora: string): string {
-        if (!fecha || !hora) return '';
-        const f = new Date(fecha);
-        const yyyy = f.getFullYear();
-        const mm = (f.getMonth() + 1).toString().padStart(2, '0');
-        const dd = f.getDate().toString().padStart(2, '0');
+    combinarFechaHora(fecha: Date, hora: string): string {
+        const yyyy = fecha.getFullYear();
+        const mm = (fecha.getMonth() + 1).toString().padStart(2, '0');
+        const dd = fecha.getDate().toString().padStart(2, '0');
         return `${yyyy}-${mm}-${dd}T${hora}:00`;
     }
 
     getFieldError(field: string): string | null {
-        const control = this.form.get(field);
-        if (control && control.touched && control.invalid) {
-            if (control.errors?.['required']) return 'Campo obligatorio';
-            if (control.errors?.['maxlength']) return 'Máx. 255 caracteres';
+        const ctl = this.form.get(field);
+        if (ctl?.touched && ctl.invalid) {
+            if (ctl.hasError('required')) return 'Campo obligatorio';
+            if (ctl.hasError('maxlength')) return 'Máx. 255 caracteres';
         }
         return null;
     }
 
-    close() {
+    close(): void {
         this.dialogRef.close(false);
     }
 
-    private showSnackbar(msg: string, ms: number = 3000) {
+    private showSnackbar(msg: string, duration = 3000): void {
         this.snackBar.open(msg, 'Cerrar', {
-            duration: ms,
+            duration,
             verticalPosition: 'top',
             horizontalPosition: 'center'
         });

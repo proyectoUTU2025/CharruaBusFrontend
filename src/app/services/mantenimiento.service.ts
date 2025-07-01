@@ -4,10 +4,11 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../models';
 import { MantenimientoDto } from '../models/buses/mantenimiento-dto';
 import { AsignarMantenimientoDto } from '../models/buses/asignar-mantenimiento-dto.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class MantenimientoService {
-    private readonly baseUrl = '/api/mantenimientos';
+    private readonly base = `${environment.apiBaseUrl}/mantenimientos`;
 
     constructor(private http: HttpClient) { }
 
@@ -15,7 +16,7 @@ export class MantenimientoService {
         dto: AsignarMantenimientoDto
     ): Observable<ApiResponse<MantenimientoDto>> {
         return this.http.post<ApiResponse<MantenimientoDto>>(
-            this.baseUrl,
+            this.base,
             dto,
             { withCredentials: true }
         );

@@ -1,9 +1,10 @@
 <h2>Asignar mantenimiento</h2>
+
 <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="mantenimiento-form">
     <mat-form-field appearance="fill">
         <mat-label>Motivo</mat-label>
         <input matInput formControlName="motivo" maxlength="255" required [disabled]="isLoading">
-        <mat-error *ngIf="getFieldError('motivo')">{{ getFieldError('motivo') }}</mat-error>
+        <mat-error *ngIf="form.get('motivo')?.hasError('required')">Campo obligatorio</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -11,7 +12,7 @@
         <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" required [disabled]="isLoading">
         <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
         <mat-datepicker #pickerInicio></mat-datepicker>
-        <mat-error *ngIf="getFieldError('fechaInicio')">{{ getFieldError('fechaInicio') }}</mat-error>
+        <mat-error *ngIf="form.get('fechaInicio')?.hasError('required')">Campo obligatorio</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -19,7 +20,7 @@
         <mat-select formControlName="horaInicio" required [disabled]="isLoading">
             <mat-option *ngFor="let h of horas" [value]="h">{{ h }}</mat-option>
         </mat-select>
-        <mat-error *ngIf="getFieldError('horaInicio')">{{ getFieldError('horaInicio') }}</mat-error>
+        <mat-error *ngIf="form.get('horaInicio')?.hasError('required')">Campo obligatorio</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -27,7 +28,7 @@
         <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" required [disabled]="isLoading">
         <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
         <mat-datepicker #pickerFin></mat-datepicker>
-        <mat-error *ngIf="getFieldError('fechaFin')">{{ getFieldError('fechaFin') }}</mat-error>
+        <mat-error *ngIf="form.get('fechaFin')?.hasError('required')">Campo obligatorio</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -35,7 +36,7 @@
         <mat-select formControlName="horaFin" required [disabled]="isLoading">
             <mat-option *ngFor="let h of horas" [value]="h">{{ h }}</mat-option>
         </mat-select>
-        <mat-error *ngIf="getFieldError('horaFin')">{{ getFieldError('horaFin') }}</mat-error>
+        <mat-error *ngIf="form.get('horaFin')?.hasError('required')">Campo obligatorio</mat-error>
     </mat-form-field>
 
     <div class="mantenimiento-actions">

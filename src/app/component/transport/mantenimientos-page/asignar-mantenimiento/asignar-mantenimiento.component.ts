@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,7 +9,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CommonModule } from '@angular/common';
 import { MantenimientoService } from '../../../../services/mantenimiento.service';
 import { AsignarMantenimientoDto } from '../../../../models/buses/asignar-mantenimiento-dto.model';
 import { ApiResponse } from '../../../../models';
@@ -33,8 +33,8 @@ import { MantenimientoDto } from '../../../../models/buses/mantenimiento-dto';
 })
 export class AsignarMantenimientoComponent implements OnInit {
     form: FormGroup;
-    isLoading = false;
     horas: string[] = [];
+    isLoading = false;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: { omnibusId: number },
@@ -53,8 +53,8 @@ export class AsignarMantenimientoComponent implements OnInit {
 
         for (let h = 0; h < 24; h++) {
             for (let m = 0; m < 60; m += 5) {
-                const hh = h.toString().padStart(2, '0');
-                const mm = m.toString().padStart(2, '0');
+                const hh = String(h).padStart(2, '0');
+                const mm = String(m).padStart(2, '0');
                 this.horas.push(`${hh}:${mm}`);
             }
         }
@@ -68,6 +68,7 @@ export class AsignarMantenimientoComponent implements OnInit {
             this.showSnackbar('Completa todos los campos obligatorios');
             return;
         }
+
         const v = this.form.value;
         const dto: AsignarMantenimientoDto = {
             idOmnibus: this.data.omnibusId,
@@ -89,16 +90,13 @@ export class AsignarMantenimientoComponent implements OnInit {
             error: err => {
                 this.isLoading = false;
                 this.form.enable();
-                if (err.status === 409) {
-                    this.showSnackbar('El ómnibus ya tiene un viaje o mantenimiento en ese rango de fechas.');
-                } else if (err.error?.errores) {
-                    let msg = '';
-                    for (const field in err.error.errores) {
-                        if (Array.isArray(err.error.errores[field])) {
-                            msg += err.error.errores[field].join(' ') + ' ';
-                        }
-                    }
-                    this.showSnackbar(msg.trim() || 'Error validando datos', 4500);
+                if (err.status === 409 && err.error?.message) {
+                    this.showSnackbar(err.error.message, 4000);
+                } else if (err.status === 400 && err.error?.errores) {
+                    const msgs = Object.values(err.error.errores)
+                        .flat()
+                        .join(' ');
+                    this.showSnackbar(msgs || 'Error validando datos', 4500);
                 } else if (err.error?.message) {
                     this.showSnackbar(err.error.message, 3500);
                 } else {
@@ -108,31 +106,18 @@ export class AsignarMantenimientoComponent implements OnInit {
         });
     }
 
-    combinarFechaHora(fecha: Date, hora: string): string {
+    private combinarFechaHora(fecha: Date, hora: string): string {
         const yyyy = fecha.getFullYear();
-        const mm = (fecha.getMonth() + 1).toString().padStart(2, '0');
-        const dd = fecha.getDate().toString().padStart(2, '0');
+        const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+        const dd = String(fecha.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}T${hora}:00`;
     }
 
-    getFieldError(field: string): string | null {
-        const ctl = this.form.get(field);
-        if (ctl?.touched && ctl.invalid) {
-            if (ctl.hasError('required')) return 'Campo obligatorio';
-            if (ctl.hasError('maxlength')) return 'Máx. 255 caracteres';
-        }
-        return null;
+    private showSnackbar(msg: string, duration = 3000) {
+        this.snackBar.open(msg, 'Cerrar', { duration });
     }
 
-    close(): void {
+    close() {
         this.dialogRef.close(false);
-    }
-
-    private showSnackbar(msg: string, duration = 3000): void {
-        this.snackBar.open(msg, 'Cerrar', {
-            duration,
-            verticalPosition: 'top',
-            horizontalPosition: 'center'
-        });
     }
 }

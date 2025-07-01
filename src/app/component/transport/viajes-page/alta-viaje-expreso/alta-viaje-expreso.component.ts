@@ -5,10 +5,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { LocalidadService } from '../../../../services/localidades.service';
 import { BusService } from '../../../../services/bus.service';
 import { ViajeExpresoService } from '../../../../services/viaje-expreso.service';
@@ -19,8 +19,15 @@ import { ConfirmDialogComponent } from './dialogs/confirm-warning-dialog.compone
     selector: 'app-alta-viaje-expreso',
     standalone: true,
     imports: [
-        CommonModule, ReactiveFormsModule, MatButtonModule,
-        MatFormFieldModule, MatSelectModule, MatInputModule, MatDatepickerModule, MatNativeDateModule
+        CommonModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatDialogModule
     ],
     templateUrl: './alta-viaje-expreso.component.html',
     styleUrls: ['./alta-viaje-expreso.component.scss']
@@ -41,7 +48,7 @@ export class AltaViajeExpresoComponent implements OnInit {
         private viajeExpresoService: ViajeExpresoService,
         private snackBar: MatSnackBar,
         private dialog: MatDialog,
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) public data: { omnibusId?: number },
         private dialogRef: MatDialogRef<AltaViajeExpresoComponent>
     ) {
         this.form = this.fb.group({
@@ -50,9 +57,8 @@ export class AltaViajeExpresoComponent implements OnInit {
             fechaSalida: [null, Validators.required],
             horaSalida: [null, Validators.required],
             fechaLlegada: [null, Validators.required],
-            horaLlegada: [null, Validators.required],
+            horaLlegada: [null, Validators.required]
         });
-
 
         for (let h = 0; h < 24; h++) {
             for (let m = 0; m < 60; m += 5) {
@@ -64,22 +70,22 @@ export class AltaViajeExpresoComponent implements OnInit {
     }
 
     ngOnInit() {
-        const omnibusId = this.data?.omnibusId || this.omnibusIdPreseleccionado;
+        const omnibusId = this.data.omnibusId ?? this.omnibusIdPreseleccionado;
         if (omnibusId) {
-            this.form.patchValue({ omnibusId: +omnibusId });
+            this.form.patchValue({ omnibusId });
         }
         this.loadLocalidades();
         this.loadBuses();
     }
 
-    loadLocalidades() {
+    private loadLocalidades() {
         this.localidadService.getAll({}, 0, 1000).subscribe({
             next: resp => this.localidades = resp.content,
             error: () => this.showSnackbar('Error cargando localidades')
         });
     }
 
-    loadBuses() {
+    private loadBuses() {
         this.busService.getAll({}, 0, 1000)
             .then(resp => this.buses = resp.content)
             .catch(() => this.showSnackbar('Error cargando ómnibus'));
@@ -92,16 +98,13 @@ export class AltaViajeExpresoComponent implements OnInit {
             return;
         }
 
-        const values = this.form.value;
-        const fechaHoraSalida = this.combinarFechaHora(values.fechaSalida, values.horaSalida);
-        const fechaHoraLlegada = this.combinarFechaHora(values.fechaLlegada, values.horaLlegada);
-
+        const v = this.form.value;
         const dto: ViajeExpresoRequest = {
-            omnibusId: values.omnibusId,
-            destinoId: values.destinoId,
-            fechaHoraSalida,
-            fechaHoraLlegada,
-            confirm: confirm
+            omnibusId: v.omnibusId,
+            destinoId: v.destinoId,
+            fechaHoraSalida: this.combinarFechaHora(v.fechaSalida, v.horaSalida),
+            fechaHoraLlegada: this.combinarFechaHora(v.fechaLlegada, v.horaLlegada),
+            confirm
         };
 
         this.isLoading = true;
@@ -113,51 +116,48 @@ export class AltaViajeExpresoComponent implements OnInit {
                 this.form.reset();
                 this.dialogRef.close('viajeRegistrado');
             },
-            error: (err) => {
+            error: err => {
                 this.isLoading = false;
-                if (err.status === 409 && err.error && err.error.message) {
+
+                if (err.status === 409 && err.error?.message) {
                     this.dialog.open(ConfirmDialogComponent, {
                         data: { message: err.error.message }
-                    }).afterClosed().subscribe(confirmar => {
-                        if (confirmar) {
-                            this.onSubmit(true);
-                        }
+                    }).afterClosed().subscribe(yes => {
+                        if (yes) this.onSubmit(true);
                     });
                 }
-                else if (err.status === 400 && err.error && err.error.errores) {
+                else if (err.status === 400 && err.error?.errores) {
                     const errores = err.error.errores;
                     let msg = '';
-                    for (const field in errores) {
-                        if (Array.isArray(errores[field])) {
-                            msg += errores[field].join(' ') + ' ';
-                        }
-                    }
+                    Object.values(errores).forEach(arr => {
+                        if (Array.isArray(arr)) msg += arr.join(' ') + ' ';
+                    });
                     this.showSnackbar(msg.trim() || 'Error validando datos', 4500);
                 }
-                else if (err.error && err.error.message) {
+                else if (err.error?.message) {
                     this.showSnackbar(err.error.message, 3500);
                 }
                 else {
                     this.showSnackbar('Error registrando viaje', 3500);
                 }
+
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     }
 
-    combinarFechaHora(fecha: string | Date, hora: string): string {
-        if (!fecha || !hora) return '';
+    private combinarFechaHora(fecha: string | Date, hora: string): string {
         const f = new Date(fecha);
         const yyyy = f.getFullYear();
-        const mm = (f.getMonth() + 1).toString().padStart(2, '0');
-        const dd = f.getDate().toString().padStart(2, '0');
+        const mm = String(f.getMonth() + 1).padStart(2, '0');
+        const dd = String(f.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}T${hora}:00`;
     }
 
     getFieldError(field: string): string | null {
-        const control = this.form.get(field);
-        if (control && control.touched && control.invalid) {
-            if (control.errors?.['required']) return 'Este campo es obligatorio';
+        const ctl = this.form.get(field);
+        if (ctl?.touched && ctl.invalid) {
+            if (ctl.errors?.['required']) return 'Este campo es obligatorio';
         }
         return null;
     }
@@ -172,6 +172,5 @@ export class AltaViajeExpresoComponent implements OnInit {
             verticalPosition: 'top',
             horizontalPosition: 'center'
         });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }

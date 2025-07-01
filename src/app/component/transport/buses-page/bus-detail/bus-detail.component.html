@@ -25,18 +25,5 @@
                 </span>
             </p>
         </mat-card-content>
-        <mat-card-actions>
-            <button mat-raised-button color="primary" (click)="abrirAltaViajeExpreso()">
-                <mat-icon>add</mat-icon> Registrar viaje expreso
-            </button>
-            <button mat-raised-button color="accent" (click)="abrirAsignarMantenimiento()">
-                <mat-icon>build</mat-icon> Asignar mantenimiento
-            </button>
-        </mat-card-actions>
     </mat-card>
-
-    <section *ngIf="bus">
-        <h2>Historial de Movimientos</h2>
-        <app-omnibus-history [busId]="bus.id"></app-omnibus-history>
-    </section>
 </ng-template>

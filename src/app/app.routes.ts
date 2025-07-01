@@ -8,7 +8,7 @@ import { ResetPasswordComponent } from './component/reset-password/reset-passwor
 import { CompraPageComponent } from './component/compra-page/compra-page.component';
 import { StripeRedirectComponent } from './component/stripe-redirect.component/stripe-redirect.component';
 import { UsersPageComponent } from './component/users-page/users-page.component';
-import { BusesPageComponent } from './component/buses-page/buses-page.component';
+import { BusesPageComponent } from './component/transport/buses-page/buses-page.component';
 import { LocalidadesPageComponent } from './component/localidades-page/localidades-page.component';
 import { ViajesPageComponent } from './component/viajes-page/viajes-page.component';
 import { ConfiguracionDelSistemaComponent } from './component/configuracion-del-sistema/configuracion-del-sistema.component';
@@ -46,7 +46,6 @@ export const routes: Routes = [
       { path: 'configuracion', component: ConfiguracionDelSistemaComponent },
       { path: 'usuarios', component: UsersPageComponent, pathMatch: 'full' },
       { path: 'omnibus', component: BusesPageComponent },
-      { path: 'omnibus/:id', component: BusDetailComponent },
       { path: 'localidades', component: LocalidadesPageComponent },
       { path: 'viajes', component: ViajesPageComponent },
       { path: 'viajes/:id/pasajes', component: PasajesPorViajeComponent, data: { roles: ['VENDEDOR'] } },

@@ -1,9 +1,5 @@
 import {
-    Component,
-    Input,
-    OnChanges,
-    SimpleChanges,
-    ViewChild
+    Component, Input, OnChanges, SimpleChanges, ViewChild, inject
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -15,6 +11,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { SharedModule } from '../../../../../shared/shared.module';
 import { MaterialModule } from '../../../../../shared/material.module';
+import { MatDialog } from '@angular/material/dialog';
+import { AltaViajeExpresoComponent } from '../../../viajes-page/alta-viaje-expreso/alta-viaje-expreso.component';
+import { AsignarMantenimientoComponent } from '../../../mantenimientos-page/asignar-mantenimiento/asignar-mantenimiento.component';
 import { MovimientoOmnibusDto } from '../../../../../models/movimiento-omnibus/movimiento-omnibus-dto.model';
 import { Page } from '../../../../../models';
 import { BusService } from '../../../../../services/bus.service';
@@ -61,11 +60,12 @@ export class OmnibusHistoryComponent implements OnChanges {
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-    constructor(
-        private fb: FormBuilder,
-        private busService: BusService,
-        private localidadService: LocalidadService
-    ) {
+    private dialog = inject(MatDialog);
+    private busService = inject(BusService);
+    private localidadService = inject(LocalidadService);
+    private fb = inject(FormBuilder);
+
+    constructor() {
         this.filterForm = this.fb.group({
             fechaHoraSalida: [''],
             fechaHoraLlegada: [''],
@@ -138,5 +138,27 @@ export class OmnibusHistoryComponent implements OnChanges {
 
     getNombreLocalidad(id: number): string {
         return this.localidadesMap[id] || '';
+    }
+
+    abrirAltaViajeExpreso() {
+        const ref = this.dialog.open(AltaViajeExpresoComponent, {
+            width: '600px', data: { omnibusId: this.busId }
+        });
+        ref.afterClosed().subscribe(res => {
+            if (res === true || res === 'viajeRegistrado') {
+                this.loadHistory();
+            }
+        });
+    }
+
+    abrirAsignarMantenimiento() {
+        const ref = this.dialog.open(AsignarMantenimientoComponent, {
+            width: '600px', data: { omnibusId: this.busId }
+        });
+        ref.afterClosed().subscribe(res => {
+            if (res === 'mantenimientoCreado') {
+                this.loadHistory();
+            }
+        });
     }
 }

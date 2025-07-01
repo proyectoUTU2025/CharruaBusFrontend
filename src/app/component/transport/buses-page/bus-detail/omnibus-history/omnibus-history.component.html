@@ -1,4 +1,13 @@
-<form [formGroup]="filterForm" class="filters-container">
+<div class="actions-bar" style="margin-bottom: 1em; display: flex; gap: 8px;">
+    <button mat-raised-button color="primary" (click)="abrirAltaViajeExpreso()">
+        <mat-icon>add</mat-icon> Registrar viaje expreso
+    </button>
+    <button mat-raised-button color="accent" (click)="abrirAsignarMantenimiento()">
+        <mat-icon>build</mat-icon> Asignar mantenimiento
+    </button>
+</div>
+
+<form [formGroup]="filterForm" class="filters-container" style="margin-bottom: 1em;">
     <mat-form-field appearance="fill">
         <mat-label>Salida desde</mat-label>
         <input matInput [matDatepicker]="picker1" formControlName="fechaHoraSalida" />
@@ -44,7 +53,7 @@
         </mat-select>
     </mat-form-field>
 
-    <button mat-flat-button color="primary" (click)="onSearch()" type="button">
+    <button mat-flat-button color="primary" (click)="onSearch()" type="button" style="margin-right: 6px;">
         Buscar
     </button>
     <button mat-stroked-button (click)="onClear()" type="button">

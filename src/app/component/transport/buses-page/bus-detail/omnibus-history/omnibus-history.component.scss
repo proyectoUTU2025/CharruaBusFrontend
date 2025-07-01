@@ -5,20 +5,42 @@
 .filters-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
     align-items: flex-end;
+    margin-bottom: 8px;
 }
 
+.filters-container mat-form-field {
+    min-width: 160px;
+    flex: 1 1 180px;
+}
+
+.actions-bar,
 .actions {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: center;
 }
 
-.history-table {
-    width: 100%;
-}
-
+.history-table,
 table.mat-table {
     width: 100%;
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+}
+
+@media (max-width: 800px) {
+
+    .filters-container,
+    .actions-bar,
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }

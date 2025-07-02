@@ -182,8 +182,10 @@ export class ViajesPageComponent implements OnInit {
   verDetallesViaje(v: ViajeDisponibleDto): void {
     this.viajeService.getDetalleViaje(v.id).then(detalle => {
       this.dialog.open(ViajeDetalleDialogComponent, {
-        width: '700px',
-        data: { viaje: detalle }
+        width: '1000px',
+        maxHeight: '95vh',
+        data: { viaje: detalle },
+        disableClose: true
       }).afterClosed().subscribe(r => {
         if (r?.reasignado) this.buscar();
       });

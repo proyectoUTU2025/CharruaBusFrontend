@@ -1,26 +1,75 @@
-<h2 mat-dialog-title>
-  <mat-icon class="icon">swap_horiz</mat-icon> Reasignar Ómnibus
-</h2>
+<div class="dialog-header">
+  <h2 class="dialog-title">
+    <mat-icon class="title-icon">swap_horiz</mat-icon>
+    Reasignar Ómnibus
+  </h2>
+</div>
 
 <mat-dialog-content class="dialog-content">
-  <p class="subtitle">Seleccione un nuevo ómnibus para el viaje:</p>
-
-  <mat-radio-group [(ngModel)]="omnibusSeleccionadoId" class="bus-list">
-    <mat-radio-button *ngFor="let bus of busesDisponibles" [value]="bus.id" class="bus-radio">
-      <div class="bus-item">
-        <mat-icon class="bus-icon">directions_bus</mat-icon>
-        <div class="bus-info">
-          <span class="matricula">{{ bus.matricula }}</span>
-          <span class="capacidad">{{ bus.capacidad }} asientos</span>
+  <div class="bus-selection-section">
+    <p class="subtitle">Seleccione un nuevo ómnibus para el viaje:</p>
+    
+    <div *ngIf="isLoadingBuses" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <span>Cargando buses disponibles...</span>
+    </div>
+    
+    <ng-container *ngIf="!isLoadingBuses">
+      <ng-container *ngIf="busesDisponibles.length > 0; else noBuses">
+        <div class="bus-grid">
+          <div *ngFor="let bus of busesDisponibles" 
+               class="bus-card" 
+               [class.selected]="omnibusSeleccionadoId === bus.id"
+               (click)="seleccionarBus(bus)">
+            <div class="bus-header">
+              <span class="bus-icon-plate">
+                <mat-icon>directions_bus</mat-icon> 
+                {{ bus.matricula }}
+              </span>
+              <span class="bus-capacity">{{ bus.capacidad }} asientos</span>
+            </div>
+            <button class="select-button" [class.selected]="omnibusSeleccionadoId === bus.id">
+              {{ omnibusSeleccionadoId === bus.id ? 'Seleccionado' : 'Seleccionar' }}
+            </button>
+          </div>
         </div>
-      </div>
-    </mat-radio-button>
-  </mat-radio-group>
+        
+        <div *ngIf="omnibusSeleccionadoId" class="selection-info">
+          <mat-icon class="info-icon">check_circle</mat-icon>
+          <span>Ómnibus seleccionado: {{ getBusSeleccionado()?.matricula }}</span>
+        </div>
+        
+        <div *ngIf="isViajeExpirado" class="warning-info">
+          <mat-icon class="warning-icon">schedule</mat-icon>
+          <span>No se puede reasignar el ómnibus porque el viaje ya ha partido o expirado.</span>
+        </div>
+      </ng-container>
+      
+      <ng-template #noBuses>
+        <div class="no-buses-message">
+          <mat-icon>directions_bus</mat-icon>
+          <h4>No hay ómnibus disponibles</h4>
+          <p>No se encontraron ómnibus disponibles para las fechas y características de este viaje.</p>
+        </div>
+      </ng-template>
+    </ng-container>
+  </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button class="acciones-btn" (click)="cancelar()">Cancelar</button>
-  <button mat-flat-button class="acciones-btn" (click)="confirmarReasignacion()" [disabled]="!omnibusSeleccionadoId">
-    Confirmar
-  </button>
+<!-- Loading overlay -->
+<div *ngIf="isLoadingConfirm" class="loading-overlay">
+  <div class="loading-content">
+    <mat-spinner diameter="50"></mat-spinner>  </div>
+</div>
+
+<mat-dialog-actions class="dialog-actions">
+  <div class="actions-left"></div>
+  <div class="actions-right">
+    <button mat-stroked-button class="secondary-btn" (click)="cancelar()">
+      Cancelar
+    </button>
+    <button mat-flat-button class="primary-btn" (click)="confirmarReasignacion()" [disabled]="!puedeReasignar">
+      Confirmar
+    </button>
+  </div>
 </mat-dialog-actions>

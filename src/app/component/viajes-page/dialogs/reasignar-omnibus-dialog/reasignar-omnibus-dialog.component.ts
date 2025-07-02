@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-reasignar-omnibus-dialog',
@@ -27,12 +27,15 @@ import { MatRadioModule } from '@angular/material/radio';
     MatListModule,
     FormsModule,
     WarningDialogComponent,
-    MatRadioModule 
+    MatRadioModule,
+    MatProgressSpinnerModule
   ]
 })
 export class ReasignarOmnibusDialogComponent implements OnInit {
   busesDisponibles: OmnibusDisponibleDto[] = [];
   omnibusSeleccionadoId: number | null = null;
+  isLoadingBuses = false;
+  isLoadingConfirm = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { viaje: DetalleViajeDto },
@@ -43,6 +46,11 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.cargarBusesDisponibles();
+  }
+
+  private cargarBusesDisponibles(): void {
+    this.isLoadingBuses = true;
     const viaje = this.data.viaje;
 
     const filtro: FiltroDisponibilidadReasOmnibusDto = {
@@ -53,18 +61,51 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
       minAsientos: viaje.cantidadAsientosVendidos + viaje.cantidadAsientosReservados
     };
 
-    this.busService.getDisponiblesParaReasignacion(filtro).then(buses => {
-      this.busesDisponibles = buses;
-    });
+    this.busService.getDisponiblesParaReasignacion(filtro)
+      .then(buses => {
+        this.busesDisponibles = buses;
+      })
+      .catch(error => {
+        console.error('Error al cargar buses disponibles:', error);
+        this.busesDisponibles = [];
+      })
+      .finally(() => {
+        this.isLoadingBuses = false;
+      });
   }
+
+  seleccionarBus(bus: OmnibusDisponibleDto): void {
+    this.omnibusSeleccionadoId = bus.id;
+  }
+
+  getBusSeleccionado(): OmnibusDisponibleDto | undefined {
+    return this.busesDisponibles.find(bus => bus.id === this.omnibusSeleccionadoId);
+  }
+
+  get isViajeExpirado(): boolean {
+    const fechaHoraSalida = new Date(this.data.viaje.fechaHoraSalida);
+    const ahora = new Date();
+    return fechaHoraSalida < ahora;
+  }
+
+  get puedeReasignar(): boolean {
+    return !this.isViajeExpirado && !!this.omnibusSeleccionadoId;
+  }
+
   confirmarReasignacion(): void {
-    if (!this.omnibusSeleccionadoId) return;
+    if (!this.puedeReasignar || !this.omnibusSeleccionadoId) return;
+    
+    this.isLoadingConfirm = true;
     const body = { nuevoOmnibusId: this.omnibusSeleccionadoId, confirm: false };
 
     this.viajeService
       .reasignar(this.data.viaje.id, body)
-      .then(() => this.dialogRef.close(true))
+      .then(() => {
+        this.isLoadingConfirm = false;
+        this.dialogRef.close(true);
+      })
       .catch((err: any) => {
+        this.isLoadingConfirm = false;
         const resp = err.error || {};
         const message =
           typeof resp === 'string'
@@ -75,10 +116,16 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
           .afterClosed()
           .subscribe((confirmed) => {
             if (!confirmed) return;
+            
+            this.isLoadingConfirm = true;
             this.viajeService
               .reasignar(this.data.viaje.id, { ...body, confirm: true })
-              .then(() => this.dialogRef.close(true))
+              .then(() => {
+                this.isLoadingConfirm = false;
+                this.dialogRef.close(true);
+              })
               .catch((err2: any) => {
+                this.isLoadingConfirm = false;
                 const resp2 = err2.error || {};
                 const message2 =
                   typeof resp2 === 'string'
@@ -92,6 +139,7 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
           });
       });
   }
+
   cancelar(): void {
     this.dialogRef.close();
   }

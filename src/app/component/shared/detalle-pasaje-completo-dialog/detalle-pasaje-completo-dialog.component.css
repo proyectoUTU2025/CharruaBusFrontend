@@ -1,0 +1,630 @@
+.detalle-pasaje-dialog {
+  max-width: 600px;
+  min-width: 480px;
+}
+
+/* Header */
+.dialog-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+  position: relative;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+}
+
+.dialog-header h2 mat-icon {
+  color: #2196f3;
+  font-size: 24px;
+}
+
+.close-button {
+  color: #666;
+  position: absolute;
+  right: 24px;
+}
+
+/* Loading */
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+.loading-section p {
+  color: #666;
+  margin: 0;
+}
+
+/* Content */
+.dialog-content {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Info Sections */
+.info-section {
+  margin-bottom: 24px;
+}
+
+.info-section h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-weight: 600;
+  font-size: 16px;
+  border-bottom: 2px solid #2196f3;
+  padding-bottom: 8px;
+}
+
+/* Pasaje Info Unificada */
+.pasaje-completo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(45deg, #f5f5f5, #fafafa);
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.pasaje-principal {
+  display: flex;
+  gap: 16px;
+}
+
+.pasaje-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #2196f3;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex: 1;
+}
+
+.pasaje-item mat-icon {
+  color: #2196f3;
+  font-size: 20px;
+}
+
+.pasaje-content {
+  flex: 1;
+}
+
+.pasaje-content label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.pasaje-content span {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.asiento-numero {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #2196f3 !important;
+}
+
+/* Reembolso Section */
+.pasaje-reembolso {
+  margin-top: 8px;
+}
+
+.reembolso-detalle {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #2196f3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reembolso-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.reembolso-header mat-icon {
+  color: #2196f3;
+  font-size: 18px;
+}
+
+.reembolso-titulo {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.reembolso-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.reembolso-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reembolso-item label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.reembolso-item .monto {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.reembolso-item .fecha {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+}
+
+/* Badges */
+.badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-confirmado {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.badge-pendiente {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.badge-cancelado {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* Viaje Info */
+.viaje-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ruta-completa {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(45deg, #f5f5f5, #fafafa);
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.parada-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.parada-detalle.origen {
+  border-left: 4px solid #4caf50;
+}
+
+.parada-detalle.destino {
+  border-left: 4px solid #2196f3;
+}
+
+.parada-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.parada-header mat-icon {
+  font-size: 22px;
+}
+
+.parada-detalle.origen .parada-header mat-icon {
+  color: #4caf50;
+}
+
+.parada-detalle.destino .parada-header mat-icon {
+  color: #2196f3;
+}
+
+.parada-info {
+  flex: 1;
+}
+
+.parada-info label {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.parada-info .lugar {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.ruta-linea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  min-width: 40px;
+}
+
+.ruta-linea mat-icon {
+  font-size: 24px;
+}
+
+.fecha-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.fecha-info mat-icon {
+  color: #666;
+  font-size: 16px;
+}
+
+.fecha-info div {
+  flex: 1;
+}
+
+.fecha-info label {
+  display: block;
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.fecha-info .fecha {
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.fecha-info .hora {
+  font-size: 12px;
+  color: #2196f3;
+  font-weight: 600;
+}
+
+/* Compra Info Unificada */
+.compra-completa {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #fff);
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.compra-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.economia-datos {
+  display: flex;
+  align-content: start;
+}
+
+.precios-unificados {
+  width: 100%;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.precio-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.precio-item:last-child {
+  border-bottom: none;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.precio-item.total {
+  background: linear-gradient(90deg, #f8f9fa, #e3f2fd);
+  margin: 8px -16px -16px -16px;
+  padding: 12px 16px;
+  border-radius: 0 0 8px 8px;
+  border-top: 2px solid #2196f3;
+}
+
+.precio-item label {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin: 0;
+}
+
+.precio-item.total label {
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.precio-item span {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.precio {
+  color: #2e7d32;
+}
+
+.descuento {
+  color: #f57c00;
+}
+
+.subtotal {
+  color: #1976d2;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.compra-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #2196f3;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.compra-item mat-icon {
+  color: #2196f3;
+  font-size: 20px;
+}
+
+.compra-item div {
+  flex: 1;
+}
+
+.compra-item label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.compra-item span {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Actions Section */
+.actions-section {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.action-btn {
+  min-width: 140px;
+  height: 44px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primary-btn {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background-color: #1976d2 !important;
+}
+
+.secondary-btn {
+  border: 2px solid #2196f3 !important;
+  color: #2196f3 !important;
+  background-color: white !important;
+}
+
+.secondary-btn:hover:not(:disabled) {
+  background-color: #f3f8ff !important;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+
+/* Reembolsado Notice */
+.reembolsado-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  background: #e8f5e8;
+  border-radius: 8px;
+}
+
+.reembolsado-notice mat-icon {
+  color: #2e7d32;
+  font-size: 18px;
+}
+
+
+
+/* Responsive */
+@media (max-width: 600px) {
+  .detalle-pasaje-dialog {
+    min-width: 320px;
+    max-width: 95vw;
+  }
+  
+  .dialog-content {
+    padding: 16px;
+  }
+  
+  .pasaje-completo {
+    padding: 16px;
+  }
+  
+  .pasaje-principal {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .pasaje-item {
+    padding: 12px;
+  }
+  
+  .reembolso-detalle {
+    padding: 12px;
+  }
+  
+  .reembolso-datos {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .compra-completa {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .economia-datos {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .precios-unificados {
+    margin-top: 0;
+  }
+  
+  .precio-item span {
+    font-size: 14px;
+  }
+  
+  .precio-item.total span {
+    font-size: 16px;
+  }
+  
+  .ruta-completa {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .ruta-linea {
+    transform: rotate(90deg);
+    min-width: auto;
+    min-height: 20px;
+  }
+  
+  .ruta-linea mat-icon {
+    font-size: 20px;
+  }
+  
+  .parada-detalle {
+    padding: 12px;
+  }
+  
+  .fecha-info {
+    padding: 6px 10px;
+  }
+  
+  .fecha-info .fecha, .fecha-info .hora {
+    font-size: 11px;
+  }
+  
+  .actions-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-btn {
+    width: 100%;
+  }
+}

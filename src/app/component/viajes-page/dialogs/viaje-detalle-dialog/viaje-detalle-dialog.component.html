@@ -1,47 +1,507 @@
-<h2 mat-dialog-title>
-  <mat-icon class="icon">info</mat-icon> Detalles del Viaje
-</h2>
-
-<mat-dialog-content class="dialog-content">
-  <div *ngIf="tieneParadas()">
-    <div class="section">
-      <mat-icon class="section-icon">place</mat-icon>
-      <span><strong>Origen:</strong> {{ data.viaje.nombreLocalidadOrigen }}</span>
-    </div>
-
-    <div class="section">
-      <mat-icon class="section-icon">flag</mat-icon>
-      <span><strong>Destino:</strong> {{ data.viaje.nombreLocalidadDestino }}</span>
+<div class="dialog-header">
+  <div class="viaje-info">
+    <mat-icon class="viaje-icon">directions_bus</mat-icon>
+    <div class="viaje-details">
+      <h2 class="viaje-title">Viaje {{ data.viaje.omnibusMatricula }}</h2>
+      <p class="viaje-route">{{ nombreOrigenSimple }} → {{ nombreDestinoSimple }}</p>
     </div>
   </div>
+  <button mat-icon-button (click)="cerrar()" class="close-button">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 
-  <div class="section">
-    <mat-icon class="section-icon">event</mat-icon>
-    <span><strong>Salida:</strong> {{ data.viaje.fechaHoraSalida | date:'short' }}</span>
-  </div>
+<mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" class="custom-tabs">
+  
+  <!-- Pestaña 1: Detalles del Viaje -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>info</mat-icon> Detalles del Viaje
+    </ng-template>
+    
+    <div class="tab-content">
+      <div class="cards-container">
+        
+        <!-- Card: Ruta y Horarios -->
+        <mat-card class="info-card">
+          <div class="card-header">
+            <mat-icon class="card-icon location-icon">place</mat-icon>
+            <h3>Ruta y Horarios</h3>
+          </div>
+          <div class="card-content">
+            <!-- Información básica completa arriba -->
+            <div class="main-info-section">
+              <!-- Información de ruta -->
+              <div class="route-basic-info">
+                <div class="route-info-grid">
+                  <div class="route-info-item">
+                    <span class="route-label">ORIGEN</span>
+                    <span class="route-value">{{ nombreOrigenSimple }}</span>
+                  </div>
+                  <div class="route-info-item">
+                    <span class="route-label">DESTINO</span>
+                    <span class="route-value">{{ nombreDestinoSimple }}</span>
+                  </div>
+                  <div class="route-info-item">
+                    <span class="route-label">ÓMNIBUS</span>
+                    <span class="route-value">{{ data.viaje.omnibusMatricula }}</span>
+                  </div>
+                </div>
+              </div>
 
-  <div class="section">
-    <mat-icon class="section-icon">event_available</mat-icon>
-    <span><strong>Llegada:</strong> {{ data.viaje.fechaHoraLlegada | date:'short' }}</span>
-  </div>
+              <!-- Horarios y duración -->
+              <div class="schedule-section">
+                <div class="schedule-grid">
+                  <div class="schedule-item">
+                    <div class="schedule-icon-wrapper">
+                      <mat-icon class="schedule-icon">schedule</mat-icon>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-label">Salida</div>
+                      <div class="schedule-value">{{ data.viaje.fechaHoraSalida | date:'d/M/yy - HH:mm' }}</div>
+                    </div>
+                  </div>
+                  
+                  <div class="schedule-item">
+                    <div class="schedule-icon-wrapper">
+                      <mat-icon class="schedule-icon">schedule</mat-icon>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-label">Llegada</div>
+                      <div class="schedule-value">{{ data.viaje.fechaHoraLlegada | date:'d/M/yy - HH:mm' }}</div>
+                    </div>
+                  </div>
+                  
+                  <div class="schedule-item">
+                    <div class="schedule-icon-wrapper">
+                      <mat-icon class="schedule-icon">access_time</mat-icon>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-label">Duración</div>
+                      <div class="schedule-value">{{ duracionViaje }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  <div class="section">
-    <mat-icon class="section-icon">confirmation_number</mat-icon>
-    <span><strong>Pasajes disponibles:</strong> {{ pasajesDisponibles }}</span>
-  </div>
+            <!-- Resumen de la ruta abajo -->
+            <div class="route-summary" *ngIf="data.viaje.paradas && data.viaje.paradas.length > 0">
+              <h4 class="route-title">Resumen de la ruta</h4>
+              <ol class="ruta-timeline">
+                <li class="stop-origen">
+                  <div class="timeline-icon">
+                    <mat-icon>trip_origin</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    {{ data.viaje.nombreLocalidadOrigen }} <span class="stop-label">(Origen)</span>
+                  </div>
+                </li>
+                <li *ngFor="let parada of data.viaje.paradas.slice(1, -1)" class="stop-intermedia">
+                  <div class="timeline-icon-line">
+                    <div class="line"></div>
+                    <mat-icon>more_vert</mat-icon>
+                    <div class="line"></div>
+                  </div>
+                  <div class="timeline-content">
+                    {{ parada.nombreLocalidad }}
+                  </div>
+                </li>
+                <li class="stop-destino">
+                  <div class="timeline-icon">
+                    <mat-icon>flag</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    {{ data.viaje.nombreLocalidadDestino }} <span class="stop-label">(Destino)</span>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </mat-card>
 
-  <div class="section">
-    <mat-icon class="section-icon">attach_money</mat-icon>
-    <span><strong>Precio por tramo:</strong> {{ data.viaje.precioPorTramo | currency:'USD' }}</span>
-  </div>
+        <!-- Card: Información Comercial -->
+        <mat-card class="info-card">
+          <div class="card-header">
+            <mat-icon class="card-icon commercial-icon">attach_money</mat-icon>
+            <h3>Tarifas y Disponibilidad</h3>
+          </div>
+          <div class="card-content">
+            <div class="commercial-content">
+              <!-- Precio y estadísticas principales -->
+              <div class="commercial-main-section">
+                <div class="price-display">
+                  <div class="price-amount">${{ data.viaje.precio }}</div>
+                  <div class="price-label">Precio del pasaje</div>
+                </div>
+                
+                <div class="price-per-segment-display">
+                  <div class="price-per-segment-amount">${{ data.viaje.precioPorTramo }}</div>
+                  <div class="price-per-segment-label">Precio por tramo</div>
+                </div>
+                
+                <div class="occupancy-display">
+                  <div class="occupancy-percentage">{{ porcentajeOcupacion.toFixed(0) }}%</div>
+                  <div class="occupancy-label">Ocupación</div>
+                </div>
+              </div>
+              
+              <!-- Información de asientos -->
+              <div class="seats-info-section">
+                <div class="seats-stats-grid">
+                  <div class="seat-stat">
+                    <div class="seat-number total">{{ data.viaje.cantidadPasajesVendibles }}</div>
+                    <div class="seat-label">ASIENTOS TOTALES</div>
+                  </div>
+                  <div class="seat-stat">
+                    <div class="seat-number available">{{ data.viaje.cantidadAsientosDisponibles }}</div>
+                    <div class="seat-label">DISPONIBLES</div>
+                  </div>
+                  <div class="seat-stat">
+                    <div class="seat-number available">{{ data.viaje.cantidadAsientosReservados }}</div>
+                    <div class="seat-label">RESERVADOS</div>
+                  </div>
+                  <div class="seat-stat">
+                    <div class="seat-number sold">{{ data.viaje.cantidadAsientosVendidos }}</div>
+                    <div class="seat-label">VENDIDOS</div>
+                  </div>
+                </div>
+                
+                <!-- Barra de progreso -->
+                <div class="progress-bar-container">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="porcentajeOcupacion"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
 
-  <div class="section">
-    <mat-icon class="section-icon">directions_bus</mat-icon>
-    <span><strong>Ómnibus:</strong> {{ data.viaje.omnibusMatricula }}</span>
-  </div>
-</mat-dialog-content>
+      </div>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button class="acciones-btn" (click)="cerrar()">Cerrar</button>
-  <button *ngIf="puedeReasignar" mat-flat-button color="primary" class="acciones-btn" (click)="abrirReasignarOmnibus()"><mat-icon>swap_horiz</mat-icon>Reasignar Ómnibus</button>
-</mat-dialog-actions>
+      <!-- Botones de acción -->
+      <div class="actions-section">
+        <button *ngIf="puedeReasignar" mat-flat-button class="action-btn primary-btn" (click)="abrirReasignarOmnibus()">
+          <mat-icon>swap_horiz</mat-icon>
+          Reasignar Ómnibus
+        </button>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- Pestaña 2: Asientos -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>airline_seat_recline_normal</mat-icon> Asientos
+      <span class="tab-badge">{{ data.viaje.asientos?.length || 0 }}</span>
+    </ng-template>
+    
+    <div class="tab-content">
+      <!-- Leyenda mejorada -->
+      <div class="seats-legend">
+        <div class="legend-item">
+          <div class="seat-icon-legend disponible">
+            <mat-icon>event_seat</mat-icon>
+          </div>
+          <span>Disponible</span>
+        </div>
+        <div class="legend-item">
+          <div class="seat-icon-legend confirmado">
+            <mat-icon>event_seat</mat-icon>
+          </div>
+          <span>Confirmado</span>
+        </div>
+        <div class="legend-item">
+          <div class="seat-icon-legend reservado">
+            <mat-icon>event_seat</mat-icon>
+          </div>
+          <span>Reservado</span>
+        </div>
+      </div>
+
+      <!-- Indicador de estado actual -->
+      <div class="seats-status-indicator">
+        <div class="status-item disponible">
+          <div class="status-count">{{ getAsientosDisponibles().length }}</div>
+          <div class="status-label">Disponibles</div>
+          <div class="status-bar">
+            <div class="status-fill" [style.width.%]="(getAsientosDisponibles().length / data.viaje.cantidadPasajesVendibles) * 100"></div>
+          </div>
+        </div>
+        <div class="status-item confirmado">
+          <div class="status-count">{{ getAsientosConfirmados().length }}</div>
+          <div class="status-label">Confirmados</div>
+          <div class="status-bar">
+            <div class="status-fill" [style.width.%]="(getAsientosConfirmados().length / data.viaje.cantidadPasajesVendibles) * 100"></div>
+          </div>
+        </div>
+        <div class="status-item reservado">
+          <div class="status-count">{{ getAsientosReservados().length }}</div>
+          <div class="status-label">Reservados</div>
+          <div class="status-bar">
+            <div class="status-fill" [style.width.%]="(getAsientosReservados().length / data.viaje.cantidadPasajesVendibles) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagrama del autobús -->
+      <mat-card class="bus-diagram-card">
+        <div class="bus-container">
+          <!-- Frente del autobús -->
+          <div class="bus-front">
+            <div class="driver-section">
+              <mat-icon class="steering-wheel">radio_button_unchecked</mat-icon>
+              <span class="driver-label">Conductor</span>
+            </div>
+            <div class="entrance-door">
+              <mat-icon>sensor_door</mat-icon>
+              <span class="door-label">Puerta</span>
+            </div>
+          </div>
+
+          <!-- Área de asientos -->
+          <div class="seats-area">
+            <div class="seats-rows">
+              <div *ngFor="let fila of getAsientosEnFilas(); let filaIndex = index" class="seat-row">
+                <div class="row-number">{{ filaIndex + 1 }}</div>
+                
+                <!-- Asientos del lado izquierdo -->
+                <div class="seats-left">
+                  <div 
+                    *ngFor="let asiento of fila.izquierda; let asientoIndex = index" 
+                    class="bus-seat"
+                    [ngClass]="getEstadoAsiento(asiento)"
+                    [title]="'Asiento ' + asiento.numero + ' - ' + asiento.estado"
+                  >
+                    <mat-icon class="seat-icon">event_seat</mat-icon>
+                    <span class="seat-number">{{ asiento.numero }}</span>
+                  </div>
+                </div>
+
+                <!-- Pasillo -->
+                <div class="aisle"></div>
+
+                <!-- Asientos del lado derecho -->
+                <div class="seats-right">
+                  <div 
+                    *ngFor="let asiento of fila.derecha; let asientoIndex = index" 
+                    class="bus-seat"
+                    [ngClass]="getEstadoAsiento(asiento)"
+                    [title]="'Asiento ' + asiento.numero + ' - ' + asiento.estado"
+                  >
+                    <mat-icon class="seat-icon">event_seat</mat-icon>
+                    <span class="seat-number">{{ asiento.numero }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Parte trasera del autobús -->
+          <div class="bus-back">
+            <div class="emergency-exit">
+              <mat-icon>exit_to_app</mat-icon>
+              <span class="exit-label">Salida de emergencia</span>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </mat-tab>
+
+  <!-- Pestaña 3: Historial de Pasajes -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>history</mat-icon> Historial de Pasajes
+    </ng-template>
+    
+    <div class="tab-content">
+      <!-- Controles superiores con filtros expandidos -->
+      <div class="controls-section">
+        <div class="filter-controls">
+          <mat-form-field appearance="outline" class="estado-filter">
+            <mat-label>Estado</mat-label>
+            <mat-select [formControl]="estadoFilter">
+              <mat-option value="todos">Todos los estados</mat-option>
+              <mat-option value="CONFIRMADO">Confirmados</mat-option>
+              <mat-option value="PENDIENTE">Pendientes</mat-option>
+              <mat-option value="CANCELADO">Cancelados</mat-option>
+              <mat-option value="DEVUELTO">Devueltos</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="fecha-filter">
+            <mat-label>Fecha desde</mat-label>
+            <input matInput [matDatepicker]="fechaDesde" [formControl]="fechaDesdeFilter">
+            <mat-datepicker-toggle matIconSuffix [for]="fechaDesde"></mat-datepicker-toggle>
+            <mat-datepicker #fechaDesde></mat-datepicker>
+          </mat-form-field>
+          
+                    <mat-form-field appearance="outline" class="fecha-filter">
+            <mat-label>Fecha hasta</mat-label>
+            <input matInput [matDatepicker]="fechaHasta" [formControl]="fechaHastaFilter">
+            <mat-datepicker-toggle matIconSuffix [for]="fechaHasta"></mat-datepicker-toggle>
+            <mat-datepicker #fechaHasta></mat-datepicker>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="parada-filter" *ngIf="paradasOrigen.length > 0">
+            <mat-label>Origen</mat-label>
+            <mat-select [formControl]="origenFilter">
+              <mat-option value="todas">Todas las paradas</mat-option>
+              <mat-option *ngFor="let parada of paradasOrigen; trackBy: trackByParadaId" [value]="parada.id.toString()">
+                {{ parada.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="parada-filter" *ngIf="paradasDestino.length > 0">
+            <mat-label>Destino</mat-label>
+            <mat-select [formControl]="destinoFilter">
+              <mat-option value="todas">Todas las paradas</mat-option>
+              <mat-option *ngFor="let parada of paradasDestino; trackBy: trackByParadaId" [value]="parada.id.toString()">
+                {{ parada.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          </div>
+        <div class="action-buttons">
+          <button mat-flat-button class="action-btn primary-btn" (click)="buscarPasajes()">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+          <button mat-stroked-button class="action-btn secondary-btn" (click)="limpiarFiltros()">
+            <mat-icon>clear_all</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </div>
+
+
+
+      <!-- Loading spinner -->
+      <div class="loading-section" *ngIf="isLoadingPasajes">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      </div>
+
+      <!-- Tabla de pasajes -->
+      <div class="table-section" *ngIf="!isLoadingPasajes">
+        <table mat-table [dataSource]="pasajesFiltrados" class="pasajes-table">
+          
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let pasaje">
+              {{ pasaje.id }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="asiento">
+            <th mat-header-cell *matHeaderCellDef>Asiento</th>
+            <td mat-cell *matCellDef="let pasaje">
+              {{ pasaje.numeroAsiento }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="origen">
+            <th mat-header-cell *matHeaderCellDef>Origen</th>
+            <td mat-cell *matCellDef="let pasaje">
+              {{ pasaje.paradaOrigen }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="destino">
+            <th mat-header-cell *matHeaderCellDef>Destino</th>
+            <td mat-cell *matCellDef="let pasaje">
+              {{ pasaje.paradaDestino }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="precio">
+            <th mat-header-cell *matHeaderCellDef>Precio</th>
+            <td mat-cell *matCellDef="let pasaje">
+              ${{ pasaje.precio.toFixed(2) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="descuento">
+            <th mat-header-cell *matHeaderCellDef>Descuento</th>
+            <td mat-cell *matCellDef="let pasaje">
+              <span *ngIf="pasaje.descuento && pasaje.descuento > 0">${{ pasaje.descuento.toFixed(2) }}</span>
+              <span *ngIf="!pasaje.descuento || pasaje.descuento === 0">-</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="subtotal">
+            <th mat-header-cell *matHeaderCellDef>Subtotal</th>
+            <td mat-cell *matCellDef="let pasaje">
+              <span class="monto">${{ pasaje.subtotal.toFixed(2) }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let pasaje">
+              <span [ngClass]="getEstadoBadgeClass(pasaje.estadoPasaje)" class="badge">
+                {{ getEstadoText(pasaje.estadoPasaje) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fechaLlegada">
+            <th mat-header-cell *matHeaderCellDef>Llegada a Parada</th>
+            <td mat-cell *matCellDef="let pasaje">
+              <div class="fecha-info">
+                <div class="fecha">{{ pasaje.fecha | date:'dd/MM/yyyy' }}</div>
+                <div class="hora">{{ pasaje.fecha | date:'HH:mm' }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fechaCompra">
+            <th mat-header-cell *matHeaderCellDef>Fecha Compra</th>
+            <td mat-cell *matCellDef="let pasaje">
+              <div class="fecha-info">
+                <div class="fecha">{{ pasaje.fechaCompra | date:'dd/MM/yyyy' }}</div>
+                <div class="hora">{{ pasaje.fechaCompra | date:'HH:mm' }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+            <td mat-cell *matCellDef="let pasaje" class="acciones-cell">
+              <div class="action-buttons-container">
+                <button mat-icon-button class="icon-btn" 
+                        (click)="abrirDetallePasaje(pasaje)" 
+                        [matTooltip]="'Ver detalle del pasaje'">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div class="no-data" *ngIf="pasajesFiltrados.length === 0 && !isLoadingPasajes">
+          <mat-icon>inbox</mat-icon>
+          <p>No hay pasajes para mostrar</p>
+        </div>
+
+        <!-- Paginador -->
+        <mat-paginator 
+          *ngIf="!isLoadingPasajes && totalElements > 0"
+          [length]="totalElements"
+          [pageSize]="pageSize"
+          [pageIndex]="currentPage"
+          [pageSizeOptions]="pageSizeOptions"
+          [showFirstLastButtons]="true"
+          (page)="onPageChange($event)"
+          class="pasajes-paginator">
+        </mat-paginator>
+      </div>
+    </div>
+  </mat-tab>
+
+</mat-tab-group>

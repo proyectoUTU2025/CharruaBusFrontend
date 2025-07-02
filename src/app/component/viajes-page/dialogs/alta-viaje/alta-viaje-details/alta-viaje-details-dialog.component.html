@@ -285,14 +285,22 @@
 
 <div class="dialog-actions">
   <div class="actions-left">
-    <button mat-stroked-button class="secondary-btn" (click)="cancelar()">Cancelar</button>
+    <button mat-stroked-button class="secondary-btn" (click)="cancelar()">
+      Cancelar
+    </button>
   </div>
   <div class="actions-right">
-    <button mat-stroked-button class="secondary-btn" *ngIf="step > 0" (click)="anterior()">Atrás</button>
+    <button mat-stroked-button class="secondary-btn" *ngIf="step > 0" (click)="anterior()">
+      <mat-icon>arrow_back</mat-icon>
+      Atrás
+    </button>
     <button mat-flat-button class="primary-btn" *ngIf="step < 3" (click)="siguiente()"
       [disabled]="deberiaDeshabilitarSiguiente()">
+      <mat-icon>arrow_forward</mat-icon>
       {{ step === 2 ? 'Continuar' : 'Siguiente' }}
     </button>
-    <button mat-flat-button class="primary-btn" *ngIf="step === 3" (click)="confirmar()">Registrar viaje</button>
+    <button mat-flat-button class="primary-btn" *ngIf="step === 3" (click)="confirmar()">
+      Registrar viaje
+    </button>
   </div>
 </div>

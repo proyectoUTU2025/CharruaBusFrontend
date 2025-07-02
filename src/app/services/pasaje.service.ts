@@ -5,7 +5,9 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { PasajeDto } from '../models/pasajes/pasaje-dto.model';
 import { FiltroBusquedaPasajeDto } from '../models/pasajes/filtro-busqueda-pasaje.dto';
+import { FiltroPasajeViajeDto } from '../models/pasajes/filtro-pasaje-viaje.dto';
 import { ApiResponse } from '../models/api/api-response.model';
+import { Page } from '../models/api/page.model';
 
 interface PageResponse<T> {
     content: T[];
@@ -64,5 +66,39 @@ export class PasajeService {
         return this.http
             .post<ApiResponse<string>>(`${this.base}/${pasajeId}/reembolsar`, {})
             .pipe(map(resp => resp.data));
+    }
+
+    getPasajesPorViaje(
+        viajeId: number,
+        filtro: FiltroPasajeViajeDto = {},
+        page = 0,
+        size = 20
+    ): Observable<Page<PasajeDto>> {
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString());
+
+        if (filtro.estados?.length) {
+            filtro.estados.forEach(estado => {
+                params = params.append('estados', estado);
+            });
+        }
+        if (filtro.fechaDesde) {
+            params = params.set('fechaDesde', filtro.fechaDesde);
+        }
+        if (filtro.fechaHasta) {
+            params = params.set('fechaHasta', filtro.fechaHasta);
+        }
+        if (filtro.origenId != null) {
+            params = params.set('origenId', filtro.origenId.toString());
+        }
+        if (filtro.destinoId != null) {
+            params = params.set('destinoId', filtro.destinoId.toString());
+        }
+
+        return this.http.get<Page<PasajeDto>>(
+            `${environment.apiBaseUrl}/viajes/${viajeId}/pasajes`,
+            { params }
+        );
     }
 }

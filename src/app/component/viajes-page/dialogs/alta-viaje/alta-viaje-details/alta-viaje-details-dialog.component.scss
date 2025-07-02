@@ -9,21 +9,25 @@ $default-color: #ccc;
 
 .dialog-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 24px 24px 16px 24px;
   border-bottom: 1px solid #e0e0e0;
   margin-bottom: 0;
+  position: relative;
 
   .dialog-title {
     margin: 0;
     font-size: 1.5rem;
     font-weight: 600;
     color: #333;
+    text-align: center;
   }
 
   .close-button {
     color: #666;
+    position: absolute;
+    right: 24px;
     
     &:hover {
       color: #333;
@@ -561,36 +565,47 @@ mat-form-field {
 
   button {
     height: 40px;
-    padding: 0 24px;
-    border-radius: 20px;
+    padding: 0 20px;
+    border-radius: 8px !important;
     text-transform: none;
     font-weight: 500;
-    min-width: 100px;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
   }
 
   .secondary-btn {
-    border-color: #666;
-    color: #666;
-    background: white;
+    border: 1px solid #2196f3 !important;
+    color: #2196f3 !important;
+    background: white !important;
 
     &:hover {
-      background: #f5f5f5;
-      border-color: #333;
-      color: #333;
+      background: #f3f8ff !important;
+      border-color: #1976d2 !important;
+      color: #1976d2 !important;
     }
   }
 
   .primary-btn {
-    background: #1976d2;
-    color: white;
+    background: #2196f3 !important;
+    color: white !important;
+    border: none !important;
 
-    &:hover {
-      background: #1565c0;
+    &:hover:not(:disabled) {
+      background: #1976d2 !important;
+      box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
     }
 
     &:disabled {
-      background: #ccc;
-      color: #999;
+      background: #ccc !important;
+      color: #999 !important;
       cursor: not-allowed;
     }
   }

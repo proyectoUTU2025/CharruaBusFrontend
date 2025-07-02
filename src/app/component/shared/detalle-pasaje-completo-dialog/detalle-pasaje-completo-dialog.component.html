@@ -1,0 +1,188 @@
+<div class="detalle-pasaje-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>confirmation_number</mat-icon>
+      Detalle del Pasaje #{{ data.pasajeId }}
+    </h2>
+    <button mat-icon-button (click)="cerrar()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-section">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <p>Cargando detalle del pasaje...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && pasaje" class="dialog-content">
+    
+    <!-- Información del Pasaje -->
+    <div class="info-section">
+      <h3>Información del Pasaje</h3>
+      <div class="pasaje-completo">
+        <div class="pasaje-principal">
+          <div class="pasaje-item">
+            <mat-icon>event_seat</mat-icon>
+            <div class="pasaje-content">
+              <label>Asiento</label>
+              <span class="asiento-numero">{{ pasaje.numeroAsiento }}</span>
+            </div>
+          </div>
+          
+          <div class="pasaje-item">
+            <mat-icon>flag</mat-icon>
+            <div class="pasaje-content">
+              <label>Estado</label>
+              <span [ngClass]="getEstadoBadgeClass(pasaje.estadoPasaje)" class="badge">
+                {{ getEstadoText(pasaje.estadoPasaje) }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="pasaje-reembolso" *ngIf="pasaje.fueReembolsado">
+          <div class="reembolso-detalle">
+            <div class="reembolso-header">
+              <mat-icon>undo</mat-icon>
+              <span class="reembolso-titulo">Información de Reembolso</span>
+            </div>
+            <div class="reembolso-datos">
+              <div class="reembolso-item">
+                <label>Monto Reintegrado</label>
+                <span class="monto">${{ pasaje.montoReintegrado?.toFixed(2) || '0.00' }}</span>
+              </div>
+              <div class="reembolso-item">
+                <label>Fecha de Devolución</label>
+                <span class="fecha">{{ pasaje.fechaDevolucion | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Viaje -->
+    <div class="info-section">
+      <h3>Información del Viaje</h3>
+      <div class="viaje-info">
+        <div class="ruta-completa">
+          <div class="parada-detalle origen">
+            <div class="parada-header">
+              <mat-icon>radio_button_checked</mat-icon>
+              <div class="parada-info">
+                <label>Origen</label>
+                <span class="lugar">{{ pasaje.paradaOrigen }}</span>
+              </div>
+            </div>
+            <div class="fecha-info" *ngIf="pasaje.fecha">
+              <mat-icon>schedule</mat-icon>
+              <div>
+                <label>Salida</label>
+                <span class="fecha">{{ pasaje.fecha | date:'dd/MM/yyyy' }}</span>
+                <span class="hora">{{ pasaje.fecha | date:'HH:mm' }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="ruta-linea">
+            <mat-icon>more_horiz</mat-icon>
+          </div>
+          
+          <div class="parada-detalle destino">
+            <div class="parada-header">
+              <mat-icon>location_on</mat-icon>
+              <div class="parada-info">
+                <label>Destino</label>
+                <span class="lugar">{{ pasaje.paradaDestino }}</span>
+              </div>
+            </div>
+            <div class="fecha-info" *ngIf="pasaje.fechaLlegada">
+              <mat-icon>schedule</mat-icon>
+              <div>
+                <label>Llegada</label>
+                <span class="fecha">{{ pasaje.fechaLlegada | date:'dd/MM/yyyy' }}</span>
+                <span class="hora">{{ pasaje.fechaLlegada | date:'HH:mm' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de Compra -->
+    <div class="info-section">
+      <h3>Información de Compra</h3>
+      <div class="compra-completa">
+        <!-- Datos de compra - Izquierda -->
+        <div class="compra-datos">
+          <div class="compra-item">
+            <mat-icon>receipt</mat-icon>
+            <div>
+              <label>ID de Compra</label>
+              <span>#{{ pasaje.compraId }}</span>
+            </div>
+          </div>
+          
+          <div class="compra-item">
+            <mat-icon>access_time</mat-icon>
+            <div>
+              <label>Fecha de Compra</label>
+              <span class="fecha-compra">
+                {{ pasaje.fechaCompra | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos económicos - Derecha -->
+        <div class="economia-datos">
+          <div class="precios-unificados">
+            <div class="precio-item">
+              <label>Precio</label>
+              <span class="precio">${{ pasaje.precio.toFixed(2) }}</span>
+            </div>
+            
+            <div class="precio-item" *ngIf="pasaje.descuento && pasaje.descuento > 0">
+              <label>Descuento</label>
+              <span class="descuento">-${{ pasaje.descuento.toFixed(2) }}</span>
+            </div>
+            
+            <div class="precio-item total">
+              <label>Subtotal</label>
+              <span class="subtotal">${{ pasaje.subtotal.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="actions-section">
+      <button mat-flat-button class="action-btn primary-btn"
+              (click)="abrirPdf()"
+              [disabled]="!puedeVerPdf()">
+        <mat-icon *ngIf="!isOpeningPdf">visibility</mat-icon>
+        <mat-progress-spinner *ngIf="isOpeningPdf" diameter="18" mode="indeterminate"></mat-progress-spinner>
+        <span *ngIf="!isOpeningPdf">Ver PDF</span>
+      </button>
+      
+      <button mat-stroked-button class="action-btn secondary-btn"
+              (click)="reembolsar()"
+              [disabled]="!puedeReembolsar()"
+              *ngIf="!pasaje.fueReembolsado">
+        <mat-icon *ngIf="!isReembolsando">undo</mat-icon>
+        <mat-progress-spinner *ngIf="isReembolsando" diameter="18" mode="indeterminate"></mat-progress-spinner>
+        <span *ngIf="!isReembolsando">Reembolsar</span>
+      </button>
+      
+      <!-- Aviso cuando el pasaje ya fue reembolsado -->
+      <div *ngIf="pasaje.fueReembolsado" class="reembolsado-notice">
+        <mat-icon>check_circle</mat-icon>
+        <span>Pasaje ya reembolsado</span>
+      </div>
+    </div>
+  </div>
+</div>

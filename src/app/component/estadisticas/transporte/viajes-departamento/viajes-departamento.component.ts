@@ -15,6 +15,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-viajes-departamento',
@@ -30,7 +31,8 @@ import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    NgChartsModule
+    NgChartsModule,
+    MatIconModule
   ],
   templateUrl: './viajes-departamento.component.html',
   styleUrls: ['./viajes-departamento.component.scss']

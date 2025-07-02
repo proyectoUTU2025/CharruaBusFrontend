@@ -1,96 +1,128 @@
-<h2 class="titulo">Estadísticas de Pasajes</h2>
+<div class="stats-page-container">
+  <div class="page-header">
+    <h1>Estadísticas de Pasajes</h1>
+    <p>Visualice las estadísticas de pasajes vendidos y devueltos por destino.</p>
+  </div>
 
-<form class="filtros">
-    <mat-form-field>
+  <div class="content-card">
+    <div class="card-header">
+      <h2 class="card-title">Filtros de Búsqueda</h2>
+    </div>
+    
+    <div class="filtros-container">
+      <mat-form-field appearance="outline">
         <mat-label>Fecha inicio</mat-label>
         <input matInput [matDatepicker]="pickerInicio" [formControl]="fechaInicio">
         <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
         <mat-datepicker #pickerInicio></mat-datepicker>
-        </mat-form-field>
-    
-        <mat-form-field>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
         <mat-label>Fecha fin</mat-label>
         <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
         <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
         <mat-datepicker #pickerFin></mat-datepicker>
-        </mat-form-field>
-    
-        <mat-form-field>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
         <mat-label>Origen</mat-label>
         <mat-select [formControl]="origen">
-            <mat-option [value]="null">Todos</mat-option>
-            <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
         </mat-select>
-        </mat-form-field>
-    
-        <mat-form-field>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
         <mat-label>Destino</mat-label>
         <mat-select [formControl]="destino">
-            <mat-option [value]="null">Todos</mat-option>
-            <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
         </mat-select>
-        </mat-form-field>
-    
-        <button mat-button (click)="filtrar()">Filtrar</button>
-    </form>
-    
-    <div class="actions">
-        <button mat-button [disabled]="downloadingCsv" (click)="exportResumenCsv()">
-            {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar Resumen CSV' }}
+      </mat-form-field>
+      
+      <button mat-raised-button color="primary" (click)="filtrar()" class="filter-btn">
+        <mat-icon>search</mat-icon>
+        Filtrar
+      </button>
+    </div>
+  </div>
+
+  <div class="content-card" *ngIf="resumen">
+    <div class="card-header">
+      <h2 class="card-title">Resumen General</h2>
+      <div class="card-actions">
+        <button mat-raised-button [disabled]="downloadingCsv" (click)="exportResumenCsv()" class="export-btn">
+          <mat-icon>download</mat-icon>
+          {{ downloadingCsv ? 'Descargando...' : 'Resumen CSV' }}
         </button>
-        <button mat-raised-button color="primary" (click)="exportResumenPdf()">Descargar Resumen PDF</button>
-        <button mat-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()">
-            {{ downloadingCsv ? 'Descargando CSV...' : 'Descargar Detalle CSV' }}
+        <button mat-raised-button color="primary" (click)="exportResumenPdf()" class="export-btn">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Resumen PDF
         </button>
-        <button mat-raised-button color="accent" (click)="exportDetallePdf()">Descargar Detalle PDF</button>
+        <button mat-raised-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()" class="export-btn">
+          <mat-icon>download</mat-icon>
+          Detalle CSV
+        </button>
+        <button mat-raised-button color="accent" (click)="exportDetallePdf()" class="export-btn">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Detalle PDF
+        </button>
+      </div>
     </div>
     
-    <mat-card class="resumen-card" *ngIf="resumen">
+    <div class="resumen-container">
+      <div class="resumen-card">
         <div class="resumen-row">
-        <div><strong>Destino:</strong> {{ resumen.destino }}</div>
-        <div><strong>Vendidos:</strong> {{ resumen.vendidos }}</div>
-        <div><strong>Devueltos:</strong> {{ resumen.devueltos }}</div>
-        <div><strong>Tasa venta:</strong> {{ resumen.tasaVenta | number:'1.2-2' }}%</div>
-        <div><strong>Tasa devolución:</strong> {{ resumen.tasaDevolucion | number:'1.2-2' }}%</div>
+          <div class="resumen-item"><strong>Destino:</strong> {{ resumen.destino }}</div>
+          <div class="resumen-item"><strong>Vendidos:</strong> {{ resumen.vendidos }}</div>
+          <div class="resumen-item"><strong>Devueltos:</strong> {{ resumen.devueltos }}</div>
+          <div class="resumen-item"><strong>Tasa venta:</strong> {{ resumen.tasaVenta | number:'1.2-2' }}%</div>
+          <div class="resumen-item"><strong>Tasa devolución:</strong> {{ resumen.tasaDevolucion | number:'1.2-2' }}%</div>
         </div>
-    </mat-card>
-    
-    <div *ngIf="mostrarGrafico" class="grafico-container">
-        <canvas
-        baseChart
-        [data]="{ labels: chartLabels, datasets: chartData }"
-        [type]="chartType"
-        [options]="chartOptions"
-        height="250">
-        </canvas>
+      </div>
     </div>
-    
+  </div>
+
+  <div class="content-card" *ngIf="mostrarGrafico">
+    <div class="card-header">
+      <h2 class="card-title">Gráfico de Pasajes por Destino</h2>
+    </div>
+
+    <div class="grafico-container">
+      <canvas baseChart
+              [data]="{ labels: chartLabels, datasets: chartData }"
+              [type]="chartType"
+              [options]="chartOptions"
+              height="250">
+      </canvas>
+    </div>
+  </div>
+
+  <div class="content-card">
     <div class="tabla-container">
-        <table mat-table [dataSource]="dataSource">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
         <ng-container matColumnDef="destino">
-            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('destino')">
-                Destino
-                <span *ngIf="ordenarPor==='destino'">{{ ascendente ? '↑' : '↓' }}</span>
-            </th>
-            <td mat-cell *matCellDef="let e">{{ e.destino }}</td>
+          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('destino')">
+            Destino
+            <span *ngIf="ordenarPor==='destino'">{{ ascendente ? '↑' : '↓' }}</span>
+          </th>
+          <td mat-cell *matCellDef="let e">{{ e.destino }}</td>
         </ng-container>
-    
+
         <ng-container matColumnDef="vendidos">
-            <th mat-header-cell *matHeaderCellDef (click)="toggleSort('vendidos')">
-                Vendidos
-                <span *ngIf="ordenarPor==='vendidos'">{{ ascendente ? '↑' : '↓' }}</span>
-            </th>
-            <td mat-cell *matCellDef="let e">{{ e.vendidos }}</td>
+          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('vendidos')">
+            Pasajes Vendidos
+            <span *ngIf="ordenarPor==='vendidos'">{{ ascendente ? '↑' : '↓' }}</span>
+          </th>
+          <td mat-cell *matCellDef="let e">{{ e.vendidos }}</td>
         </ng-container>
-    
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-    
-        <mat-paginator
-        [length]="total"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        (page)="load($event)">
-        </mat-paginator>
+      </table>
+
+      <mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)">
+      </mat-paginator>
     </div>
+  </div>
+</div>

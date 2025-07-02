@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { EstadisticaPasaje } from '../../../../models/estadisticas/transporte/estadistica-pasaje';
@@ -32,7 +33,8 @@ import { CommonModule } from '@angular/common';
         MatPaginatorModule,
         NgChartsModule,
         MatDatepickerModule,
-        MatNativeDateModule
+        MatNativeDateModule,
+        MatIconModule
     ],
     templateUrl: './estadisticas-pasajes.component.html',
     styleUrls: ['./estadisticas-pasajes.component.scss']

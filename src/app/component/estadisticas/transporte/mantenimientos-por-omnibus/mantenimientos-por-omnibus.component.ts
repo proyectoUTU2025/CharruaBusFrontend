@@ -13,6 +13,7 @@ import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-mantenimientos-por-omnibus',
@@ -27,7 +28,8 @@ import { MatNativeDateModule } from '@angular/material/core';
         MatButtonModule,
         NgChartsModule,
         MatDatepickerModule,
-        MatNativeDateModule
+        MatNativeDateModule,
+        MatIconModule
     ],
     templateUrl: './mantenimientos-por-omnibus.component.html',
     styleUrls: ['./mantenimientos-por-omnibus.component.scss']

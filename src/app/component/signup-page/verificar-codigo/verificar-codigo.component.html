@@ -18,6 +18,16 @@
       <input #digitInput type="text" formControlName="digit5" maxlength="1" (input)="onInput($event, 4)" (keydown)="onKeyDown($event, 4)" class="digit-input">
       <input #digitInput type="text" formControlName="digit6" maxlength="1" (input)="onInput($event, 5)" (keydown)="onKeyDown($event, 5)" class="digit-input">
     </div>
+    
+    <div class="resend-container">
+      <button type="button" class="resend-button" 
+              (click)="onResendCode()" 
+              [disabled]="resending || resendCooldown > 0">
+        <span *ngIf="resendCooldown === 0">Reenviar código</span>
+        <span *ngIf="resendCooldown > 0">Reenviar en {{ resendCooldown }}s</span>
+      </button>
+    </div>
+
     <button type="submit" mat-flat-button color="primary" class="submit-button" [disabled]="form.invalid">
       <mat-icon>verified_user</mat-icon>
       Validar

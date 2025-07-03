@@ -1,5 +1,55 @@
 <div class="home-container">
-    <h1>Bienvenido a</h1>
-    <h1 class="charrua-title">Charrua Bus</h1>
-    <img src="assets/charruabusIcon.png" alt="Logo Charrua Bus" class="logo" />
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="welcome-card">
+      <div class="welcome-content">
+        <div class="logo-section">
+          <img src="assets/charruabusIcon.png" alt="Charrua Bus" class="logo">
+        </div>
+        <div class="welcome-text">
+          <h1 class="welcome-title">¡Hola, {{ userName }}!</h1>
+          <p class="welcome-subtitle">{{ getRoleDisplayName() }} • {{ currentTime }}</p>
+          <p class="welcome-message">Bienvenido de vuelta a Charrua Bus</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="actions-section">
+    <h2 class="section-title">Acciones Rápidas</h2>
+    <div class="actions-grid">
+      <mat-card 
+        *ngFor="let action of quickActions" 
+        class="action-card" 
+        (click)="navigateTo(action.route)"
+        [style.border-left-color]="action.color">
+        <mat-card-content class="action-content">
+          <div class="action-header">
+            <mat-icon [style.color]="action.color" class="action-icon">{{ action.icon }}</mat-icon>
+            <h3 class="action-title">{{ action.title }}</h3>
+          </div>
+          <p class="action-description">{{ action.description }}</p>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Info Section - Solo para clientes -->
+  <div class="info-section" *ngIf="userRole === 'CLIENTE'">
+    <mat-card class="info-card">
+      <mat-card-content class="info-content">
+        <div class="info-item">
+          <mat-icon class="info-icon">info</mat-icon>
+          <div class="info-text">
+            <h4>¿Necesitas ayuda?</h4>
+            <p>Contacta con nosotros en charruabus&#64;gmail.com o al 0800-CHARRUA</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

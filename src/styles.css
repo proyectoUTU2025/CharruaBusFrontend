@@ -286,3 +286,23 @@ html, body {
   background-color: var(--success-color, #4caf50);
   color: white;
 }
+
+.notification-snackbar {
+  background-color: var(--primary-color, #1976d2);
+  color: white;
+}
+
+/* Estilos globales responsivos para el menú de notificaciones */
+.cdk-overlay-pane .notifications-menu .mat-mdc-menu-content,
+.mat-mdc-menu-panel.notifications-menu .mat-mdc-menu-content {
+  width: clamp(320px, 35vw, 480px) !important;
+  min-width: 320px !important;
+  max-width: 480px !important;
+  max-height: 70vh !important;
+}
+
+.mat-mdc-menu-panel.notifications-menu {
+  width: clamp(320px, 35vw, 480px) !important;
+  min-width: 320px !important;
+  max-width: 480px !important;
+}

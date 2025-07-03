@@ -1078,6 +1078,10 @@
       min-width: 180px;
     }
 
+    .asiento-filter {
+      min-width: 140px;
+    }
+
     .showing-text {
       font-size: 14px;
       color: var(--text-secondary);
@@ -1101,7 +1105,8 @@
       
       .estado-filter,
       .fecha-filter,
-      .parada-filter {
+      .parada-filter,
+      .asiento-filter {
         min-width: 120px;
         flex: 1;
       }

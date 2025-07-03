@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MaterialUtilsService } from '../../../shared/material-utils.service';
 
 @Component({
@@ -18,7 +19,8 @@ import { MaterialUtilsService } from '../../../shared/material-utils.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './verificar-codigo.component.html',
   styleUrls: ['./verificar-codigo.component.scss']
@@ -28,6 +30,10 @@ export class VerificarCodigoComponent implements OnInit, AfterViewInit, OnDestro
   error: string | null = null;
   email: string | null = null;
   @ViewChildren('digitInput') digitInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  
+  resending = false;
+  resendCooldown = 0;
+  private cooldownInterval: any;
 
   constructor(
     private fb: FormBuilder,
@@ -60,6 +66,9 @@ export class VerificarCodigoComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   ngOnDestroy(): void {
+    if (this.cooldownInterval) {
+      clearInterval(this.cooldownInterval);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -95,6 +104,33 @@ export class VerificarCodigoComponent implements OnInit, AfterViewInit, OnDestro
       }
       this.digitInputs.last.nativeElement.focus();
     }
+  }
+
+  async onResendCode(): Promise<void> {
+    if (!this.email || this.resending || this.resendCooldown > 0) return;
+
+    this.resending = true;
+    this.error = null;
+
+    try {
+      const response = await this.authService.resendVerificationEmail(this.email);
+      this.materialUtils.showSuccess(response.message);
+      this.startCooldown();
+    } catch (err: any) {
+      this.error = err.error?.message || 'Error al reenviar el código.';
+    } finally {
+      this.resending = false;
+    }
+  }
+
+  private startCooldown(): void {
+    this.resendCooldown = 60;
+    this.cooldownInterval = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) {
+        clearInterval(this.cooldownInterval);
+      }
+    }, 1000);
   }
   
   async onSubmit(): Promise<void> {

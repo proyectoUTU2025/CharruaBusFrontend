@@ -95,6 +95,9 @@ export class PasajeService {
         if (filtro.destinoId != null) {
             params = params.set('destinoId', filtro.destinoId.toString());
         }
+        if (filtro.numeroAsiento != null) {
+            params = params.set('numeroAsiento', filtro.numeroAsiento.toString());
+        }
 
         return this.http.get<Page<PasajeDto>>(
             `${environment.apiBaseUrl}/viajes/${viajeId}/pasajes`,

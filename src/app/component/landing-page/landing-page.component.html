@@ -1,0 +1,184 @@
+<div class="landing-container">
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-background"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-logo">
+          <img src="assets/CharruaBusLogoSinFondo.png" alt="Charrua Bus Logo" class="hero-logo-img">
+        </div>      
+        <div class="hero-text">
+          <h1 class="hero-title">
+            Viajá Cómodo
+            <span class="hero-highlight">por Todo Uruguay</span>
+          </h1>
+          <p class="hero-description">
+            Comprá tus pasajes de ómnibus online de forma fácil y segura. 
+            Conectamos las principales ciudades de Uruguay.
+          </p>
+        </div>
+        
+        <div class="hero-buttons">
+          <button mat-flat-button class="btn-primary" (click)="navigateToCompra()">
+            Empezar a Viajar
+          </button>
+          <button mat-stroked-button class="btn-secondary" (click)="scrollToSection('destinos')">
+            Ver Destinos
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicios" class="services-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">¿Por qué elegir Charrua Bus?</h2>
+          <p class="section-description">Te ofrecemos la mejor experiencia para viajar por Uruguay</p>
+        </div>
+
+        <div class="services-grid">
+          <mat-card class="service-card">
+            <mat-card-content class="service-content">
+              <mat-icon class="service-icon routes-icon">map</mat-icon>
+              <h3 class="service-title">Rutas por Todo el País</h3>
+              <p class="service-description">
+                Conectamos las principales ciudades de Uruguay con horarios convenientes
+              </p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="service-card">
+            <mat-card-content class="service-content">
+              <mat-icon class="service-icon schedule-icon">schedule</mat-icon>
+              <h3 class="service-title">Horarios Puntuales</h3>
+              <p class="service-description">
+                Salidas y llegadas a tiempo para que planifiques tu viaje sin preocupaciones
+              </p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="service-card">
+            <mat-card-content class="service-content">
+              <mat-icon class="service-icon payment-icon">credit_card</mat-icon>
+              <h3 class="service-title">Pago Fácil y Seguro</h3>
+              <p class="service-description">
+                Pagá de forma online con tarjeta, o en nuestras oficinas
+              </p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </section>
+
+    <!-- Destinations Section -->
+    <section id="destinos" class="destinations-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Principales Destinos</h2>
+          <p class="section-description">Conectamos las ciudades más importantes de Uruguay</p>
+        </div>
+
+        <div class="destinations-grid">
+          <mat-card class="destination-card">
+            <mat-card-content class="destination-content">
+              <div class="destination-header">
+                <mat-icon class="destination-icon">location_on</mat-icon>
+                <h3 class="destination-name">Montevideo</h3>
+              </div>
+              <p class="destination-description">Capital del país, centro de conexiones a todos los destinos</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="destination-card">
+            <mat-card-content class="destination-content">
+              <div class="destination-header">
+                <mat-icon class="destination-icon">location_on</mat-icon>
+                <h3 class="destination-name">Punta del Este</h3>
+              </div>
+              <p class="destination-description">El balneario más famoso de Uruguay, ideal para vacaciones</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="destination-card">
+            <mat-card-content class="destination-content">
+              <div class="destination-header">
+                <mat-icon class="destination-icon">location_on</mat-icon>
+                <h3 class="destination-name">Colonia del Sacramento</h3>
+              </div>
+              <p class="destination-description">Ciudad histórica, patrimonio de la humanidad</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="destination-card">
+            <mat-card-content class="destination-content">
+              <div class="destination-header">
+                <mat-icon class="destination-icon">location_on</mat-icon>
+                <h3 class="destination-name">Rivera</h3>
+              </div>
+              <p class="destination-description">Ciudad fronteriza con Brasil, ideal para compras</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="destination-card">
+            <mat-card-content class="destination-content">
+              <div class="destination-header">
+                <mat-icon class="destination-icon">location_on</mat-icon>
+                <h3 class="destination-name">Salto</h3>
+              </div>
+              <p class="destination-description">Famosa por sus termas y aguas termales</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="destination-card">
+            <mat-card-content class="destination-content">
+              <div class="destination-header">
+                <mat-icon class="destination-icon">location_on</mat-icon>
+                <h3 class="destination-name">Maldonado</h3>
+              </div>
+              <p class="destination-description">Puerta de entrada a las mejores playas del este</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="contacto" class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="footer-logo">
+            <img src="assets/charruabusIcon.png" alt="Charrua Bus" class="footer-logo-img">
+            <span class="footer-logo-text">Charrua Bus</span>
+          </div>
+          <p class="footer-description">
+            Tu compañía de confianza para viajar cómodo y seguro por todo Uruguay.
+          </p>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Contacto</h4>
+          <div class="footer-contact">
+            <div class="contact-item">
+              <mat-icon class="contact-icon">phone</mat-icon>
+              <span class="contact-text">0800-CHARRUA (2427782)</span>
+            </div>
+            <div class="contact-item">
+              <mat-icon class="contact-icon">email</mat-icon>
+              <span class="contact-text">charruabus&#64;gmail.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copyright">
+          © {{ currentYear }} Charrua Bus. Todos los derechos reservados.
+        </p>
+      </div>
+    </div>
+  </footer>
+</div> 

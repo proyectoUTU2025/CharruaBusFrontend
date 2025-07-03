@@ -23,9 +23,6 @@
         <span class="card-title">Lista de Configuraciones</span>
       </div>
       <div class="table-header-actions">
-        <button mat-flat-button class="create-btn" (click)="create()">
-          <mat-icon>add</mat-icon> Nueva Configuración
-        </button>
       </div>
     </div>
     <div class="table-container">
@@ -51,7 +48,7 @@
           <td mat-cell *matCellDef="let c">{{ c.id }}</td>
         </ng-container>
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef>Parámetro</th>
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
           <td mat-cell *matCellDef="let c">{{ c.nombre }}</td>
         </ng-container>
         <ng-container matColumnDef="valorInt">
@@ -69,9 +66,6 @@
               <button mat-icon-button class="icon-btn" (click)="edit(c)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button class="icon-btn" (click)="delete(c)">
-                <mat-icon>delete</mat-icon>
-              </button>
             </div>
           </td>
         </ng-container>
@@ -84,7 +78,7 @@
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="currentPage"
-      [pageSizeOptions]="[5, 10, 20, 50]"
+      [pageSizeOptions]="[5, 10]"
       (page)="pageChange($event)"
       showFirstLastButtons>
     </mat-paginator>

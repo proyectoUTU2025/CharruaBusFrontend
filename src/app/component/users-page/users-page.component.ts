@@ -192,26 +192,29 @@ export class UsersPageComponent implements OnInit {
     });
   }
 
-  remove(user: UsuarioDto) {
+  toggleUserStatus(user: UsuarioDto) {
+    const action = user.activo ? 'desactivar' : 'activar';
+    const actionPast = user.activo ? 'desactivado' : 'activado';
+    
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Confirmar Eliminación',
-        message: `¿Está seguro de que desea eliminar al usuario ${user.nombre} ${user.apellido}?`
+        title: `Confirmar ${action}`,
+        message: `¿Está seguro de que desea ${action} al usuario ${user.nombre} ${user.apellido}?`
       },
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(async confirmed => {
-      if (confirmed) {
-        try {
-          await this.userService.delete(user.id);
-          this.materialUtils.showSuccess('Usuario eliminado correctamente.');
-          this.loadUsers(this.getCurrentSort());
-        } catch (err: any) {
-          this.materialUtils.showError(err.error?.message || 'Error al eliminar el usuario.');
+          dialogRef.afterClosed().subscribe(async confirmed => {
+        if (confirmed) {
+          try {
+            await this.userService.cambiarEstado(user.id);
+            this.materialUtils.showSuccess(`Usuario ${actionPast} correctamente.`);
+            this.loadUsers(this.getCurrentSort());
+          } catch (err: any) {
+            this.materialUtils.showError(err.error?.message || `Error al ${action} el usuario.`);
+          }
         }
-      }
-    });
+      });
   }
   
   openBulkUpload() {

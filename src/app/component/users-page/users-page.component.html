@@ -142,8 +142,12 @@
               <button mat-icon-button class="icon-btn" (click)="edit(u)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button class="icon-btn" (click)="remove(u)">
-                <mat-icon>delete</mat-icon>
+              <button mat-icon-button class="icon-btn" 
+                      (click)="toggleUserStatus(u)" 
+                      [matTooltip]="u.activo ? 'Desactivar usuario' : 'Activar usuario'">
+                <mat-icon [ngClass]="u.activo ? 'deactivate-icon' : 'activate-icon'">
+                  {{ u.activo ? 'person_off' : 'person' }}
+                </mat-icon>
               </button>
             </div>
           </td>
@@ -157,7 +161,7 @@
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="pageIndex"
-      [pageSizeOptions]="[5, 10, 25]"
+      [pageSizeOptions]="[5, 10]"
       (page)="onPageChange($event)"
       showFirstLastButtons>
     </mat-paginator>

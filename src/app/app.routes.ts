@@ -13,11 +13,11 @@ import { LocalidadesPageComponent } from './component/localidades-page/localidad
 import { ViajesPageComponent } from './component/viajes-page/viajes-page.component';
 import { ConfiguracionDelSistemaComponent } from './component/configuracion-del-sistema/configuracion-del-sistema.component';
 import { AuthGuard } from './core/auth/auth.guard';
+import { RoleGuard } from './core/auth/role.guard';
+import { LoggedInGuard } from './core/auth/logged-in.guard';
 import { BusDetailComponent } from './component/transport/buses-page/bus-detail/bus-detail.component';
 import { ProfilePageComponent } from './component/profile-page/profile-page.component';
 import { PasajeHistoryComponent } from './component/pasaje-history/pasaje-history.component';
-import { ChangePasswordComponent } from './component/change-password/change-password.component';
-import { EditUserDialogComponent } from './component/users-page/dialogs/edit-user-dialog/edit-user-dialog.component';
 import { UsuariosPorTipoComponent } from './component/estadisticas/usuario/usuarios-por-tipo/usuarios-por-tipo.component';
 import { ComprasClientesComponent } from './component/estadisticas/usuario/compras-clientes/compras-clientes.component';
 import { LogueosUsuariosComponent } from './component/estadisticas/usuario/logueos-usuarios/logueos-usuarios.component';
@@ -27,48 +27,69 @@ import { MantenimientosPorOmnibusComponent } from './component/estadisticas/tran
 import { EstadisticasPasajesComponent } from './component/estadisticas/transporte/estadisticas-pasajes/estadisticas-pasajes.component';
 import { PasajesPorViajeComponent } from './component/pasajes-por-viaje/pasajes-por-viaje.component';
 import { CompraDetallePageComponent } from './component/compra-detalle/compra-detalle-page.component';
+import { LandingPageComponent } from './component/landing-page/landing-page.component';
+import { NotFoundComponent } from './component/not-found/not-found.component';
 import { AppComponent } from './app.component';
 
 export const routes: Routes = [
-  // Rutas de autenticación (sin navbar)
-  { path: 'login', component: LoginPageComponent },
-  { path: 'signup', component: SignupPageComponent },
-  { path: 'verificar-codigo', component: VerificarCodigoComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'verify-reset', component: VerifyResetComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
+  // Landing page (pública) - redirige a /home si el usuario está logueado
+  { path: '', component: LandingPageComponent, canActivate: [LoggedInGuard] },
+
+  // Rutas de autenticación (sin navbar) - redirigen a /home si el usuario está logueado
+  { path: 'login', component: LoginPageComponent, canActivate: [LoggedInGuard] },
+  { path: 'signup', component: SignupPageComponent, canActivate: [LoggedInGuard] },
+  { path: 'verificar-codigo', component: VerificarCodigoComponent, canActivate: [LoggedInGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [LoggedInGuard] },
+  { path: 'verify-reset', component: VerifyResetComponent, canActivate: [LoggedInGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [LoggedInGuard] },
 
   // Rutas de la aplicación principal (con navbar y protegidas)
   {
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-      { path: 'inicio', loadComponent: () => import('./component/home-page/home-page.component').then(m => m.HomePageComponent) },
-      { path: 'configuraciones', component: ConfiguracionDelSistemaComponent },
-      { path: 'usuarios', component: UsersPageComponent, pathMatch: 'full' },
-      { path: 'omnibus', component: BusesPageComponent },
-      { path: 'omnibus/:id', component: BusDetailComponent },
-      { path: 'localidades', component: LocalidadesPageComponent },
-      { path: 'viajes', component: ViajesPageComponent },
-      { path: 'viajes/:id/pasajes', component: PasajesPorViajeComponent, data: { roles: ['VENDEDOR'] } },
-      { path: 'compras/exito', component: StripeRedirectComponent },
-      { path: 'compras/cancelada', component: StripeRedirectComponent },
-      { path: 'comprar', component: CompraPageComponent },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      
+      // Rutas comunes para todos los usuarios logueados
+      { path: 'home', loadComponent: () => import('./component/home-page/home-page.component').then(m => m.HomePageComponent) },
       { path: 'perfil', component: ProfilePageComponent },
-      { path: 'perfil/editar', component: EditUserDialogComponent },
-      { path: 'pasajes', component: PasajeHistoryComponent },
-      { path: 'change-password', component: ChangePasswordComponent },
-      { path: 'estadisticas/usuarios-por-tipo', component: UsuariosPorTipoComponent },
-      { path: 'estadisticas/compras-clientes', component: ComprasClientesComponent },
-      { path: 'estadisticas/logueos-usuarios', component: LogueosUsuariosComponent },
-      { path: 'estadisticas/viajes-departamento', component: ViajesDepartamentoComponent },
-      { path: 'estadisticas/viajes-por-omnibus', component: ViajesPorOmnibusComponent },
-      { path: 'estadisticas/mantenimientos-por-omnibus', component: MantenimientosPorOmnibusComponent },
-      { path: 'estadisticas/estadisticas-pasajes', component: EstadisticasPasajesComponent },
-      { path: 'compras/:id', component: CompraDetallePageComponent, canActivate: [AuthGuard] }
+      
+      // Rutas específicas para ADMIN
+      { path: 'usuarios', component: UsersPageComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
+      { path: 'configuraciones', component: ConfiguracionDelSistemaComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
+      
+      // Rutas específicas para VENDEDOR
+      { path: 'omnibus', component: BusesPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      { path: 'omnibus/:id', component: BusDetailComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      { path: 'localidades', component: LocalidadesPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      { path: 'viajes', component: ViajesPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      
+      // Rutas compartidas VENDEDOR y CLIENTE
+      { path: 'comprar', component: CompraPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
+      { path: 'compras/exito', component: StripeRedirectComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
+      { path: 'compras/cancelada', component: StripeRedirectComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
+      { path: 'compras/:id', component: CompraDetallePageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
+
+
+      // Rutas específicas para CLIENTE
+      { path: 'pasajes', component: PasajeHistoryComponent, canActivate: [RoleGuard], data: { roles: ['CLIENTE'] } },
+      
+      // Estadísticas para ADMIN
+      { path: 'estadisticas/usuarios-por-tipo', component: UsuariosPorTipoComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
+      { path: 'estadisticas/compras-clientes', component: ComprasClientesComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
+      { path: 'estadisticas/logueos-usuarios', component: LogueosUsuariosComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
+      
+      // Estadísticas para VENDEDOR
+      { path: 'estadisticas/viajes-departamento', component: ViajesDepartamentoComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      { path: 'estadisticas/viajes-por-omnibus', component: ViajesPorOmnibusComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      { path: 'estadisticas/mantenimientos-por-omnibus', component: MantenimientosPorOmnibusComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+      { path: 'estadisticas/estadisticas-pasajes', component: EstadisticasPasajesComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
     ]
   },
 
-  { path: '**', redirectTo: 'login' } // Redirigir a login si la ruta no existe
+  // Página 404 específica para acceso sin permisos
+  { path: 'not-found', component: NotFoundComponent },
+
+  // Wildcard route para URLs realmente inexistentes
+  { path: '**', component: NotFoundComponent }
 ];

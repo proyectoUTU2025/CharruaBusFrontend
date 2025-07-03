@@ -50,8 +50,8 @@ export class UserService {
       .then(resp => resp.data);
   }
 
-  delete(id: number): Promise<void> {
-    return firstValueFrom(this.http.patch<void>(`${this.base}/${id}/desactivar`, {}));
+  cambiarEstado(id: number): Promise<void> {
+    return firstValueFrom(this.http.patch<void>(`${this.base}/${id}/estado`, {}));
   }
 
   bulkUpload(file: File): Promise<BulkResponseDto> {

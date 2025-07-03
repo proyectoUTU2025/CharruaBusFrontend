@@ -14,6 +14,9 @@
             {{ loc.nombreConDepartamento }}
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="filterForm.hasError('origenDestinoIguales')">
+          El origen y destino no pueden ser iguales
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="search-field">
@@ -24,6 +27,9 @@
             {{ loc.nombreConDepartamento }}
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="filterForm.hasError('origenDestinoIguales')">
+          El origen y destino no pueden ser iguales
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="search-field">
@@ -31,6 +37,9 @@
         <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" />
         <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
         <mat-datepicker #pickerDesde></mat-datepicker>
+        <mat-error *ngIf="filterForm.hasError('fechaDesdeInvalida')">
+          La fecha desde no puede ser mayor que la fecha hasta
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="search-field">
@@ -38,9 +47,12 @@
         <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" />
         <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
         <mat-datepicker #pickerHasta></mat-datepicker>
+        <mat-error *ngIf="filterForm.hasError('fechaDesdeInvalida')">
+          La fecha desde no puede ser mayor que la fecha hasta
+        </mat-error>
       </mat-form-field>
 
-      <button mat-flat-button class="create-btn" type="submit">Buscar</button>
+      <button mat-flat-button class="create-btn" type="submit" [disabled]="filterForm.invalid">Buscar</button>
       <button mat-stroked-button class="massive-btn" type="button" (click)="onClear()">Limpiar</button>
     </form>
   </div>
@@ -118,7 +130,7 @@
       [length]="totalElements" 
       [pageSize]="pageSize"
       [pageIndex]="pageIndex" 
-      [pageSizeOptions]="[5,10,20]" 
+      [pageSizeOptions]="[5,10]" 
       (page)="cambiarPagina($event)" 
       showFirstLastButtons>
     </mat-paginator>

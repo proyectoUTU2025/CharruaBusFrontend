@@ -17,7 +17,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DetalleViajeDto, AsientoDto } from '../../../../models/viajes';
 import { ReasignarOmnibusDialogComponent } from '../reasignar-omnibus-dialog/reasignar-omnibus-dialog.component';
 import { DetallePasajeCompletoDialogComponent } from '../../../shared/detalle-pasaje-completo-dialog/detalle-pasaje-completo-dialog.component';
@@ -65,6 +65,7 @@ export class ViajeDetalleDialogComponent implements OnInit {
   fechaHastaFilter = new FormControl();
   origenFilter = new FormControl('todas');
   destinoFilter = new FormControl('todas');
+  numeroAsientoFilter = new FormControl(null, [Validators.min(1)]);
   
   // Paginación
   currentPage = 0;
@@ -84,6 +85,11 @@ export class ViajeDetalleDialogComponent implements OnInit {
 
   ngOnInit() {
     // Los filtros solo se aplicarán cuando se presione el botón "Buscar"
+    // Agregar validador máximo dinámico basado en la cantidad de asientos del viaje
+    this.numeroAsientoFilter.setValidators([
+      Validators.min(1),
+      Validators.max(this.cantidadMaximaAsientos)
+    ]);
   }
 
   onTabChange(index: number) {
@@ -164,6 +170,12 @@ export class ViajeDetalleDialogComponent implements OnInit {
       filtro.destinoId = parseInt(destino);
     }
     
+    // Filtro por número de asiento
+    const numeroAsiento = this.numeroAsientoFilter.value;
+    if (numeroAsiento && numeroAsiento > 0 && this.numeroAsientoFilter.valid) {
+      filtro.numeroAsiento = parseInt(numeroAsiento);
+    }
+    
     this.cargarPasajesConFiltro(filtro);
   }
 
@@ -176,6 +188,7 @@ export class ViajeDetalleDialogComponent implements OnInit {
     this.fechaHastaFilter.setValue(null);
     this.origenFilter.setValue('todas');
     this.destinoFilter.setValue('todas');
+    this.numeroAsientoFilter.setValue(null);
     this.currentPage = 0; // Resetear a la primera página
     this.cargarPasajes();
   }
@@ -259,7 +272,20 @@ export class ViajeDetalleDialogComponent implements OnInit {
    * Busca pasajes aplicando los filtros activos
    */
   buscarPasajes() {
+    // Verificar que no hay errores de validación
+    if (this.numeroAsientoFilter.invalid) {
+      this.materialUtils.showError('Corrige los errores en el número de asiento antes de buscar');
+      return;
+    }
+    
     this.aplicarFiltros(true); // Resetear a la primera página en nueva búsqueda
+  }
+
+  /**
+   * Verifica si hay errores de validación en los filtros
+   */
+  get tieneErroresValidacion(): boolean {
+    return this.numeroAsientoFilter.invalid;
   }
 
   /**
@@ -370,6 +396,10 @@ export class ViajeDetalleDialogComponent implements OnInit {
 
   get nombreDestinoSimple(): string {
     return this.data.viaje.nombreLocalidadDestino;
+  }
+
+  get cantidadMaximaAsientos(): number {
+    return this.data.viaje.cantidadPasajesVendibles || 0;
   }
 
   cerrar() {

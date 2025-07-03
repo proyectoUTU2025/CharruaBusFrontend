@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn, FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,6 +55,7 @@ export class SignupPageComponent implements OnInit {
   hideConfirmPassword = true;
   error: string | null = null;
   today: Date;
+  yesterday: Date;
   matcher = new PasswordsMatchErrorStateMatcher();
 
   passwordValidationStatus = {
@@ -69,8 +71,11 @@ export class SignupPageComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.today = new Date();
-    const todayString = this.today.toISOString().split('T')[0];
     this.today.setHours(0, 0, 0, 0);
+    
+    this.yesterday = new Date();
+    this.yesterday.setDate(this.yesterday.getDate() - 1);
+    this.yesterday.setHours(0, 0, 0, 0);
 
     this.signupForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -79,7 +84,7 @@ export class SignupPageComponent implements OnInit {
       tipoDocumento: ['', Validators.required],
       fechaNacimiento: ['', [Validators.required, (control: AbstractControl) => {
         const date = new Date(control.value);
-        return date > this.today ? { futureDate: true } : null;
+        return date >= this.today ? { futureDate: true } : null;
       }]],
       email: ['', [Validators.required, Validators.email]],
       password: [
@@ -108,17 +113,28 @@ export class SignupPageComponent implements OnInit {
     this.passwordValidationStatus.hasSpecialChar = /[!@#$%^&*]/.test(password);
   }
 
-  get todayISO(): string {
-    return new Date().toISOString().split('T')[0];
-  }
+
 
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) return;
     try {
       await this.authService.registrarCliente(this.signupForm.value);
       this.router.navigate(['/verificar-codigo'], { state: { email: this.signupForm.value.email } });
-    } catch (error) {
-      this.error = 'Error al registrar. Verificá los datos.';
+    } catch (error: HttpErrorResponse | any) {
+      debugger;
+      console.error('Error al registrar usuario:', error);
+          
+      // Extraer mensaje específico del backend
+      if (error?.error?.message) {
+        this.error = error.error.message;
+      } else if (typeof error?.error === 'string') {
+        this.error = error.error;
+      } else if (error?.message) {
+        this.error = error.message;
+      } else {
+        this.error = 'Error al registrar. Verificá los datos.';
+      }
+
     }
   }
 }

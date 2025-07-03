@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { AuthService } from '../../services/auth.service';
+import { NotificacionesComponent } from '../shared/notificaciones/notificaciones.component';
 
 @Component({
   selector: 'app-navbar',
@@ -21,7 +22,8 @@ import { AuthService } from '../../services/auth.service';
     MatIconModule,
     MatTooltipModule,
     MatMenuModule,
-    MatChipsModule
+    MatChipsModule,
+    NotificacionesComponent
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
@@ -65,10 +67,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   onLogoClick(): void {
-    if (this.router.url === '/' || this.router.url === '') {
-      window.location.reload();
+    if (this.isLoggedIn) {
+      // Si el usuario está logueado, ir a /home
+      if (this.router.url === '/home') {
+        window.location.reload();
+      } else {
+        this.router.navigate(['/home']);
+      }
     } else {
-      this.router.navigate(['']);
+      // Si el usuario NO está logueado, ir a la landing page
+      if (this.router.url === '/' || this.router.url === '') {
+        window.location.reload();
+      } else {
+        this.router.navigate(['']);
+      }
     }
   }
 

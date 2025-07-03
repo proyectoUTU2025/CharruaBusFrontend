@@ -1,5 +1,5 @@
 <div class="dialog-header">
-  <h2 class="dialog-title">Editar Perfil</h2>
+  <h2 class="dialog-title">Editar Usuario</h2>
 </div>
 
 <div class="edit-container" mat-dialog-content>
@@ -26,7 +26,7 @@
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
       <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('required')">La fecha de nacimiento es obligatoria.</mat-error>
-      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('futureDate')">No se permiten fechas futuras.</mat-error>
+      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('futureDate')">No se puede seleccionar el día de hoy o fechas futuras.</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">

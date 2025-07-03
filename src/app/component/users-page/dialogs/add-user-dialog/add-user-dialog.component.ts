@@ -9,7 +9,6 @@ import { MatNativeDateModule, ErrorStateMatcher } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TipoDocumento, TipoRol } from '../../../../models/users';
 import { UserService } from '../../../../services/user.service';
@@ -49,7 +48,6 @@ export class PasswordsMatchErrorStateMatcher implements ErrorStateMatcher {
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatCheckboxModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './add-user-dialog.component.html',
@@ -57,7 +55,7 @@ export class PasswordsMatchErrorStateMatcher implements ErrorStateMatcher {
 })
 export class AddUserDialogComponent implements OnInit {
   form: FormGroup;
-  tiposDocumento = Object.values(TipoDocumento).map(value => ({ value, viewValue: value }));
+  tiposDocumento = Object.values(TipoDocumento).map(value => ({ value, viewValue: value.toUpperCase() }));
   roles = Object.values(TipoRol)
     .filter(rol => rol !== TipoRol.CLIENTE) // Excluir CLIENTE
     .map(value => ({ value, viewValue: value }));
@@ -75,7 +73,9 @@ export class AddUserDialogComponent implements OnInit {
   private static futureDateValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
     const valueDate = new Date(control.value);
-    return valueDate > new Date() ? { futureDate: true } : null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return valueDate >= today ? { futureDate: true } : null;
   }
 
   passwordValidationStatus = {
@@ -93,6 +93,8 @@ export class AddUserDialogComponent implements OnInit {
     private materialUtils: MaterialUtilsService
   ) {
     this.maxDate = new Date();
+    this.maxDate.setDate(this.maxDate.getDate() - 1);
+    this.maxDate.setHours(0, 0, 0, 0);
     this.form = this.fb.group({
       email:            ['', [Validators.required, Validators.email]],
       password:         ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/)]],
@@ -102,8 +104,7 @@ export class AddUserDialogComponent implements OnInit {
       documento:        ['', Validators.required],
       tipoDocumento:    ['', Validators.required],
       rol:              ['', Validators.required],
-      fechaNacimiento:  ['', [Validators.required, AddUserDialogComponent.futureDateValidator]],
-      activo:           [true]
+      fechaNacimiento:  ['', [Validators.required, AddUserDialogComponent.futureDateValidator]]
     }, { validators: passwordsMatchValidator });
   }
 

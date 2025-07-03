@@ -54,11 +54,14 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Fecha de Nacimiento</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" [max]="today" id="fechaNacimiento">
+      <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" [max]="yesterday" id="fechaNacimiento">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
-      <mat-error *ngIf="signupForm.get('fechaNacimiento')?.invalid && signupForm.get('fechaNacimiento')?.touched">
+      <mat-error *ngIf="signupForm.get('fechaNacimiento')?.hasError('required')">
         Campo obligatorio
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('fechaNacimiento')?.hasError('futureDate')">
+        No se puede seleccionar el día de hoy o fechas futuras
       </mat-error>
     </mat-form-field>
 
@@ -131,7 +134,8 @@
     </button>
 
     <div *ngIf="error" class="error-message">
-      {{ error }}
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error }}</span>
     </div>
   </form>
 </div>

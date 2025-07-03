@@ -10,6 +10,7 @@ import { ResetPasswordRequestDto } from '../models/auth/reset-password-request.d
 import { LoginRequestDto } from '../models/auth/login-request.dto';
 import { RegisterRequestDto } from '../models/auth/register-request.dto';
 import { AuthenticationResponseDto } from '../models/auth/authentication-response.dto';
+import { ResendVerificationRequestDto } from '../models/auth/resend-verification-request.dto';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -132,6 +133,15 @@ export class AuthService {
   resetPassword(payload: ResetPasswordRequestDto): Promise<ApiResponse<void>> {
     return firstValueFrom(
       this.http.post<ApiResponse<void>>(`${this.base}/reset-password`, payload)
+    );
+  }
+
+  resendVerificationEmail(email: string): Promise<ApiResponse<void>> {
+    return firstValueFrom(
+      this.http.post<ApiResponse<void>>(
+        `${this.base}/resend-verification`,
+        { email } as ResendVerificationRequestDto
+      )
     );
   }
 

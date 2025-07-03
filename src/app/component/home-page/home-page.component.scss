@@ -1,27 +1,263 @@
-$primary-color: #675992;
+$primary-color: #1976d2;
+$background-color: #f5f7fa;
+$card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$border-radius: 12px;
 
 .home-container {
+  min-height: calc(100vh - 64px);
+  background: $background-color;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header Section
+.header-section {
+  margin-bottom: 32px;
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, $primary-color 0%, #1565c0 100%);
+  border-radius: $border-radius;
+  padding: 32px;
+  color: white;
+  box-shadow: $card-shadow;
+}
+
+.welcome-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 90vh;
-  text-align: center;
+  gap: 24px;
 }
 
-h1 {
-  font-size: 48px;
+.logo-section {
+  .logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+  }
+}
+
+.welcome-text {
+  flex: 1;
+
+  .welcome-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: white;
+  }
+
+  .welcome-subtitle {
+    font-size: 1rem;
+    margin: 0 0 8px 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+  }
+
+  .welcome-message {
+    font-size: 1.1rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Actions Section
+.actions-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.action-card {
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-left: 4px solid $primary-color;
+  background: white;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.action-content {
+  padding: 24px;
+  position: relative;
+}
+
+.action-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.action-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.action-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
   margin: 0;
+}
+
+.action-description {
+  color: #666;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.action-arrow {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+
+  mat-icon {
+    font-size: 20px;
+    color: #999;
+  }
+}
+
+.action-card:hover .action-arrow {
+  opacity: 1;
+
+  mat-icon {
+    color: $primary-color;
+  }
+}
+
+// Info Section
+.info-section {
+  margin-bottom: 24px;
+}
+
+.info-card {
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  background: white;
+}
+
+.info-content {
+  padding: 24px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.info-icon {
   color: $primary-color;
+  font-size: 24px;
+  margin-top: 4px;
 }
 
-.charrua-title {
-  font-weight: bold;
+.info-text {
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+  }
 }
 
-.logo {
-  width: 500px;
-  height: 600px;
-  margin-top: 10px;
+// Responsive Design
+@media (max-width: 1024px) {
+  .actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 16px;
+  }
+
+  .welcome-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .welcome-text .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .action-content {
+    padding: 20px;
+  }
+
+  .action-header {
+    gap: 12px;
+  }
+
+  .action-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .action-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-card {
+    padding: 24px;
+  }
+
+  .logo-section .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .welcome-text .welcome-title {
+    font-size: 1.3rem;
+  }
+
+  .welcome-text .welcome-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .action-content {
+    padding: 16px;
+  }
 }
 

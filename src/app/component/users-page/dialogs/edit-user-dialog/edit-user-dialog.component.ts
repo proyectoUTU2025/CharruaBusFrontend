@@ -50,7 +50,7 @@ export class EditUserDialogComponent implements OnInit {
   error: string | null = null;
   user!: UsuarioDto;
   private userId: number;
-  maxDate: Date = new Date();
+  maxDate: Date;
 
   noFutureDate = (d: Date | null): boolean => {
     return (d ?? this.maxDate) <= this.maxDate;
@@ -59,12 +59,14 @@ export class EditUserDialogComponent implements OnInit {
   private static futureDateValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
     const valueDate = new Date(control.value);
-    return valueDate > new Date() ? { futureDate: true } : null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return valueDate >= today ? { futureDate: true } : null;
   }
 
   tiposDocumento = Object.values(TipoDocumento).map(value => ({
     value,
-    label: value.charAt(0) + value.slice(1).toLowerCase()
+    label: value.toUpperCase()
   }));
 
   situacionesLaborales = Object.values(TipoCategoriaCliente).map(v => ({
@@ -80,6 +82,9 @@ export class EditUserDialogComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.userId = data.userId;
+    this.maxDate = new Date();
+    this.maxDate.setDate(this.maxDate.getDate() - 1);
+    this.maxDate.setHours(0, 0, 0, 0);
   }
 
   ngOnInit(): void {

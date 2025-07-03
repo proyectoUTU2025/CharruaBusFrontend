@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,6 +21,34 @@ import { ViajeService } from '../../services/viaje.service';
 import { LocalidadService } from '../../services/localidades.service';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { Page } from '../../models';
+
+// Validadores personalizados
+export const origenDestinoValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const origen = control.get('localidadOrigenId');
+  const destino = control.get('localidadDestinoId');
+  
+  if (origen && destino && origen.value && destino.value && origen.value === destino.value) {
+    return { origenDestinoIguales: true };
+  }
+  
+  return null;
+};
+
+export const fechasValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const fechaDesde = control.get('fechaDesde');
+  const fechaHasta = control.get('fechaHasta');
+  
+  if (fechaDesde && fechaHasta && fechaDesde.value && fechaHasta.value) {
+    const desde = new Date(fechaDesde.value);
+    const hasta = new Date(fechaHasta.value);
+    
+    if (desde > hasta) {
+      return { fechaDesdeInvalida: true };
+    }
+  }
+  
+  return null;
+};
 
 @Component({
   selector: 'app-viajes-page',
@@ -97,7 +125,7 @@ export class ViajesPageComponent implements OnInit {
       localidadDestinoId: [null],
       fechaDesde: [null],
       fechaHasta: [null]
-    });
+    }, { validators: [origenDestinoValidator, fechasValidator] });
   }
 
   ngOnInit(): void {
@@ -148,6 +176,10 @@ export class ViajesPageComponent implements OnInit {
   }
 
   onSearch(): void {
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      return;
+    }
     this.pageIndex = 0;
     if (this.paginator) {
       this.paginator.firstPage();

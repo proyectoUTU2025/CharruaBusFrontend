@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -47,7 +47,20 @@ export class EditPersonalInfoComponent implements OnInit {
   user: UsuarioDto | null = null;
   isLoading = false;
   isLoadingData = true;
-  tipoDocumentoOptions = Object.values(TipoDocumento);
+  tipoDocumentoOptions = Object.values(TipoDocumento).map(tipo => tipo.toUpperCase());
+  maxDate: Date;
+
+  noFutureDate = (d: Date | null): boolean => {
+    return (d ?? this.maxDate) <= this.maxDate;
+  };
+
+  private static futureDateValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    const valueDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return valueDate >= today ? { futureDate: true } : null;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -55,6 +68,10 @@ export class EditPersonalInfoComponent implements OnInit {
     private userService: UserService,
     private materialUtils: MaterialUtilsService
   ) {
+    this.maxDate = new Date();
+    this.maxDate.setDate(this.maxDate.getDate() - 1);
+    this.maxDate.setHours(0, 0, 0, 0);
+
     this.form = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
@@ -62,7 +79,7 @@ export class EditPersonalInfoComponent implements OnInit {
       rol: [{ value: '', disabled: true }],
       tipoDocumento: ['', Validators.required],
       documento: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required]
+      fechaNacimiento: ['', [Validators.required, EditPersonalInfoComponent.futureDateValidator]]
     });
   }
 

@@ -1,0 +1,318 @@
+.notification-button {
+  position: relative;
+  // Los estilos principales se manejan desde el navbar para consistencia
+}
+
+// Estilos responsivos para el ancho del mat-menu
+::ng-deep .notifications-menu {
+  .mat-mdc-menu-content {
+    padding: 0 !important;
+    width: clamp(320px, 35vw, 480px) !important; // Responsive entre 320px y 480px
+    min-width: 320px !important;
+    max-width: 480px !important;
+    max-height: 70vh !important; // 70% de la altura de pantalla
+    overflow-y: auto !important;
+  }
+}
+
+// Estilos adicionales para asegurar el ancho
+::ng-deep .mat-mdc-menu-panel.notifications-menu {
+  width: clamp(320px, 35vw, 480px) !important;
+  min-width: 320px !important;
+  max-width: 480px !important;
+}
+
+::ng-deep .cdk-overlay-pane .notifications-menu {
+  .mat-mdc-menu-content {
+    width: clamp(320px, 35vw, 480px) !important;
+    min-width: 320px !important;
+    max-width: 480px !important;
+  }
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .mark-all-read-btn {
+    font-size: 12px;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 12px;
+  }
+}
+
+.notifications-content {
+  max-height: 60vh; // Usar viewport height para adaptarse a la pantalla
+  overflow-y: auto;
+}
+
+.notifications-summary {
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  
+  small {
+    color: #666;
+    font-size: 12px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  
+  p {
+    margin-top: 16px;
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+.no-notifications {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  color: #666;
+  
+  .mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.notifications-list {
+  .notification-item {
+    position: relative;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+    
+    &.unread {
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      
+      &:hover {
+        background-color: #bbdefb;
+      }
+    }
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.notification-content {
+  position: relative;
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    
+    h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      flex: 1;
+      line-height: 1.4;
+    }
+    
+    .notification-date {
+      font-size: 12px;
+      color: #666;
+      margin-left: 12px;
+      white-space: nowrap;
+    }
+  }
+  
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+  }
+  
+  .unread-indicator {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background-color: #2196f3;
+    border-radius: 50%;
+  }
+}
+
+// Estilos para el badge (aplicados globalmente para este componente)
+::ng-deep .notification-button .mat-badge-content {
+  background-color: #f44336 !important;
+  color: white !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  width: 18px !important;
+  height: 18px !important;
+  line-height: 18px !important;
+  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
+  top: 2px !important; // Ajuste para el botón cuadrado centrado
+  right: 2px !important;
+}
+
+// Estilos para el snackbar de notificaciones
+::ng-deep .notification-snackbar {
+  .mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: #2196f3;
+    --mdc-snackbar-supporting-text-color: white;
+    --mdc-snackbar-action-color: white;
+  }
+  
+  .mat-mdc-snack-bar-action {
+    color: white !important;
+    font-weight: 500 !important;
+  }
+}
+
+.load-more-section {
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+  text-align: center;
+  
+  .loading-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 0;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .load-more-btn {
+    width: 100%;
+    font-size: 13px;
+    padding: 8px 16px;
+    color: #1976d2 !important; // Color primario del sistema
+    background-color: #f5f7fa !important; // Fondo consistente con el sistema
+    border: 1px solid #1976d2 !important; // Borde del color primario
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #e3f2fd !important; // Hover usando el color primario
+      color: #1251a3 !important; // Color hover del sistema
+    }
+    
+    .mat-icon {
+      margin-right: 4px;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+  
+  .end-message {
+    padding: 8px 0;
+    
+    small {
+      color: #999;
+      font-size: 12px;
+      font-style: italic;
+    }
+  }
+}
+
+// Estilos para el botón de notificaciones en modo desktop (navbar horizontal)
+@media (min-width: 59.375em) {
+  .notification-button {
+    .nav-text {
+      display: none; // Ocultar texto en desktop
+    }
+  }
+}
+
+// Estilos para el botón de notificaciones en modo móvil (menú sidebar)
+@media (max-width: 59.374em) {
+  .notification-button {
+    // Los estilos principales ya están definidos en navbar.component.scss
+    // Aquí solo ajustamos detalles específicos si es necesario
+    
+    .nav-text {
+      display: inline; // Mostrar texto en móvil
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: 0.0125rem;
+    }
+  }
+}
+
+// Responsive design para pantallas pequeñas
+@media (max-width: 480px) {
+  ::ng-deep .notifications-menu {
+    .mat-mdc-menu-content {
+      width: 95vw !important; // En móviles, usar casi toda la pantalla
+      min-width: 280px !important;
+      max-width: 95vw !important;
+      max-height: 80vh !important; // Más altura en móviles
+    }
+  }
+  
+  .notifications-header {
+    padding: 12px;
+    
+    h3 {
+      font-size: 16px;
+    }
+    
+    .mark-all-read-btn {
+      font-size: 11px;
+      height: 28px;
+      line-height: 28px;
+      padding: 0 8px;
+    }
+  }
+  
+  .notifications-content {
+    max-height: 60vh !important; // Ajustar altura del contenido en móviles
+  }
+  
+  .notification-button {
+    .nav-text {
+      font-size: 0.9375rem !important;
+    }
+  }
+} 

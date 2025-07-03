@@ -49,7 +49,7 @@
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
       <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('required')">La fecha de nacimiento es obligatoria.</mat-error>
-      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('futureDate')">No se permiten fechas futuras.</mat-error>
+      <mat-error *ngIf="form.get('fechaNacimiento')?.hasError('futureDate')">No se puede seleccionar el día de hoy o fechas futuras.</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -117,8 +117,6 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-checkbox formControlName="activo" class="activo-checkbox">Activo</mat-checkbox>
-    
     <div *ngIf="error" class="error-banner">
       {{ error }}
     </div>

@@ -72,7 +72,7 @@
     </div>
 
     <mat-paginator *ngIf="!isLoading && localidades.length > 0" [length]="totalElements" [pageSize]="pageSize"
-      [pageIndex]="pageIndex" [pageSizeOptions]="[5,10,20]" (page)="cambiarPagina($event)" showFirstLastButtons>
+      [pageIndex]="pageIndex" [pageSizeOptions]="[5,10]" (page)="cambiarPagina($event)" showFirstLastButtons>
     </mat-paginator>
   </div>
 </div>

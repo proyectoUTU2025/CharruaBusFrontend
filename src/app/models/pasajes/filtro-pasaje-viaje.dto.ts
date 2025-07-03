@@ -6,4 +6,5 @@ export interface FiltroPasajeViajeDto {
     fechaHasta?: string;
     origenId?: number;
     destinoId?: number;
+    numeroAsiento?: number;
 } 

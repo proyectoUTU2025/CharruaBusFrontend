@@ -694,7 +694,9 @@ mat-form-field {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Roboto', sans-serif;
+  justify-content: center;
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .error-banner {

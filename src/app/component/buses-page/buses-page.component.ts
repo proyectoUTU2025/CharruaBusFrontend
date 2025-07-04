@@ -25,6 +25,8 @@ import { BusDetailDialogComponent } from './dialogs/bus-detail-dialog/bus-detail
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { LocalidadService } from '../../services/localidades.service';
 import { firstValueFrom } from 'rxjs';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @Component({
@@ -48,9 +50,11 @@ import { firstValueFrom } from 'rxjs';
     MatNativeDateModule,
     MatSnackBarModule,
     LoadingSpinnerComponent,
+    ConfirmDialogComponent,
     AddBusDialogComponent,
     BulkUploadBusDialogComponent,
-    BusDetailDialogComponent
+    BusDetailDialogComponent,
+    MatTooltipModule
   ],
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
@@ -353,11 +357,33 @@ export class BusesPageComponent implements OnInit {
       });
   }
 
-  toggleActive(bus: BusDto) {
-    this.busService.cambiarEstado(bus.id, !bus.activo)
-      .then(() => this.loadBuses(this.getCurrentSort()))
-      .catch(console.error);
+   toggleActive(bus: BusDto) {
+    const action = bus.activo ? 'desactivar' : 'activar';
+    const actionPast = bus.activo ? 'desactivado' : 'activado';
+    
+    const newActive = !bus.activo;
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: `Confirmar ${action}`,
+        message: `¿Está seguro de que desea ${action} el ómnibus ${bus.matricula}?`
+      },
+      disableClose: true
+    });
+
+        dialogRef.afterClosed().subscribe(async confirmed => {
+        if (confirmed) {
+          try {
+            await this.busService.cambiarEstado(bus.id, newActive);
+            this.materialUtils.showSuccess(`Ómnibus ${actionPast} correctamente.`);
+            this.loadBuses(this.getCurrentSort());
+          } catch (err: any) {
+            this.materialUtils.showError(err.error?.message || `Error al ${action} el ómnibus.`);
+          }
+        }
+      });
   }
+
   localidadNombre(id: number): string {
     return this.localidades.find(l => l.id === id)?.nombreConDepartamento ?? 'Desconocido';
   }
@@ -376,6 +402,4 @@ export class BusesPageComponent implements OnInit {
       this.loadBuses(this.getCurrentSort());
     });
   }
-
-
 }

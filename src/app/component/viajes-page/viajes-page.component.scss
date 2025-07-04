@@ -12,18 +12,79 @@
 }
 
 .filters-container {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 
-  .search-field {
-    flex: 1 1 200px;
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+
+    &.datetime-field {
+      grid-column: span 2;
+
+      .datetime-group {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-start;
+
+        .date-field {
+          flex: 2;
+          min-width: 160px;
+        }
+
+        .time-field {
+          flex: 1;
+          min-width: 120px;
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: 0.75rem;
+
+          .date-field,
+          .time-field {
+            flex: 1;
+            min-width: unset;
+          }
+        }
+      }
+
+      @media (max-width: 1200px) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    mat-form-field {
+      width: 100%;
+    }
   }
 
-  button {
-    height: 56px;
-    flex-shrink: 0;
+  .filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    grid-column: 1 / -1;
+
+    @media (min-width: 769px) {
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        width: 100%;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
   }
 }
 
@@ -132,6 +193,7 @@ mat-paginator {
   align-items: center;
   min-height: 250px;
   padding: 2rem;
+  text-align: center;
 
   .no-results-content {
     text-align: center;
@@ -158,4 +220,26 @@ mat-paginator {
       line-height: 1.5;
     }
   }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1.5px solid;
+}
+
+.badge-active {
+  background: #e6f4ea;
+  color: #2e7d32;
+  border-color: #2e7d32;
+}
+
+.badge-inactive {
+  background: #fdecea;
+  color: #c62828;
+  border-color: #c62828;
 }

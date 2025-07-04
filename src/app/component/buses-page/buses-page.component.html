@@ -172,6 +172,9 @@
               <button mat-icon-button class="icon-btn" (click)="goToBusDetail(b)">
                 <mat-icon>visibility</mat-icon>
               </button>
+              <button mat-icon-button class="icon-btn" (click)="toggleActive(b)" [matTooltip]="b.activo ? 'Desactivar Ómnibus' : 'Activar Ómnibus'">
+                <mat-icon>{{ b.activo ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+              </button>
             </div>
           </td>
         </ng-container>

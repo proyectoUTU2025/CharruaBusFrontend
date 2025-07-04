@@ -273,8 +273,13 @@ export class ViajeDetalleDialogComponent implements OnInit {
    */
   buscarPasajes() {
     // Verificar que no hay errores de validación
-    if (this.numeroAsientoFilter.invalid) {
-      this.materialUtils.showError('Corrige los errores en el número de asiento antes de buscar');
+    if (this.tieneErroresValidacion) {
+      // Mensajes específicos
+      if (this.numeroAsientoFilter.invalid) {
+        this.materialUtils.showError('Corrige los errores en el número de asiento antes de buscar');
+      } else {
+        this.materialUtils.showError('La fecha "Desde" debe ser anterior o igual a la fecha "Hasta"');
+      }
       return;
     }
     
@@ -285,7 +290,16 @@ export class ViajeDetalleDialogComponent implements OnInit {
    * Verifica si hay errores de validación en los filtros
    */
   get tieneErroresValidacion(): boolean {
-    return this.numeroAsientoFilter.invalid;
+    return this.numeroAsientoFilter.invalid || this.fechasInvalidas;
+  }
+
+  get fechasInvalidas(): boolean {
+    const desde = this.fechaDesdeFilter.value;
+    const hasta = this.fechaHastaFilter.value;
+    if (desde && hasta) {
+      return hasta < desde;
+    }
+    return false;
   }
 
   /**

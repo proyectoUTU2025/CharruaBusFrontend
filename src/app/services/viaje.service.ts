@@ -14,11 +14,16 @@ export class ViajeService {
 
   constructor(private http: HttpClient) { }
 
-  buscar(filtro: FiltroBusquedaViajeDto, page = 0, size = 5): Promise<Page<ViajeDisponibleDto>> {
+  buscar(
+    filtro: FiltroBusquedaViajeDto,
+    page = 0,
+    size = 5,
+    sort: string = 'fechaHoraSalida,asc'
+  ): Promise<Page<ViajeDisponibleDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
-      .set('sort', 'fechaHoraSalida,asc');
+      .set('sort', sort);
 
     if (filtro.localidadOrigenId != null) {
       params = params.set('localidadOrigenId', filtro.localidadOrigenId.toString());

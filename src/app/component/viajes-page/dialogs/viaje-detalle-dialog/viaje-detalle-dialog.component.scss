@@ -245,7 +245,7 @@
 
       .route-label {
         font-size: 11px;
-        font-weight: 600;
+        font-weight: 500;
         color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -253,7 +253,7 @@
 
       .route-value {
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 500;
         color: var(--text-primary);
         line-height: 1.2;
       }
@@ -299,7 +299,7 @@
 
         .schedule-label {
           font-size: 11px;
-          font-weight: 600;
+          font-weight: 500;
           color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -307,7 +307,7 @@
 
         .schedule-value {
           font-size: 16px;
-          font-weight: 600;
+          font-weight: 500;
           color: var(--text-primary);
           line-height: 1.2;
         }
@@ -339,7 +339,7 @@
   
   .price-amount {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 4px;
     line-height: 1;
@@ -347,7 +347,7 @@
 
   .price-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -359,7 +359,7 @@
   
   .price-per-segment-amount {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 4px;
     line-height: 1;
@@ -367,7 +367,7 @@
 
   .price-per-segment-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -379,7 +379,7 @@
   
   .occupancy-percentage {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 4px;
     line-height: 1;
@@ -387,7 +387,7 @@
 
   .occupancy-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -416,7 +416,7 @@
 
   .seat-number {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1;
 
     &.total {
@@ -435,7 +435,7 @@
   .seat-label {
     font-size: 11px;
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -996,16 +996,20 @@
 }
 
 .action-btn {
-  height: 40px;
-  padding: 0 20px;
+  --primary-color: #1976d2;
+  --primary-dark: #1565c0;
+
   border-radius: 8px !important;
-  text-transform: none;
-  font-weight: 500;
-  min-width: 120px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
+  font-weight: 500 !important;
+  height: 40px;
+  padding: 0 20px !important;
+  min-width: 100px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center;
+  gap: 8px !important;
+  text-transform: none !important;
+
   mat-icon {
     font-size: 18px;
     width: 18px;
@@ -1013,31 +1017,30 @@
   }
 
   &.primary-btn {
-    background: #2196f3 !important;
-    color: white !important;
-    border: none !important;
-
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+    border: none;
+    
     &:hover:not(:disabled) {
-      background: #1976d2 !important;
-      box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+      background-color: var(--primary-dark) !important;
     }
 
     &:disabled {
-      background: #ccc !important;
-      color: #999 !important;
+      background-color: rgba(25, 118, 210, 0.4) !important;
+      color: #fff !important;
       cursor: not-allowed;
     }
   }
 
   &.secondary-btn {
-    border: 1px solid #2196f3 !important;
-    color: #2196f3 !important;
-    background: white !important;
-
-    &:hover {
-      background: #f3f8ff !important;
-      border-color: #1976d2 !important;
-      color: #1976d2 !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    background-color: transparent !important;
+    
+    &:hover:not(:disabled) {
+      background-color: #f3f8ff !important;
+      border-color: var(--primary-dark) !important;
+      color: var(--primary-dark) !important;
     }
 
     &:disabled {
@@ -1050,42 +1053,23 @@
 // Pestaña de Historial de Pasajes
 .controls-section {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
   background: white;
   padding: 16px 20px;
   border-radius: 8px;
   box-shadow: var(--shadow);
-  flex-wrap: wrap;
-  gap: 12px;
 
   .filter-controls {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1rem;
 
-    .estado-filter {
-      min-width: 160px;
-    }
-
-    .fecha-filter {
-      min-width: 140px;
-    }
-
-    .parada-filter {
-      min-width: 180px;
-    }
-
-    .asiento-filter {
-      min-width: 140px;
-    }
-
-    .showing-text {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-left: 8px;
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
     }
   }
 
@@ -1895,6 +1879,45 @@
       }
     }
   }
+}
+
+.availability-display {
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-active {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.badge-inactive {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.simple-error-message {
+  color: #f44336;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 

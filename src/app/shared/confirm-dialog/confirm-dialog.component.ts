@@ -29,13 +29,17 @@ export interface ConfirmDialogData {
         <p>{{ data.message }}</p>
       </div>
       <mat-divider></mat-divider>
-      <div mat-dialog-actions align="end">
+      <div mat-dialog-actions>
         <button mat-stroked-button class="cancel-btn" (click)="onCancel()">{{ data.cancelText || 'Cancelar' }}</button>
-        <button mat-flat-button class="confirm-btn" color="primary" (click)="onConfirm()">{{ data.confirmText || 'Confirmar' }}</button>
+        <button mat-flat-button class="confirm-btn" [class.warn]="data.type === 'error' || data.type === 'warning'" (click)="onConfirm()">{{ data.confirmText || 'Confirmar' }}</button>
       </div>
     </div>
   `,
   styles: [`
+    :host ::ng-deep .mat-mdc-dialog-actions {
+      justify-content: space-between !important;
+    }
+
     .confirm-dialog {
       min-width: 400px;
       max-width: 500px;
@@ -60,8 +64,12 @@ export interface ConfirmDialogData {
     }
     
     mat-dialog-content {
-      padding: 0 24px;
+      padding: 20px 24px;
       color: #555;
+    }
+
+    mat-dialog-content p {
+      margin: 0;
     }
 
     mat-dialog-actions {
@@ -70,13 +78,13 @@ export interface ConfirmDialogData {
     }
     
     .cancel-btn {
-      border-color: var(--primary-color, #1976d2);
+      border: 1px solid var(--primary-color, #1976d2);
       color: var(--primary-color, #1976d2);
+      background: white;
       text-transform: none;
       font-weight: 500;
       border-radius: 8px;
       padding: 8px 20px;
-      background: white;
     }
 
     .confirm-btn {
@@ -86,6 +94,10 @@ export interface ConfirmDialogData {
       font-weight: 500;
       border-radius: 8px;
       padding: 8px 20px;
+    }
+
+    .confirm-btn.warn {
+      background-color: var(--app-warn, #d32f2f);
     }
 
     @media (max-width: 600px) {

@@ -1,52 +1,54 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from '../../../../shared/shared.module';
 import { MaterialModule } from '../../../../shared/material.module';
 import { NgIf } from '@angular/common';
 import { BusService } from '../../../../services/bus.service';
 import { BusDto } from '../../../../models/buses';
 import { OmnibusHistoryComponent } from './omnibus-history/omnibus-history.component';
-import { AsignarMantenimientoComponent } from '../../mantenimientos-page/asignar-mantenimiento/asignar-mantenimiento.component';
-import { AltaViajeExpresoComponent } from '../../viajes-page/alta-viaje-expreso/alta-viaje-expreso.component';
+import { AsignarMantenimientoComponent } from '../asignar-mantenimiento/asignar-mantenimiento.component';
+import { AltaViajeExpresoComponent } from '../alta-viaje-expreso/alta-viaje-expreso.component';
 
 @Component({
     standalone: true,
-    selector: 'app-bus-detail',
+    selector: 'app-bus-detail-dialog',
     imports: [
         SharedModule,
         MaterialModule,
         NgIf,
         MatProgressSpinnerModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatIconModule,
         OmnibusHistoryComponent,
         AsignarMantenimientoComponent,
         AltaViajeExpresoComponent
     ],
-    templateUrl: './bus-detail.component.html',
-    styleUrls: ['./bus-detail.component.scss']
+    templateUrl: './bus-detail-dialog.component.html',
+    styleUrls: ['./bus-detail-dialog.component.scss']
 })
-export class BusDetailComponent implements OnInit {
-    busId!: number;
+export class BusDetailDialogComponent implements OnInit {
+    busId: number;
     bus?: BusDto;
     loading = true;
     error = '';
     @ViewChild(OmnibusHistoryComponent) historyComponent!: OmnibusHistoryComponent;
 
     constructor(
-        private route: ActivatedRoute,
+        @Inject(MAT_DIALOG_DATA) public data: { busId: number },
+        private dialogRef: MatDialogRef<BusDetailDialogComponent>,
         private busService: BusService,
         private dialog: MatDialog
-    ) { }
+    ) {
+        this.busId = data.busId;
+    }
 
     ngOnInit() {
-        this.route.paramMap.subscribe(params => {
-            const id = params.get('id');
-            if (id) {
-                this.busId = +id;
-                this.loadBus();
-            }
-        });
+        this.loadBus();
     }
 
     private loadBus() {
@@ -65,7 +67,6 @@ export class BusDetailComponent implements OnInit {
         ref.afterClosed().subscribe(res => {
             if (res === true || res === 'viajeRegistrado') {
                 this.loadBus();
-                setTimeout(() => this.historyComponent.loadHistory(), 0);
             }
         });
     }
@@ -77,8 +78,11 @@ export class BusDetailComponent implements OnInit {
         ref.afterClosed().subscribe(res => {
             if (res === 'mantenimientoCreado') {
                 this.loadBus();
-                setTimeout(() => this.historyComponent.loadHistory(), 0);
             }
         });
     }
-}
+
+    cerrar() {
+        this.dialogRef.close();
+    }
+} 

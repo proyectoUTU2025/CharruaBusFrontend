@@ -1,0 +1,79 @@
+<!-- Header del diálogo -->
+<div class="dialog-header">
+  <div class="viaje-info">
+    <mat-icon class="viaje-icon">directions_bus</mat-icon>
+    <div class="viaje-details">
+      <h2 class="viaje-title">Detalles del Ómnibus</h2>
+      <p class="viaje-route" *ngIf="bus">{{ bus.matricula }}</p>
+    </div>
+  </div>
+  <button mat-icon-button (click)="cerrar()" class="close-button">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<!-- Contenido del diálogo -->
+<div class="dialog-content">
+  <ng-container *ngIf="loading; else content">
+    <div class="spinner-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+  </ng-container>
+
+  <ng-template #content>
+    <div *ngIf="error; else detail">
+      <p class="error">{{ error }}</p>
+    </div>
+  </ng-template>
+
+  <ng-template #detail>
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>Información General</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">ID</span>
+            <span class="info-value">{{ bus?.id }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Matrícula</span>
+            <span class="info-value">{{ bus?.matricula }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Ubicación Actual</span>
+            <span class="info-value">{{ bus?.ubicacionActual }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Capacidad</span>
+            <span class="info-value">{{ bus?.capacidad }} asientos</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Estado</span>
+            <span class="info-value">
+              <span class="badge" [class.badge-active]="bus?.activo" [class.badge-inactive]="!bus?.activo">
+                {{ bus?.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="actions-section">
+      <button mat-flat-button class="action-btn primary" (click)="abrirAltaViajeExpreso()">
+        <mat-icon>add_road</mat-icon> 
+        <span>Registrar Viaje Expreso</span>
+      </button>
+      <button mat-flat-button class="action-btn accent" (click)="abrirAsignarMantenimiento()">
+        <mat-icon>build</mat-icon> 
+        <span>Asignar Mantenimiento</span>
+      </button>
+    </div>
+
+    <section *ngIf="bus" class="history-section">
+      <app-omnibus-history [busId]="bus.id"></app-omnibus-history>
+    </section>
+  </ng-template>
+</div>

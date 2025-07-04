@@ -40,7 +40,7 @@
         </mat-select>
       </mat-form-field>
       
-      <button mat-raised-button color="primary" (click)="filtrar()" class="filter-btn">
+      <button mat-flat-button (click)="filtrar()" class="primary-btn">
         <mat-icon>search</mat-icon>
         Filtrar
       </button>
@@ -51,19 +51,19 @@
     <div class="card-header">
       <h2 class="card-title">Resumen General</h2>
       <div class="card-actions">
-        <button mat-raised-button [disabled]="downloadingCsv" (click)="exportResumenCsv()" class="export-btn">
+        <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportResumenCsv()" class="secondary-btn">
           <mat-icon>download</mat-icon>
           {{ downloadingCsv ? 'Descargando...' : 'Resumen CSV' }}
         </button>
-        <button mat-raised-button color="primary" (click)="exportResumenPdf()" class="export-btn">
+        <button mat-flat-button (click)="exportResumenPdf()" class="primary-btn">
           <mat-icon>picture_as_pdf</mat-icon>
           Resumen PDF
         </button>
-        <button mat-raised-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()" class="export-btn">
+        <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()" class="secondary-btn">
           <mat-icon>download</mat-icon>
           Detalle CSV
         </button>
-        <button mat-raised-button color="accent" (click)="exportDetallePdf()" class="export-btn">
+        <button mat-flat-button (click)="exportDetallePdf()" class="accent-btn">
           <mat-icon>picture_as_pdf</mat-icon>
           Detalle PDF
         </button>

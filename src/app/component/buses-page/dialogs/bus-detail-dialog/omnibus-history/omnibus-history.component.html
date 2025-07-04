@@ -1,0 +1,146 @@
+<div class="history-header">
+  <h3 class="history-title">Historial de Movimientos</h3>
+</div>
+<form [formGroup]="filterForm">
+  <div class="filters-container">
+    <div class="filter-row">
+      <div class="filter-group">
+          <mat-form-field appearance="outline">
+              <mat-label>Salida desde</mat-label>
+              <input matInput [matDatepicker]="picker1" formControlName="fechaHoraSalida" />
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+              <mat-label>Hora</mat-label>
+              <mat-select formControlName="horaSalida">
+                  <mat-option value="">Cualquiera</mat-option>
+                  <mat-option *ngFor="let hora of horasDisponibles" [value]="hora">
+                      {{ hora }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+      </div>
+  
+      <div class="filter-group" [ngClass]="{'invalid-range': filterForm.hasError('dateRangeInvalid')}">
+          <mat-form-field appearance="outline">
+              <mat-label>Hasta</mat-label>
+              <input matInput [matDatepicker]="picker2" formControlName="fechaHoraLlegada" />
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+              <mat-label>Hora</mat-label>
+              <mat-select formControlName="horaLlegada">
+                  <mat-option value="">Cualquiera</mat-option>
+                  <mat-option *ngFor="let hora of horasDisponibles" [value]="hora">
+                      {{ hora }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Mensaje de error entre fechas y horas -->
+    <div class="error-row" *ngIf="filterForm.hasError('dateRangeInvalid')">
+        <div class="simple-error-message">
+            La fecha y hora de "Hasta" debe ser posterior, o igual, a la de "Salida".
+        </div>
+    </div>
+
+    <div class="filter-row">
+      <mat-form-field appearance="outline">
+          <mat-label>Origen</mat-label>
+          <mat-select formControlName="origenId">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let id of localidadesKeys" [value]="id">
+                  {{ localidadesMap[+id] }}
+              </mat-option>
+          </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+          <mat-label>Destino</mat-label>
+          <mat-select formControlName="destinoId">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let id of localidadesKeys" [value]="id">
+                  {{ localidadesMap[+id] }}
+              </mat-option>
+          </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="tipoMovimientoOmnibus">
+              <mat-option value="">Todos</mat-option>
+              <mat-option value="VIAJE">{{ 'Viaje' | uppercase }}</mat-option>
+              <mat-option value="EXPRESO">{{ 'Expreso' | uppercase }}</mat-option>
+              <mat-option value="INICIAL">{{ 'Inicial' | uppercase }}</mat-option>
+              <mat-option value="MANTENIMIENTO">{{ 'Mantenimiento' | uppercase }}</mat-option>
+          </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+    <div class="filter-actions">
+      <button mat-flat-button color="primary" class="action-btn primary-btn" (click)="onSearch()" type="button" [disabled]="filterForm.invalid" [ngClass]="{'error-btn': filterForm.hasError('dateRangeInvalid')}">
+          <span>Buscar</span>
+      </button>
+      <button mat-stroked-button class="action-btn secondary-btn" (click)="onClear()" type="button">
+          <span>Limpiar</span>
+      </button>
+    </div>
+
+    <!-- Bloque error se moverá arriba -->
+</form>
+
+<div class="table-wrapper">
+  <div *ngIf="isLoading" class="spinner-overlay">
+    <mat-progress-spinner mode="indeterminate" [diameter]="50"></mat-progress-spinner>
+  </div>
+
+  <table mat-table [dataSource]="history" class="mat-elevation-z1" *ngIf="history.length > 0">
+    <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let m"> {{ m.id }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="fechaHoraSalida">
+        <th mat-header-cell *matHeaderCellDef> Salida </th>
+        <td mat-cell *matCellDef="let m"> {{ m.fechaHoraSalida | date:'short' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="fechaHoraLlegada">
+        <th mat-header-cell *matHeaderCellDef> Llegada </th>
+        <td mat-cell *matCellDef="let m"> {{ m.fechaHoraLlegada | date:'short' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="origenNombre">
+        <th mat-header-cell *matHeaderCellDef> Origen </th>
+        <td mat-cell *matCellDef="let m"> {{ m.origen }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="destinoNombre">
+        <th mat-header-cell *matHeaderCellDef> Destino </th>
+        <td mat-cell *matCellDef="let m"> {{ m.destino }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="tipoMovimientoOmnibus">
+        <th mat-header-cell *matHeaderCellDef> Tipo </th>
+        <td mat-cell *matCellDef="let m"> {{ m.tipoMovimientoOmnibus }} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+  </table>
+
+  <div *ngIf="!isLoading && history.length === 0" class="no-results">
+    <mat-icon class="no-results-icon">history</mat-icon>
+    <h3>No se encontraron movimientos</h3>
+    <p>No hay movimientos que coincidan con los filtros especificados.</p>
+  </div>
+</div>
+
+<mat-paginator [length]="totalMovimientos" [pageSize]="pageSize" [pageSizeOptions]="[5, 10]"
+    (page)="loadHistory($event)" showFirstLastButtons>
+</mat-paginator>

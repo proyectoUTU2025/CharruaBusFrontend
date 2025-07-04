@@ -38,34 +38,45 @@ mat-form-field {
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
   padding-top: 24px;
   margin-top: 24px;
   border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
-.cancel-btn,
-.create-btn {
+.cancel-btn {
+  border: 1px solid var(--primary-color, #1976d2);
+  color: var(--primary-color, #1976d2);
+  background: white;
   text-transform: none;
   font-weight: 500;
   border-radius: 8px;
   padding: 8px 20px;
-}
 
-.create-btn {
-  background-color: var(--primary-color, #1976d2);
-  color: white;
-
-  &:disabled {
-    background-color: var(--primary-color, #1976d2);
-    opacity: 0.5;
+  &:hover {
+      background: #f3f8ff;
   }
 }
 
-.cancel-btn {
-  border-color: var(--primary-color, #1976d2);
-  color: var(--primary-color, #1976d2);
+.create-btn {
+  background: var(--primary-color, #1976d2);
+  color: white;
+  text-transform: none;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 20px;
+
+  &:hover:not(:disabled) {
+    background: #1565c0;
+  }
+
+  &:disabled {
+      background: var(--primary-color, #1976d2);
+      opacity: 0.6;
+      cursor: default;
+      color: white;
+  }
 }
 
 .error-banner {

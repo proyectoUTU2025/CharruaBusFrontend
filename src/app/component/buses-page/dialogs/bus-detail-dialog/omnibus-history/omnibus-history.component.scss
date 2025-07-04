@@ -1,0 +1,190 @@
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.filter-row > * {
+  flex: 1;
+}
+
+.filter-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1 1 260px;
+
+  > mat-form-field {
+    flex: 1;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  --primary-color: #1976d2;
+  --primary-dark: #1565c0;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  height: 40px;
+  padding: 0 20px !important;
+  min-width: 100px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center;
+  gap: 8px !important;
+  text-transform: none !important;
+
+  &.primary-btn {
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+    border: none;
+    
+    &:hover:not(:disabled) {
+      background-color: var(--primary-dark) !important;
+    }
+  }
+
+  &.secondary-btn {
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    background-color: transparent !important;
+    
+    &:hover:not(:disabled) {
+      background-color: #f3f8ff !important;
+      border-color: var(--primary-dark) !important;
+      color: var(--primary-dark) !important;
+    }
+  }
+
+  /* Variante opaca cuando el formulario tiene error: color primario más claro */
+  &.error-btn {
+    background-color: rgba(25, 118, 210, 0.4) !important; /* Azul con opacidad */
+    color: #fff !important;
+    border: none;
+
+    /* El botón está deshabilitado, pero por coherencia mantenemos hover similar */
+    &:hover:not(:disabled) {
+      background-color: rgba(25, 118, 210, 0.55) !important;
+    }
+  }
+}
+
+.history-table {
+    width: 100%;
+}
+
+table.mat-table {
+    width: 100%;
+}
+
+.history-header {
+  margin-bottom: 24px;
+}
+
+.history-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.table-wrapper {
+  position: relative;
+  min-height: 200px; /* Prevents layout jump when table is not visible */
+  margin-bottom: 16px;
+  overflow: auto;
+}
+
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 48px;
+  color: #6c757d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+
+  .no-results-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #ced4da;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #495057;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: #6c757d;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+}
+
+.date-error-message {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+// Bloque de error entre fechas y horas
+.error-row {
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+
+.simple-error-message {
+  color: #f44336;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Resalta borde de los campos "Hasta" cuando el rango es inválido */
+.invalid-range {
+  .mat-form-field-outline {
+    stroke: #d32f2f !important;
+  }
+}

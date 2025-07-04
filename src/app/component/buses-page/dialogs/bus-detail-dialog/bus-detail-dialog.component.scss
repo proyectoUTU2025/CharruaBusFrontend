@@ -1,0 +1,221 @@
+:host {
+  display: block;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  
+  .viaje-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .viaje-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: #2196f3;
+    }
+    
+    .viaje-details {
+      .viaje-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .viaje-route {
+        margin: 2px 0 0 0;
+        font-size: 14px;
+        color: #666;
+      }
+    }
+  }
+  
+  .close-button {
+    color: #666;
+    
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+.dialog-content {
+  padding: 24px;
+  background: #f5f5f5;
+  overflow-y: auto;
+}
+
+.custom-tabs {
+  border-top: 1px solid #e0e0e0;
+
+  .mat-mdc-tab-header {
+    background-color: #fff;
+  }
+  
+  .tab-icon {
+    margin-right: 8px;
+  }
+}
+
+.tab-content {
+  padding: 24px;
+  background-color: #f5f5f5;
+  min-height: 400px;
+}
+
+.info-card {
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  
+  .info-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  
+  .info-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.badge-active {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.badge-inactive {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.actions-section {
+  display: flex;
+  gap: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px 24px;
+  margin-bottom: 24px;
+
+  .action-btn {
+    flex: 1;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    height: 40px;
+    padding: 0 16px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center;
+    gap: 8px !important;
+    text-transform: none !important;
+    transition: background-color 0.2s, border-color 0.2s;
+
+    /* Botón azul intenso relleno */
+    &.primary {
+      --btn-color: #1565c0; /* azul intenso */
+      background-color: var(--btn-color) !important;
+      color: #fff !important;
+      border: none !important;
+
+      &:hover:not(:disabled) {
+        background-color: #135ba8 !important; /* tono más oscuro */
+      }
+    }
+
+    /* Botón azul claro relleno */
+    &.accent {
+      --btn-color: #64b5f6; /* azul claro */
+      background-color: var(--btn-color) !important;
+      color: #fff !important;
+      border: none !important;
+
+      &:hover:not(:disabled) {
+        background-color: #42a5f5 !important; /* tono más oscuro */
+      }
+    }
+  }
+}
+
+.history-section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 24px;
+}
+
+// Estilos específicos para el diálogo de detalles del ómnibus
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.error {
+  color: #d32f2f;
+  text-align: center;
+  padding: 20px;
+  font-weight: 500;
+}
+
+table.mat-table {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.mat-header-row {
+  background: #fafafa;
+}
+
+.mat-cell,
+.mat-header-cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ececec;
+}

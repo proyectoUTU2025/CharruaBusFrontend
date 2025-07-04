@@ -10,6 +10,7 @@ export interface BusDto {
     matricula: string;
     capacidad: number;
     activo: boolean;
+    ubicacionActual: string;
     asientos: AsientoDto[];
 }
 

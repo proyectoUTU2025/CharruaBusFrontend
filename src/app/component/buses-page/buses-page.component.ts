@@ -1,4 +1,3 @@
-import { Router } from '@angular/router';
 import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -22,6 +21,7 @@ import { FiltroBusquedaBusDto, BusDto, Page } from '../../models';
 import { BusService } from '../../services/bus.service';
 import { AddBusDialogComponent } from './dialogs/add-bus-dialog/add-bus-dialog.component';
 import { BulkUploadBusDialogComponent } from './dialogs/bulk-upload-bus-dialog/bulk-upload-bus-dialog.component';
+import { BusDetailDialogComponent } from './dialogs/bus-detail-dialog/bus-detail-dialog.component';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { LocalidadService } from '../../services/localidades.service';
 import { firstValueFrom } from 'rxjs';
@@ -49,7 +49,8 @@ import { firstValueFrom } from 'rxjs';
     MatSnackBarModule,
     LoadingSpinnerComponent,
     AddBusDialogComponent,
-    BulkUploadBusDialogComponent
+    BulkUploadBusDialogComponent,
+    BusDetailDialogComponent
   ],
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
@@ -92,7 +93,6 @@ export class BusesPageComponent implements OnInit {
     private busService: BusService,
     private dialog: MatDialog,
     private localidadesService: LocalidadService,
-    private router: Router,
     private changeDetectorRef: ChangeDetectorRef,
     private materialUtils: MaterialUtilsService
   ) {
@@ -137,10 +137,7 @@ export class BusesPageComponent implements OnInit {
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-    // Solo recargar si ya se hizo una búsqueda previa
-    if (this.hasSearched) {
-      this.loadBuses(this.getCurrentSort());
-    }
+    this.loadBuses(this.getCurrentSort());
   }
 
   loadInitialData() {
@@ -155,6 +152,7 @@ export class BusesPageComponent implements OnInit {
         this.totalElements = res.page?.totalElements || 0;
         this.pageIndex = res.page?.number || 0;
         this.pageSize = res.page?.size || this.pageSize;
+        this.hasSearched = true; // Marcar como buscado después de la carga inicial
       })
       .catch((error) => {
         console.error('Error al cargar datos:', error);
@@ -365,7 +363,18 @@ export class BusesPageComponent implements OnInit {
   }
 
   goToBusDetail(bus: BusDto) {
-    this.router.navigate(['/omnibus', bus.id]);
+    const dialogRef = this.dialog.open(BusDetailDialogComponent, {
+      width: '90vw',
+      maxWidth: '1200px',
+      maxHeight: '90vh',
+      data: { busId: bus.id },
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      // Recargar los datos de la lista por si hubo cambios
+      this.loadBuses(this.getCurrentSort());
+    });
   }
 
 

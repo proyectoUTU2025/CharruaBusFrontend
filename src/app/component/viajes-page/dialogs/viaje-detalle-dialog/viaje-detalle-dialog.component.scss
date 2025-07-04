@@ -1130,8 +1130,6 @@
   }
 }
 
-
-
 .loading-section {
   display: flex;
   justify-content: center;
@@ -1148,15 +1146,23 @@
 
   .pasajes-table {
     width: 100%;
-    min-width: 800px; // Ancho mínimo para mantener usabilidad
+    min-width: 800px;
+    border-collapse: collapse;
+
+    .mat-mdc-header-row {
+      background-color: #fff;
+    }
 
     .mat-mdc-header-cell {
-      background-color: #f8f9fa;
-      font-weight: 600;
-      color: var(--text-primary);
-      border-bottom: 2px solid var(--border-light);
-      font-size: 12px;
-      text-transform: uppercase;
+      padding: 16px;
+      background-color: #fff;
+      font-weight: 500;
+      color: #212121;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+      text-transform: none;
+      letter-spacing: normal;
+      text-align: left;
     }
 
     .mat-mdc-cell {
@@ -1597,8 +1603,6 @@
   .occupancy-percentage {
     font-size: 24px !important;
   }
-
-
 
   .controls-section {
     flex-direction: column;

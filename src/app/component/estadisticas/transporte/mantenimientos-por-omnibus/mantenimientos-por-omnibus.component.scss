@@ -61,6 +61,48 @@ $primary-color: #675992;
   gap: 0.75rem;
 }
 
+.primary-btn {
+  background-color: #1976d2;
+  color: white;
+  text-transform: none;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0 1.25rem;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.primary-btn mat-icon {
+  margin-right: 8px;
+}
+
+.primary-btn:hover {
+  background: #1565c0;
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  border: 1.5px solid #1976d2;
+  color: #1976d2;
+  background: white;
+  text-transform: none;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0 1.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.secondary-btn mat-icon {
+  margin-right: 8px;
+}
+
+.secondary-btn:hover {
+  background: #e3f2fd;
+  transform: translateY(-1px);
+}
+
 .filtros-container {
   display: flex;
   gap: 1rem;

@@ -15,7 +15,7 @@ import { ConfiguracionDelSistemaComponent } from './component/configuracion-del-
 import { AuthGuard } from './core/auth/auth.guard';
 import { RoleGuard } from './core/auth/role.guard';
 import { LoggedInGuard } from './core/auth/logged-in.guard';
-import { BusDetailComponent } from './component/transport/buses-page/bus-detail/bus-detail.component';
+
 import { ProfilePageComponent } from './component/profile-page/profile-page.component';
 import { PasajeHistoryComponent } from './component/pasaje-history/pasaje-history.component';
 import { UsuariosPorTipoComponent } from './component/estadisticas/usuario/usuarios-por-tipo/usuarios-por-tipo.component';
@@ -60,7 +60,7 @@ export const routes: Routes = [
       
       // Rutas específicas para VENDEDOR
       { path: 'omnibus', component: BusesPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
-      { path: 'omnibus/:id', component: BusDetailComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
+
       { path: 'localidades', component: LocalidadesPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
       { path: 'viajes', component: ViajesPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR'] } },
       

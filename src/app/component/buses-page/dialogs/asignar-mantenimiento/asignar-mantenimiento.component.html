@@ -1,0 +1,95 @@
+<div class="dialog-header">
+  <h2 class="dialog-title">Asignar mantenimiento</h2>
+</div>
+
+<div class="dialog-content">
+  <form [formGroup]="form" class="mantenimiento-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Motivo</mat-label>
+      <input matInput formControlName="motivo" maxlength="255" required />
+      <mat-error *ngIf="getFieldError('motivo')">{{
+        getFieldError('motivo')
+      }}</mat-error>
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de inicio</mat-label>
+        <input
+          matInput
+          [min]="minDateInicio"
+          [matDatepicker]="pickerInicio"
+          formControlName="fechaInicio"
+          required
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="pickerInicio"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+        <mat-error *ngIf="getFieldError('fechaInicio')">{{
+          getFieldError('fechaInicio')
+        }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de inicio</mat-label>
+        <mat-select formControlName="horaInicio" required>
+          <mat-option *ngFor="let h of horasInicio" [value]="h">{{
+            h
+          }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="getFieldError('horaInicio')">{{
+          getFieldError('horaInicio')
+        }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de fin</mat-label>
+        <input
+          matInput
+          [min]="minDateFin"
+          [matDatepicker]="pickerFin"
+          formControlName="fechaFin"
+          required
+        />
+        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
+        <mat-error *ngIf="getFieldError('fechaFin')">{{
+          getFieldError('fechaFin')
+        }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de fin</mat-label>
+        <mat-select formControlName="horaFin" required>
+          <mat-option *ngFor="let h of horasFin" [value]="h">{{ h }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="getFieldError('horaFin')">{{
+          getFieldError('horaFin')
+        }}</mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+
+  <div *ngIf="errorMensaje" class="error-banner">
+    {{ errorMensaje }}
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <div class="actions-left">
+    <button class="secondary-btn" (click)="close()">Cancelar</button>
+  </div>
+  <div class="actions-right">
+    <button
+      class="primary-btn"
+      [disabled]="isLoading || form.invalid"
+      (click)="onSubmit()"
+    >
+      Asignar mantenimiento
+    </button>
+  </div>
+</div>

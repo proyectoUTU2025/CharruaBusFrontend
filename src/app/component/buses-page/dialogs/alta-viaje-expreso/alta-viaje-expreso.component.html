@@ -1,0 +1,121 @@
+<div class="dialog-header">
+  <h2 class="dialog-title">Alta de Viaje Expreso</h2>
+</div>
+
+<div class="dialog-content">
+  <form [formGroup]="form" class="expreso-form" novalidate>
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Ómnibus</mat-label>
+        <input 
+          matInput 
+          [value]="omnibusSeleccionado" 
+          readonly 
+          disabled
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Destino</mat-label>
+        <mat-select formControlName="destinoId" required>
+          <mat-option [value]="null">-- Selecciona --</mat-option>
+          <mat-option *ngFor="let loc of localidades" [value]="loc.id">
+            {{ loc.nombreConDepartamento }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getFieldError('destinoId')">{{
+          getFieldError('destinoId')
+        }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de salida</mat-label>
+        <input
+          matInput
+          [min]="minDateSalida"
+          [matDatepicker]="pickerSalida"
+          formControlName="fechaSalida"
+          required
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="pickerSalida"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #pickerSalida></mat-datepicker>
+        <mat-error *ngIf="getFieldError('fechaSalida')">{{
+          getFieldError('fechaSalida')
+        }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de salida</mat-label>
+        <mat-select formControlName="horaSalida" required>
+          <mat-option *ngFor="let h of horasSalida" [value]="h">{{ h }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="getFieldError('horaSalida')">{{
+          getFieldError('horaSalida')
+        }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de llegada</mat-label>
+        <input
+          matInput
+          [min]="minDateLlegada"
+          [matDatepicker]="pickerLlegada"
+          formControlName="fechaLlegada"
+          required
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="pickerLlegada"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #pickerLlegada></mat-datepicker>
+        <mat-error *ngIf="getFieldError('fechaLlegada')">{{
+          getFieldError('fechaLlegada')
+        }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de llegada</mat-label>
+        <mat-select formControlName="horaLlegada" required>
+          <mat-option *ngFor="let h of horasLlegada" [value]="h">{{ h }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="getFieldError('horaLlegada')">{{
+          getFieldError('horaLlegada')
+        }}</mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+
+  <div *ngIf="errorMensaje" class="error-banner">
+    {{ errorMensaje }}
+  </div>
+</div>
+
+<!-- Overlay de carga cuando se envía la solicitud -->
+<div class="loading-overlay" *ngIf="isLoading">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
+
+<div class="dialog-actions">
+  <div class="actions-left">
+    <button class="secondary-btn" type="button" (click)="close()">
+      Cancelar
+    </button>
+  </div>
+  <div class="actions-right">
+    <button
+      class="primary-btn"
+      [disabled]="isLoading || form.invalid"
+      type="submit"
+      (click)="onSubmit()"
+    >
+      Registrar viaje
+    </button>
+  </div>
+</div>

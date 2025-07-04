@@ -89,9 +89,10 @@ mat-dialog-content p {
   border-radius: 20px;
 }
 
-mat-dialog-actions {
+mat-dialog-actions,
+:host ::ng-deep .mat-mdc-dialog-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between !important;
   gap: 12px;
   padding: 0 24px 16px;
 }

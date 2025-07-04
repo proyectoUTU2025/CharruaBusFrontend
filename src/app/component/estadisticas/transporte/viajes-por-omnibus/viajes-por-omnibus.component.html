@@ -24,7 +24,7 @@
         <mat-datepicker #pickerFin></mat-datepicker>
       </mat-form-field>
       
-      <button mat-raised-button color="primary" (click)="filtrar()" class="filter-btn">
+      <button mat-flat-button (click)="filtrar()" class="primary-btn">
         <mat-icon>search</mat-icon>
         Filtrar
       </button>
@@ -35,11 +35,11 @@
     <div class="card-header">
       <h2 class="card-title">Gráfico de Viajes por Ómnibus</h2>
       <div class="card-actions">
-        <button mat-raised-button [disabled]="downloadingCsv" (click)="exportCsv()" class="export-btn">
+        <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportCsv()" class="secondary-btn">
           <mat-icon>download</mat-icon>
           {{ downloadingCsv ? 'Descargando...' : 'CSV' }}
         </button>
-        <button mat-raised-button color="primary" (click)="exportPdf()" class="export-btn">
+        <button mat-flat-button (click)="exportPdf()" class="primary-btn">
           <mat-icon>picture_as_pdf</mat-icon>
           PDF
         </button>

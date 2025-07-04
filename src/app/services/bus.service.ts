@@ -94,10 +94,10 @@ export class BusService {
       .set('size', size.toString());
 
     if (filtros.fechaHoraSalida) {
-      params = params.set('fechaHoraSalida', this.toISOString(filtros.fechaHoraSalida, 'start'));
+      params = params.set('fechaHoraSalida', filtros.fechaHoraSalida);
     }
     if (filtros.fechaHoraLlegada) {
-      params = params.set('fechaHoraLlegada', this.toISOString(filtros.fechaHoraLlegada, 'end'));
+      params = params.set('fechaHoraLlegada', filtros.fechaHoraLlegada);
     }
     if (filtros.origenId) {
       params = params.set('origenId', filtros.origenId.toString());

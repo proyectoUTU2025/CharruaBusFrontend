@@ -61,6 +61,48 @@ $primary-color: #675992;
   gap: 0.75rem;
 }
 
+.primary-btn {
+  background-color: #1976d2;
+  color: white;
+  text-transform: none;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0 1.25rem;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.primary-btn mat-icon {
+  margin-right: 8px;
+}
+
+.primary-btn:hover {
+  background: #1565c0;
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  border: 1.5px solid #1976d2;
+  color: #1976d2;
+  background: white;
+  text-transform: none;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0 1.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.secondary-btn mat-icon {
+  margin-right: 8px;
+}
+
+.secondary-btn:hover {
+  background: #e3f2fd;
+  transform: translateY(-1px);
+}
+
 .filtros-container {
   display: flex;
   gap: 1rem;
@@ -71,66 +113,6 @@ $primary-color: #675992;
     min-width: 200px;
     flex: 1;
   }
-
-  .filter-btn {
-    margin-top: 8px;
-    text-transform: none;
-    font-weight: 500;
-    height: 36px;
-    border-radius: 18px;
-    min-width: 120px;
-    background-color: #1976d2;
-    color: white;
-    transition: background 0.2s, color 0.2s;
-    
-    mat-icon {
-      margin-right: 0.5rem;
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  .filter-btn:hover {
-    background: #1565c0;
-  }
-}
-
-.export-btn {
-  text-transform: none;
-  font-weight: 500;
-  height: 36px;
-  border-radius: 18px;
-  min-width: 100px;
-  transition: background 0.2s, color 0.2s;
-  
-  mat-icon {
-    margin-right: 0.5rem;
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-}
-
-.export-btn:not([color="primary"]) {
-  border-color: #1976d2;
-  color: #1976d2;
-  background: white;
-}
-
-.export-btn:not([color="primary"]):hover {
-  background: #e3f2fd;
-  color: #1565c0;
-  border-color: #1565c0;
-}
-
-.export-btn[color="primary"] {
-  background-color: #1976d2;
-  color: white;
-}
-
-.export-btn[color="primary"]:hover {
-  background: #1565c0;
 }
 
 .grafico-container {

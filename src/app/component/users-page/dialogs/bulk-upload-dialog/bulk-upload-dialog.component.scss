@@ -87,40 +87,49 @@ mat-dialog-content p {
   color: var(--primary-color, #1976d2);
   text-transform: none;
   border-radius: 20px;
+  background-color: #f0f0f0;
 }
 
-mat-dialog-actions {
+mat-dialog-actions,
+:host ::ng-deep .mat-mdc-dialog-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between !important;
   gap: 12px;
   padding: 0 24px 16px;
 }
 
-.cancel-btn,
-.create-btn {
+.cancel-btn {
+  border: 1px solid var(--primary-color, #1976d2);
+  color: var(--primary-color, #1976d2);
+  background: white;
   text-transform: none;
   font-weight: 500;
   border-radius: 8px;
   padding: 8px 20px;
+
+  &:hover {
+    background: #f3f8ff;
+  }
 }
 
 .create-btn {
   background-color: var(--primary-color, #1976d2);
   color: white;
+  text-transform: none;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 150px;
-}
 
-.create-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  border-color: var(--primary-color, #1976d2);
-  color: var(--primary-color, #1976d2);
+  &:disabled {
+    background: var(--primary-color, #1976d2);
+    opacity: 0.6;
+    cursor: default;
+    color: white;
+  }
 }
 
 .button-spinner {

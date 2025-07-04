@@ -72,6 +72,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   horasLlegadaDisponibles: string[] = [];
   isLoadingBuses = false;
   isLoadingConfirm = false;
+  errorMensaje = '';
 
   constructor(
     private dialogRef: MatDialogRef<AltaViajeDetailsDialogComponent>,
@@ -244,6 +245,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   siguiente(): void {
+    this.errorMensaje = '';
     // Si pasamos de los detalles a las paradas, validamos la lista.
     if (this.step === 0) {
       this.validarParadasExistentes();
@@ -256,6 +258,14 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   anterior(): void {
     this.step--;
+    this.errorMensaje = '';
+
+    // Si retrocedemos a un paso anterior a la selección de ómnibus (paso 2),
+    // limpiamos la selección del bus para obligar a elegir nuevamente.
+    if (this.step < 2) {
+      this.busSeleccionado = null;
+      this.busSeleccionadoArray = [];
+    }
   }
 
   cancelar(): void {
@@ -312,30 +322,35 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       })
       .catch(err => {
         this.isLoadingConfirm = false;
-        // El backend devuelve un string con el mensaje de conflicto
-        const mensaje = typeof err === 'string' ? err : (err?.message || 'Error inesperado al crear el viaje.');
-        
-        const dialogRef = this.dialog.open(WarningDialogComponent, {
-          data: { message: mensaje },
-          disableClose: true,
-        });
 
-        dialogRef.afterClosed().subscribe(confirmado => {
-          if (confirmado) {
-            // El usuario confirma, reenviamos la solicitud con `confirm: true`
-            this.isLoadingConfirm = true;
-            this.viajeService.altaViaje({ ...alta, confirm: true })
-              .then(() => {
-                this.isLoadingConfirm = false;
-                this.dialogRef.close(true);
-              })
-              .catch(finalErr => {
-                this.isLoadingConfirm = false;
-                const fallback = typeof finalErr === 'string' ? finalErr : (finalErr?.message || 'Error al confirmar el viaje');
-                this.dialog.open(WarningDialogComponent, { data: { message: fallback }, disableClose: true });
-              });
-          }
-        });
+        // Error de conflicto (409) -> mostrar diálogo de advertencia
+        if (err?.status === 409) {
+          const mensaje409 = err?.error?.message || 'Conflicto detectado. ¿Desea continuar?';
+          const dialogRef = this.dialog.open(WarningDialogComponent, {
+            data: { message: mensaje409 },
+            disableClose: true,
+          });
+
+          dialogRef.afterClosed().subscribe(confirmado => {
+            if (confirmado) {
+              this.isLoadingConfirm = true;
+              this.viajeService.altaViaje({ ...alta, confirm: true })
+                .then(() => {
+                  this.isLoadingConfirm = false;
+                  this.dialogRef.close(true);
+                })
+                .catch(finalErr => {
+                  this.isLoadingConfirm = false;
+                  const fallback = typeof finalErr === 'string' ? finalErr : (finalErr?.message || 'Error al confirmar el viaje');
+                  this.errorMensaje = fallback;
+                });
+            }
+          });
+        } else {
+          // Otros errores -> mostrar banner rojo
+          const mensaje = typeof err === 'string' ? err : (err?.message || 'Error inesperado al crear el viaje.');
+          this.errorMensaje = mensaje;
+        }
       });
   }
 
@@ -365,8 +380,14 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   seleccionarBus(bus: OmnibusDisponibleDto): void {
-    this.busSeleccionado = bus;
-    this.busSeleccionadoArray = [bus];
+    // Si se hace clic sobre el mismo bus seleccionado, lo deseleccionamos
+    if (this.busSeleccionado?.matricula === bus.matricula) {
+      this.busSeleccionado = null;
+      this.busSeleccionadoArray = [];
+    } else {
+      this.busSeleccionado = bus;
+      this.busSeleccionadoArray = [bus];
+    }
   }
 
   localidadNombre(id: number): string {

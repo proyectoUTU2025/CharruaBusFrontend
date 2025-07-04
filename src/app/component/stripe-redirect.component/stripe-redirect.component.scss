@@ -1,60 +1,117 @@
-.redirect-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #675992, #483d8b);
-  color: white;
-}
-
-.redirect-card {
-  padding: 3rem;
-  text-align: center;
-  background: white;
-  color: #333;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
-  width: 100%;
-}
-
-.icon-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.spinner-icon {
-  font-size: 60px;
-  color: #675992;
-  animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.redirect-container {
+:host {
+  display: block;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 2000; // Asegura que esté por encima de todo
+}
+
+.redirect-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0.1);
-  z-index: 1000;
+  height: 100%;
+  background: rgba(248, 249, 250, 0.8); // Un fondo semi-transparente
+  backdrop-filter: blur(5px);
 }
 
 .redirect-card {
-  padding: 2rem;
-  text-align: center;
-  background: white;
-  color: #333;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  max-width: 360px;
   width: 100%;
+  max-width: 420px;
+  padding: 2.5rem 3rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border-top: 5px solid;
+  transition: all 0.3s ease-in-out;
+  border-color: #3f51b5; // Color azul estándar de Material (cargando)
+
+  &.success-state {
+    border-color: #4caf50; // Verde para éxito
+  }
+
+  &.error-state {
+    border-color: #f44336; // Rojo para error
+  }
+}
+
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-wrapper {
+  margin-bottom: 0.5rem;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+
+  &.success mat-icon {
+    color: #4caf50;
+  }
+
+  &.error mat-icon {
+    color: #f44336;
+  }
+}
+
+.state-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  color: #212529;
+}
+
+.state-description {
+  font-size: 1rem;
+  color: #6c757d;
+  margin: 0;
+  max-width: 300px;
+}
+
+.progress-wrapper {
+  width: 100%;
+  margin-top: 1.5rem;
+  
+  mat-progress-bar {
+    border-radius: 4px;
+  }
+}
+
+.redirect-message {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+// Keyframes para la animación del ícono
+@keyframes pop-in {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Estilo para el spinner
+::ng-deep .mat-mdc-progress-spinner circle {
+  stroke: #3f51b5; // Color del spinner
+}
+
+.status-card.loading {
+  border-top-color: #3f51b5; // Azul primario de Angular Material (similar a los botones)
 }

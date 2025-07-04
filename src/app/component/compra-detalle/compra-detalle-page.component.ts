@@ -1,5 +1,5 @@
 import { PasajeDto } from './../../models/pasajes/pasaje-dto.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { DetalleCompraDto } from '../../models';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CompraService } from '../../services/compra.service';
@@ -27,16 +27,23 @@ import { UserService } from '../../services/user.service';
     MatIconModule        
   ],
  templateUrl: './compra-detalle-page.component.html',
-  styleUrls: ['./compra-detalle-page.component.scss']
+  styleUrls: ['./compra-detalle-page.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CompraDetallePageComponent implements OnInit {
   compraId!: number;
   detalle!: DetalleCompraDto;
   isCliente = false;
-  //mostrarBannerExito = false;
+  
+  banner: {
+    mostrar: boolean;
+    clase: string;
+    icono: string;
+    texto: string;
+  } = { mostrar: false, clase: '', icono: '', texto: '' };
+  
   clienteNombre = '';
   vendedorNombre = '';
-  ;
 
   displayedColumns = [
     'numeroAsiento',
@@ -57,8 +64,27 @@ export class CompraDetallePageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    //const navigation = this.router.getCurrentNavigation();
-    //this.mostrarBannerExito = !!navigation?.extras.state?.['compraExitosa'];
+    this.route.queryParamMap.subscribe(params => {
+      const source = params.get('source');
+      const status = params.get('status');
+      if (source === 'purchase') {
+        this.banner.mostrar = true;
+        if (status === 'success') {
+          this.banner.clase = 'success';
+          this.banner.icono = 'check_circle';
+          this.banner.texto = '¡Compra Realizada con Éxito!';
+        } else if (status === 'cancelled') {
+          this.banner.clase = 'cancelled';
+          this.banner.icono = 'cancel';
+          this.banner.texto = 'La compra fue cancelada.';
+        } else if (status === 'failed') {
+          this.banner.clase = 'failed';
+          this.banner.icono = 'error';
+          this.banner.texto = 'Ocurrió un error al procesar la compra.';
+        }
+      }
+    });
+
     this.isCliente = this.authService.rol === 'CLIENTE';
     this.compraId = Number(this.route.snapshot.paramMap.get('id'));
     this.compraService.getDetalle(this.compraId)

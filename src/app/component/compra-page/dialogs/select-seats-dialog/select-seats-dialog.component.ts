@@ -1,50 +1,45 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { SeatsComponent } from '../../../seats/seats.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
+
+export interface SelectSeatsDialogData {
+  totalAsientos: number;
+  asientosOcupados: number[];
+  asientosSeleccionados: number[];
+  maxSeleccion: number;
+}
 
 @Component({
+  selector: 'app-select-seats-dialog',
+  templateUrl: './select-seats-dialog.component.html',
   standalone: true,
-  selector: 'app-seleccionar-pasajeros-dialog',
   imports: [
     CommonModule,
-    MatButtonModule,
     MatDialogModule,
-    SeatsComponent,
-    MatFormFieldModule
-  ],
-  templateUrl: './select-seats-dialog.component.html',
-  styleUrls: ['./select-seats-dialog.component.scss']
+    MatButtonModule,
+    SeatsComponent
+  ]
 })
 export class SelectSeatsDialogComponent implements OnInit {
   selectedSeats: number[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<SelectSeatsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { 
-      pasajeros: number; 
-      viajeId: number; 
-      cantidadAsientos: number 
-      precio: number
-    }
+    @Inject(MAT_DIALOG_DATA) public data: SelectSeatsDialogData
   ) {}
 
-  ngOnInit(): void {}
-
-  onAsientosSeleccionados(ids: number[]): void {    
-    this.selectedSeats = ids;
+  ngOnInit(): void {
+    // Clonamos los asientos seleccionados para no modificar el array original
+    this.selectedSeats = [...this.data.asientosSeleccionados];
   }
 
-  confirmar(): void {    
-    if (this.selectedSeats.length === this.data.pasajeros) {
-      this.dialogRef.close({
-        asientos: this.selectedSeats
-      });
-    }
+  onSelectionChange(seats: number[]): void {
+    this.selectedSeats = seats;
   }
-  cancelar(): void {
+
+  onCancel(): void {
     this.dialogRef.close();
   }
 }

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatIconModule } from '@angular/material/icon';
 import { CompraResponseDto } from '../../models/compra';
 
 @Component({
@@ -14,68 +15,74 @@ import { CompraResponseDto } from '../../models/compra';
     CommonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatIconModule
   ],
   templateUrl: './stripe-redirect.component.html',
   styleUrls: ['./stripe-redirect.component.scss']
 })
 export class StripeRedirectComponent implements OnInit {
-  mensaje = '';
   cargando = true;
+  mensaje = '';
+  error: boolean = false;
+  compraId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
-    private compraService: CompraService
+    private compraService: CompraService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    const url = this.router.url;
-    const sessionId = new URLSearchParams(window.location.search).get('session_id');
+    const sessionId = this.route.snapshot.queryParamMap.get('session_id');
+    const cancelled = this.route.snapshot.queryParamMap.get('cancelled');
+    const compraIdStr = this.route.snapshot.queryParamMap.get('compraId');
 
-    if (!sessionId) {
-      this.mensaje = '❌ Error: sesión de pago no encontrada.';
-      this.cargando = false;
-      this.iniciarRedireccion();
-      return;
+    if (compraIdStr) {
+      this.compraId = +compraIdStr;
     }
 
-    if (url.includes('/compras/exito')) {
-      this.compraService.confirmarCompra(sessionId).subscribe(
-        (_: any) => {
-          this.mensaje = '✅ Compra confirmada con éxito!';
+    if (sessionId) {
+      this.compraService.confirmarCompra(sessionId).subscribe({
+        next: (response) => {
           this.cargando = false;
-          setTimeout(() => this.router.navigate(['/compras', (_ as CompraResponseDto).compraId]), 2000);
+          this.mensaje = '¡Compra confirmada con éxito!';
+          this.compraId = response.compraId;
+          this.redirigir(true);
         },
-        () => {
-          this.mensaje = '⚠️ Error al confirmar la compra.';
+        error: (err) => {
           this.cargando = false;
-          this.iniciarRedireccion();
-        }
-      );
-    } else if (url.includes('/compras/cancelada')) {
-      this.compraService.cancelarCompra(sessionId).subscribe(
-        () => {
-          this.mensaje = '❌ Compra cancelada.';
-          this.cargando = false;
-          this.iniciarRedireccion();
+          this.error = true;
+          this.mensaje = 'Error al confirmar la compra.';
+          console.error(err);
+          this.redirigir(false);
         },
-        () => {
-          this.mensaje = '⚠️ Error al cancelar la compra.';
-          this.cargando = false;
-          this.iniciarRedireccion();
-        }
-      );
-    } else {
-      this.mensaje = '🚫 Ruta de redirección no válida.';
+      });
+    } else if (cancelled && this.compraId) {
       this.cargando = false;
-      this.iniciarRedireccion();
+      this.error = true;
+      this.mensaje = 'La compra ha sido cancelada.';
+      this.redirigir(false, true);
+    } else {
+      this.cargando = false;
+      this.error = true;
+      this.mensaje = 'Parámetros inválidos para la redirección.';
+      this.router.navigate(['/']);
     }
   }
 
-  private iniciarRedireccion(): void {
+  private redirigir(exito: boolean, cancelado: boolean = false): void {
     setTimeout(() => {
-      this.router.navigate(['/comprar']);
+      if (this.compraId) {
+        let queryParams = { 
+          source: 'purchase',
+          status: exito ? 'success' : (cancelado ? 'cancelled' : 'failed')
+        };
+        this.router.navigate(['/compras', this.compraId], { queryParams });
+      } else {
+        // Si no hay ID de compra, redirigir a una página genérica
+        this.router.navigate(['/pasajes-history']); 
+      }
     }, 3000);
   }
 }

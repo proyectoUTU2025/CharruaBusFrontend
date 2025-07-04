@@ -1,22 +1,69 @@
-<div class="seat-container">
-  <div *ngFor="let row of seats" class="seatrow">
-    <ng-container *ngFor="let seat of row; let i = index">
-      <div *ngIf="seat.seatLabel; else empty"
-           (click)="selectSeat(seat)"
-           class="seat-item"
-           [ngClass]="{
-             'seat-available': seat.status === 'available',
-             'seat-booked':   seat.status === 'booked'
-           }">
-        {{ seat.seatNo }}
-      </div>
-      <ng-template #empty><div class="seat-empty"></div></ng-template>
-      <div *ngIf="i === 1" class="aisle"></div>
-    </ng-container>
+<div class="seats-legend">
+  <div class="legend-item">
+    <div class="seat-icon-legend disponible">
+      <mat-icon>event_seat</mat-icon>
+    </div>
+    <span>Disponible</span>
+  </div>
+  <div class="legend-item">
+    <div class="seat-icon-legend seleccionado">
+      <mat-icon>event_seat</mat-icon>
+    </div>
+    <span>Seleccionado</span>
+  </div>
+  <div class="legend-item">
+    <div class="seat-icon-legend ocupado">
+      <mat-icon>event_seat</mat-icon>
+    </div>
+    <span>Ocupado</span>
   </div>
 </div>
 
-<div class="summary-bar">
-  <div>Seleccionados: {{ cart.selectedIds.length }}</div>
-  <div>Total: {{ cart.totalamount }} UYU</div>  
+<mat-card class="bus-diagram-card">
+  <div class="bus-container">
+    <div class="bus-header">
+      <div class="driver-section">
+        <mat-icon class="steering-wheel-icon">settings</mat-icon>
+        <span>CONDUCTOR</span>
+      </div>
+      <div class="door-section">
+        <span>Puerta</span>
+        <mat-icon class="door-icon">sensor_door</mat-icon>
+      </div>
+    </div>
+
+    <div class="bus-body">
+      <div class="bus-aisle"></div>
+      <div class="seat-grid">
+        <div *ngFor="let fila of filas" class="seat-row">
+          <div class="row-number">{{ fila.numero }}</div>
+          <div class="seats-in-row">
+            <div *ngFor="let asiento of fila.asientos" 
+                 class="seat"
+                 [ngClass]="{
+                   'disponible': esDisponible(asiento),
+                   'ocupado': esOcupado(asiento),
+                   'seleccionado': esSeleccionado(asiento),
+                   'empty': !asiento
+                 }"
+                 (click)="toggleSeat(asiento)">
+              <mat-icon *ngIf="asiento">{{ getSeatIcon(asiento) }}</mat-icon>
+              <span *ngIf="asiento" class="seat-number">{{ asiento.numero }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bus-footer">
+      <mat-icon class="emergency-exit-icon">crisis_alert</mat-icon>
+      <span>SALIDA DE EMERGENCIA</span>
+    </div>
+  </div>
+</mat-card>
+
+<div class="actions">
+  <button mat-flat-button color="primary" (click)="confirmSelection()" [disabled]="asientosSeleccionados.length === 0">
+    Confirmar Asientos
+  </button>
 </div>

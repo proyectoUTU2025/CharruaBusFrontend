@@ -1,14 +1,36 @@
 <div class="redirect-container">
-  <mat-card class="redirect-card">
-    <div *ngIf="cargando" class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Procesando tu transacción, por favor espera...</p>
+  <mat-card class="redirect-card" [ngClass]="{'success-state': !cargando, 'error-state': !!error}">
+    <!-- Estado de carga -->
+    <div *ngIf="cargando" class="state-container loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <h2 class="state-title">Procesando tu pago</h2>
+      <p class="state-description">Esto puede tardar unos segundos. No cierres esta ventana.</p>
     </div>
 
-    <div *ngIf="!cargando" class="resultado-container">
-      <h2>{{ mensaje }}</h2>
-      <p>Serás redirigido en unos segundos...</p>
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <!-- Estado de éxito -->
+    <div *ngIf="!cargando && !error" class="state-container success-container">
+      <div class="icon-wrapper success">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <h2 class="state-title">¡Compra confirmada con éxito!</h2>
+      <p class="state-description">Preparando los detalles de tu compra...</p>
+      <div class="progress-wrapper">
+        <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+        <p class="redirect-message">Serás redirigido en unos segundos...</p>
+      </div>
+    </div>
+    
+    <!-- Estado de error/cancelación -->
+    <div *ngIf="error" class="state-container error-container">
+      <div class="icon-wrapper error">
+        <mat-icon>cancel</mat-icon>
+      </div>
+      <h2 class="state-title">{{ mensaje }}</h2>
+      <p class="state-description">Algo no salió como esperábamos.</p>
+      <div class="progress-wrapper">
+        <mat-progress-bar mode="indeterminate" color="warn"></mat-progress-bar>
+        <p class="redirect-message">Serás redirigido en unos segundos...</p>
+      </div>
     </div>
   </mat-card>
 </div>

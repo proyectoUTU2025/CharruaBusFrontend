@@ -1,4 +1,7 @@
 $purple-faded: #675992;
+$green-success: #2e7d32;
+$red-error: #c62828;
+$orange-warn: #ef6c00;
 
 .detalle-card {
   max-width: 900px;
@@ -8,16 +11,24 @@ $purple-faded: #675992;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 
-  .status-bar {
+  .mat-card-header {
+    padding: 0 !important;
+  }
+
+  .status-banner {
     display: flex;
     align-items: center;
-    background: #e8f5e9;
-    color: #2e7d32;
+    width: 100%;
+    box-sizing: border-box;
     padding: 1rem;
     font-weight: 600;
+    
     mat-icon {
       margin-right: 0.5rem;
     }
+
+    &.success { background: #e8f5e9; color: #2e7d32; }
+    &.cancelled, &.failed { background: #ffebee; color: #c62828; }
   }
 
   .ruta-info {
@@ -37,6 +48,23 @@ $purple-faded: #675992;
   .detalles {
     padding: 1rem;
 
+    .tag {
+      display: inline-block;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-radius: 6px;
+
+      &.completada,
+      &.confirmada { 
+        background: #e8f5e9; 
+        color: $green-success; 
+      }
+      &.pendiente { background: #fff3e0; color: $orange-warn; }
+      &.cancelada { background: #ffebee; color: $red-error; }
+    }
+
     h3 {
       margin-bottom: 1rem;
       border-bottom: 1px solid #ccc;
@@ -54,85 +82,29 @@ $purple-faded: #675992;
         padding: 1rem;
         border: 1px solid #ddd;
         border-radius: 0.5rem;
-        position: relative;
+        position: initial;
 
-        h4 {
-          margin-top: 0;
-          font-size: 1rem;
-          margin-bottom: 0.75rem;
+        .status-tag-wrapper {
+          text-align: right;
+          margin-top: -2.5rem;
+          margin-bottom: 1rem;
         }
-
-        .row {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 0.5rem;
-        }
-
-        .tag {
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          padding: 0.25rem 0.5rem;
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          border-radius: 4px;
-          &.confirmada { background: #e8f5e9; color: #2e7d32; }
-          &.cancelada { background: #ffebee; color: #c62828; }
-        }
-      }
-    }
-
-    .resumen-pago {
-      border-top: 1px solid #eee;
-      padding-top: 1rem;
-
-      .row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-      }
-
-      .total-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 1.1rem;
-        margin-top: 0.5rem;
       }
     }
   }
 
   mat-card-actions {
-    padding: 1rem;
-    display: flex;
-    gap: 0.5rem;
-
-    button {
-      border-radius: 0.5rem;
-      text-transform: none;
-    }
-
-    button.purple-stroked {
-      border-color: $purple-faded;
-      color: $purple-faded;
-
-      &:hover {
-        background-color: rgba($purple-faded, 0.1);
-      }
-    }
-
-    button.purple-flat {
-      background-color: $purple-faded;
-      color: white;
-
-      &:hover {
-        background-color: darken($purple-faded, 10%);
-      }
-    }
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
   }
-   .flex-spacer {
-      flex: 1;
-    }
-  .pasajes-compact {
+}
+
+.flex-spacer {
+  flex: 1;
+}
+
+.pasajes-compact {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -146,7 +118,4 @@ $purple-faded: #675992;
   background-color: rgba(0,0,0,0.05);
   font-size: 0.875rem;
   color: #333;
-}
-
-
 }

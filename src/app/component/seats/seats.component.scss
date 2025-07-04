@@ -1,64 +1,217 @@
-$violeta-gastado: #675992;
-$gris-claro: #d8d8d8;
-$gris-oscuro: #888;
-
-.seat-container {
-  padding: 1rem;
+:host {
+  display: block;
+  background-color: #f8f9fa;
+  padding: 24px;
+  border-radius: 8px;
+  font-family: 'Roboto', sans-serif;
 }
 
-.seatrow {
+.seats-legend {
   display: flex;
   justify-content: center;
-  margin-bottom: 0.5rem;
-}
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
 
-.seat-item {
-  width: 36px;
-  height: 36px;
-  line-height: 36px;
-  text-align: center;
-  margin: 3px;
-  border-radius: 8px;
-  border: 2px solid $violeta-gastado;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s, color 0.3s;
-}
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #495057;
 
-.seat-available {
-  background: white;
-  color: $violeta-gastado;
+    .seat-icon-legend {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 4px;
+      color: white;
 
-  &:hover {
-    background-color: lighten($violeta-gastado, 40%);
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &.disponible { background-color: #2196f3; }
+      &.seleccionado { background-color: #ffc107; }
+      &.ocupado { background-color: #6c757d; }
+    }
   }
 }
 
-.seat-booked {
-  background: $violeta-gastado;
-  color: white;
+.bus-diagram-card {
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 0 !important;
+  border-radius: 12px;
+  background-color: #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .bus-container {
+    padding: 20px;
+  }
 }
 
-.aisle {
-  width: 36px;
-  flex-shrink: 0;
-}
-
-.seat-empty {
-  width: 36px;
-  height: 36px;
-  margin: 3px;
-  visibility: hidden;
-}
-
-.summary-bar {
+.bus-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: #f8f8f8;
-  border-top: 1px solid $gris-claro;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: #495057;
+  color: white;
+  border-radius: 8px;
+
+  .driver-section, .door-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .steering-wheel-icon {
+    color: #ffc107;
+  }
+  .door-icon {
+    color: #ced4da;
+  }
+}
+
+.bus-body {
+  display: flex;
+  gap: 20px;
+}
+
+.bus-aisle {
+  width: 1px;
+  background-color: #adb5bd;
+  margin: 0 10px;
+}
+
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .row-number {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #6c757d;
+    color: white;
+    font-weight: 500;
+    font-size: 12px;
+    border-radius: 50%;
+  }
+
+  .seats-in-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    flex-grow: 1;
+
+    // Insertar el pasillo visualmente después del segundo asiento
+    & > .seat:nth-child(2) {
+      margin-right: 24px; 
+    }
+  }
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+
+  mat-icon {
+    font-size: 24px;
+  }
+  
+  .seat-number {
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  &.empty {
+    background-color: transparent;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  // Estilos por estado
+  &.disponible {
+    background-color: #ffffff;
+    color: #495057;
+    border: 1px solid #ced4da;
+    &:hover {
+      background-color: #2196f3;
+      color: white;
+      border-color: #2196f3;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.ocupado {
+    background-color: #6c757d;
+    color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+
+  &.seleccionado {
+    background-color: #ffc107;
+    color: #343a40;
+    border-color: #ffc107;
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(255, 193, 7, 0.7);
+  }
+}
+
+.bus-footer {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #dc3545;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
   font-weight: 500;
-  font-size: 14px;
-  color: $gris-oscuro;
+
+  .emergency-exit-icon {
+    font-size: 20px;
+  }
+}
+
+.actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    font-size: 15px;
+    padding: 10px 24px;
+    line-height: 1.5;
+  }
 }

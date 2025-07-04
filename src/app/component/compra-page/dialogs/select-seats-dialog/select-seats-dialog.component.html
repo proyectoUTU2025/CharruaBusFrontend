@@ -1,16 +1,14 @@
+<h2 mat-dialog-title>Selecciona tus asientos</h2>
 <mat-dialog-content>
-  <h3>Seleccionar Asientos</h3>
   <app-seats
-    [viajeId]="data.viajeId"
-    [cantidadAsientos]="data.cantidadAsientos"
-    [maxSeleccion]="data.pasajeros"
-    (bookingConfirmed)="onAsientosSeleccionados($event)">
+    [totalAsientos]="data.totalAsientos"
+    [asientosOcupados]="data.asientosOcupados"
+    [asientosSeleccionados]="data.asientosSeleccionados"
+    [maxSeleccion]="data.maxSeleccion"
+    (seleccionCambio)="onSelectionChange($event)">
   </app-seats>
 </mat-dialog-content>
-
 <mat-dialog-actions align="end">
-  <button mat-button class="btn-violeta" (click)="cancelar()">Cancelar</button>
-  <button mat-raised-button class="btn-violeta"
-          [disabled]="selectedSeats.length !== data.pasajeros"
-          (click)="confirmar()">Confirmar</button>
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" [mat-dialog-close]="selectedSeats" [disabled]="selectedSeats.length !== data.maxSeleccion">Confirmar</button>
 </mat-dialog-actions>

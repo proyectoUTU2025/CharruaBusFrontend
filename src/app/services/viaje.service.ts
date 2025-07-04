@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 import {
   AltaViajeDto, ViajeDisponibleDto, FiltroBusquedaViajeDto, CompraViajeDto,
   DetalleViajeDto,
@@ -52,7 +52,7 @@ export class ViajeService {
     },
     page = 0,
     size = 5
-  ): Promise<Page<CompraViajeDto>> {
+  ): Observable<Page<CompraViajeDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -62,9 +62,8 @@ export class ViajeService {
       .set('fechaViaje', filtro.fechaViaje)
       .set('cantidadPasajes', filtro.cantidadPasajes.toString());
 
-    return firstValueFrom(
-      this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
-    );
+    return this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
+      .pipe(map(resp => resp));
   }
   getAllViajes(page = 0, size = 5): Promise<Page<CompraViajeDto>> {
     let params = new HttpParams()
@@ -92,5 +91,16 @@ export class ViajeService {
     return firstValueFrom(
       this.http.get<{ data: DetalleViajeDto }>(`${this.baseUrl}/${idViaje}`)
     ).then(resp => resp.data);
+  }
+
+  getOcupados(idViaje: number): Observable<number[]> {
+    return this.http.get<{ data: DetalleViajeDto }>(`${this.baseUrl}/${idViaje}`).pipe(
+      map(response => {
+        const asientosOcupados = response.data.asientos
+          ?.filter(asiento => asiento.estado === 'RESERVADO' || asiento.estado === 'CONFIRMADO')
+          .map(asiento => asiento.numero) || [];
+        return asientosOcupados;
+      })
+    );
   }
 }

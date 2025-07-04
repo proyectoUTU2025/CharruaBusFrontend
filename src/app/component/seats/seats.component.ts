@@ -1,99 +1,122 @@
-import { ApiResponse } from './../../models/api/api-response.model';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { environment } from '../../../environments/environment';
-import { AsientoDto, DetalleViajeDto } from '../../models';
+import { MatButtonModule } from '@angular/material/button';
 
+export interface Seat {
+  numero: number;
+  estado: 'disponible' | 'ocupado' | 'seleccionado';
+}
 
-interface Seat {
-  seatLabel?: string;
-  seatNo?: string;
-  price?: number;
-  status: 'available' | 'booked' | 'unavailable';
+export interface SeatRow {
+  numero: string;
+  asientos: (Seat | null)[];
 }
 
 @Component({
   selector: 'app-seats',
-  standalone: true,
-  imports: [CommonModule, MatTooltipModule],
   templateUrl: './seats.component.html',
-  styleUrls: ['./seats.component.scss']
+  styleUrls: ['./seats.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule
+  ]
 })
-export class SeatsComponent implements OnInit {
-  @Input() cantidadAsientos!: number;
-  @Input() viajeId!: number;
-  @Input() maxSeleccion = 5;
+export class SeatsComponent implements OnChanges {
+  @Input() totalAsientos: number = 40;
+  @Input() asientosOcupados: number[] = [];
+  @Input() asientosSeleccionados: number[] = [];
+  @Input() maxSeleccion: number = 1;
+  @Output() seleccionCambio = new EventEmitter<number[]>();
 
-  @Output() bookingConfirmed = new EventEmitter<number[]>();
+  filas: SeatRow[] = [];
 
-  seats: Seat[][] = [];
-  cart = {
-    selectedIds: [] as number[],
-    totalamount: 0
-  };
-
-  constructor(private http: HttpClient) {}
-
-  ngOnInit(): void {
-    this.http
-      .get<ApiResponse<DetalleViajeDto>>(
-        `${environment.apiBaseUrl}/viajes/${this.viajeId}`
-      )
-      .subscribe(response => this.buildChart(response.data.asientos || []));
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['totalAsientos'] || changes['asientosOcupados'] || changes['asientosSeleccionados']) {
+      this.generarMapaAsientos();
+    }
   }
 
-  private buildChart(asientos: AsientoDto[]) {
-  const booked = asientos
-    .filter(a => a.estado === 'RESERVADO' || a.estado === 'CONFIRMADO')
-    .map(a => a.numero);
+  generarMapaAsientos(): void {
+    const allSeats: Seat[] = Array.from({ length: this.totalAsientos }, (_, i) => {
+      const numero = i + 1;
+      let estado: 'disponible' | 'ocupado' | 'seleccionado' = 'disponible';
+      if (this.asientosOcupados.includes(numero)) {
+        estado = 'ocupado';
+      } else if (this.asientosSeleccionados.includes(numero)) {
+        estado = 'seleccionado';
+      }
+      return { numero, estado };
+    });
 
-  const cols = 2;
-  const perRow = cols * 2;
-  const rows = Math.ceil(this.cantidadAsientos / perRow);
-  let n = 1;
-  this.seats = [];
+    const numRows = Math.ceil(this.totalAsientos / 4);
+    this.filas = [];
 
-  for (let r = 0; r < rows; r++) {
-    const row: Seat[] = [];
-
-    for (let i = 0; i < cols; i++) {
-      row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
+    for (let i = 0; i < numRows; i++) {
+      const asientosFila: (Seat | null)[] = [];
+      for (let j = 0; j < 4; j++) {
+        const seatIndex = i * 4 + j;
+        if (seatIndex < this.totalAsientos) {
+          asientosFila.push(allSeats[seatIndex]);
+        } else {
+          asientosFila.push(null);
+        }
+      }
+      this.filas.push({
+        numero: `${i + 1}`,
+        asientos: asientosFila,
+      });
     }
-    row.push({ status: 'unavailable' }); // pasillo
-    for (let i = 0; i < cols; i++) {
-      row.push(n <= this.cantidadAsientos ? this.makeSeat(n++, booked) : { status: 'unavailable' });
-    }
-    this.seats.push(row);
   }
-}
-
-  private makeSeat(n: number, booked: number[]): Seat {
-    return {
-      seatLabel: 'S' + n,
-      seatNo: n < 10 ? '0' + n : '' + n,
-      price: 250,
-      status: booked.includes(n) ? 'booked' : 'available'
-    };
+  
+  esDisponible(asiento: Seat | null): boolean {
+    return asiento?.estado === 'disponible';
   }
 
-  selectSeat(seat: Seat) {
-    if (seat.status !== 'available') return;
-    const id = parseInt(seat.seatNo!, 10);
-    const idx = this.cart.selectedIds.indexOf(id);
+  esOcupado(asiento: Seat | null): boolean {
+    return asiento?.estado === 'ocupado';
+  }
 
-    if (idx > -1) {
-      // des-seleccionar
-      this.cart.selectedIds.splice(idx, 1);
-      seat.status = 'available';
-    } else if (this.cart.selectedIds.length < this.maxSeleccion) {
-      this.cart.selectedIds.push(id);
-      seat.status = 'booked';
+  esSeleccionado(asiento: Seat | null): boolean {
+    return asiento?.estado === 'seleccionado';
+  }
+
+  getSeatIcon(asiento: Seat | null): string {
+    if (this.esSeleccionado(asiento)) {
+      return 'check_circle';
     }
+    return 'event_seat';
+  }
 
-    this.cart.totalamount = this.cart.selectedIds.length * 250;
-    
-    this.bookingConfirmed.emit(this.cart.selectedIds);
-  } 
+  toggleSeat(asiento: Seat | null): void {
+    if (asiento && asiento.estado !== 'ocupado') {
+      const index = this.asientosSeleccionados.indexOf(asiento.numero);
+      if (index > -1) {
+        // Deseleccionar
+        this.asientosSeleccionados.splice(index, 1);
+        asiento.estado = 'disponible';
+      } else {
+        // Seleccionar
+        if (this.asientosSeleccionados.length < this.maxSeleccion) {
+          this.asientosSeleccionados.push(asiento.numero);
+          asiento.estado = 'seleccionado';
+        } else {
+          console.warn(`No se pueden seleccionar más de ${this.maxSeleccion} asientos.`);
+        }
+      }
+      this.seleccionCambio.emit(this.asientosSeleccionados);
+      // No es necesario regenerar todo el mapa, solo cambiar el estado visual
+      // this.generarMapaAsientos(); 
+    }
+  }
+
+  confirmSelection(): void {
+    // La lógica de confirmación ahora se maneja en la página de compra.
+    // Este componente solo emite los cambios.
+    console.log('Asientos confirmados:', this.asientosSeleccionados);
+  }
 }

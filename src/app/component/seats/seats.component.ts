@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 export interface Seat {
   numero: number;
-  estado: 'disponible' | 'ocupado' | 'seleccionado';
+  estado?: 'disponible' | 'ocupado' | 'seleccionado';
 }
 
 export interface SeatRow {
@@ -26,97 +26,81 @@ export interface SeatRow {
     MatButtonModule
   ]
 })
-export class SeatsComponent implements OnChanges {
+export class SeatsComponent implements OnInit, OnChanges {
   @Input() totalAsientos: number = 40;
   @Input() asientosOcupados: number[] = [];
   @Input() asientosSeleccionados: number[] = [];
   @Input() maxSeleccion: number = 1;
-  @Output() seleccionCambio = new EventEmitter<number[]>();
+  @Input() showConfirmButton: boolean = false;
+  
+  @Output() asientosChange = new EventEmitter<number[]>();
+  @Output() onConfirm = new EventEmitter<number[]>();
 
-  filas: SeatRow[] = [];
+  seats: Seat[] = [];
+  seatRows: { izquierda: Seat[]; derecha: Seat[] }[] = [];
+  selectedSeats: number[] = [];
+
+  ngOnInit(): void {
+    this.selectedSeats = [...this.asientosSeleccionados];
+    this.initializeSeats();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['totalAsientos'] || changes['asientosOcupados'] || changes['asientosSeleccionados']) {
-      this.generarMapaAsientos();
+    if (changes['totalAsientos'] || changes['asientosOcupados']) {
+      this.initializeSeats();
     }
   }
 
-  generarMapaAsientos(): void {
-    const allSeats: Seat[] = Array.from({ length: this.totalAsientos }, (_, i) => {
-      const numero = i + 1;
-      let estado: 'disponible' | 'ocupado' | 'seleccionado' = 'disponible';
-      if (this.asientosOcupados.includes(numero)) {
-        estado = 'ocupado';
-      } else if (this.asientosSeleccionados.includes(numero)) {
-        estado = 'seleccionado';
-      }
-      return { numero, estado };
-    });
-
-    const numRows = Math.ceil(this.totalAsientos / 4);
-    this.filas = [];
-
-    for (let i = 0; i < numRows; i++) {
-      const asientosFila: (Seat | null)[] = [];
-      for (let j = 0; j < 4; j++) {
-        const seatIndex = i * 4 + j;
-        if (seatIndex < this.totalAsientos) {
-          asientosFila.push(allSeats[seatIndex]);
-        } else {
-          asientosFila.push(null);
-        }
-      }
-      this.filas.push({
-        numero: `${i + 1}`,
-        asientos: asientosFila,
+  private initializeSeats(): void {
+    this.seats = [];
+    for (let i = 1; i <= this.totalAsientos; i++) {
+      this.seats.push({
+        numero: i,
+        estado: this.getInitialSeatState(i)
       });
     }
-  }
-  
-  esDisponible(asiento: Seat | null): boolean {
-    return asiento?.estado === 'disponible';
+    this.buildSeatRows();
   }
 
-  esOcupado(asiento: Seat | null): boolean {
-    return asiento?.estado === 'ocupado';
-  }
-
-  esSeleccionado(asiento: Seat | null): boolean {
-    return asiento?.estado === 'seleccionado';
-  }
-
-  getSeatIcon(asiento: Seat | null): string {
-    if (this.esSeleccionado(asiento)) {
-      return 'check_circle';
+  private buildSeatRows(): void {
+    this.seatRows = [];
+    for (let i = 0; i < this.seats.length; i += 4) {
+      const izquierda = this.seats.slice(i, i + 2);
+      const derecha = this.seats.slice(i + 2, i + 4);
+      this.seatRows.push({ izquierda, derecha });
     }
-    return 'event_seat';
   }
 
-  toggleSeat(asiento: Seat | null): void {
-    if (asiento && asiento.estado !== 'ocupado') {
-      const index = this.asientosSeleccionados.indexOf(asiento.numero);
-      if (index > -1) {
-        // Deseleccionar
-        this.asientosSeleccionados.splice(index, 1);
-        asiento.estado = 'disponible';
-      } else {
-        // Seleccionar
-        if (this.asientosSeleccionados.length < this.maxSeleccion) {
-          this.asientosSeleccionados.push(asiento.numero);
-          asiento.estado = 'seleccionado';
-        } else {
-          console.warn(`No se pueden seleccionar más de ${this.maxSeleccion} asientos.`);
-        }
-      }
-      this.seleccionCambio.emit(this.asientosSeleccionados);
-      // No es necesario regenerar todo el mapa, solo cambiar el estado visual
-      // this.generarMapaAsientos(); 
+  private getInitialSeatState(seatNumber: number): 'disponible' | 'ocupado' | 'seleccionado' {
+    if (this.asientosOcupados.includes(seatNumber)) {
+      return 'ocupado';
     }
+    if (this.selectedSeats.includes(seatNumber)) {
+      return 'seleccionado';
+    }
+    return 'disponible';
+  }
+
+  getSeatClass(seat: Seat): string {
+    if (seat.estado === 'ocupado') return 'confirmado';
+    if (this.selectedSeats.includes(seat.numero)) return 'reservado';
+    return 'disponible';
+  }
+
+  onSeatClick(seat: Seat): void {
+    if (seat.estado === 'ocupado') return;
+
+    const idx = this.selectedSeats.indexOf(seat.numero);
+    if (idx > -1) {
+      this.selectedSeats.splice(idx, 1);
+    } else if (this.selectedSeats.length < this.maxSeleccion) {
+      this.selectedSeats.push(seat.numero);
+    }
+    this.asientosChange.emit(this.selectedSeats);
+    this.buildSeatRows();
   }
 
   confirmSelection(): void {
-    // La lógica de confirmación ahora se maneja en la página de compra.
-    // Este componente solo emite los cambios.
-    console.log('Asientos confirmados:', this.asientosSeleccionados);
+    this.onConfirm.emit(this.selectedSeats);
   }
 }

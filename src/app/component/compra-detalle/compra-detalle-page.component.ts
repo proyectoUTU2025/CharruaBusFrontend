@@ -12,6 +12,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
+import { TipoEstadoCompra } from '../../models/tipo-estado-compra';
+import { DetallePasajeCompletoDialogComponent } from '../shared/detalle-pasaje-completo-dialog/detalle-pasaje-completo-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-compra-detalle-page',
@@ -24,7 +29,9 @@ import { UserService } from '../../services/user.service';
     MatPaginatorModule,
     MatButtonModule,
     RouterModule,
-    MatIconModule        
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatDividerModule
   ],
  templateUrl: './compra-detalle-page.component.html',
   styleUrls: ['./compra-detalle-page.component.scss'],
@@ -60,7 +67,8 @@ export class CompraDetallePageComponent implements OnInit {
     private router: Router,  
     private compraService: CompraService,
     private authService: AuthService,
-    private userService: UserService // Asumiendo que AuthService tiene el método getById
+    private userService: UserService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -92,13 +100,13 @@ export class CompraDetallePageComponent implements OnInit {
         this.detalle = d;
         // cargar nombre de cliente
         this.userService.getById(d.clienteId)
-          .then(u => this.clienteNombre = `${u.nombre} ${u.apellido}`)
-          .catch(() => this.clienteNombre = '');
+          .then(u => this.detalle.clienteNombre = `${u.nombre} ${u.apellido}`)
+          .catch(() => this.detalle.clienteNombre = 'No disponible');
         // si vino de un vendedor, cargar nombre del vendedor
-        if (!this.isCliente) {
-          this.userService.getById(d.vendedorId!)
-            .then(v => this.vendedorNombre = `${v.nombre} ${v.apellido}`)
-            .catch(() => this.vendedorNombre = '');
+        if (d.vendedorId) {
+          this.userService.getById(d.vendedorId)
+            .then(v => this.detalle.vendedorNombre = `${v.nombre} ${v.apellido}`)
+            .catch(() => this.detalle.vendedorNombre = 'No disponible');
         }
       });
   }
@@ -110,7 +118,63 @@ export class CompraDetallePageComponent implements OnInit {
         window.open(url, '_blank');
       });
   }
-  abrirDetallePasaje(PasajeDto: PasajeDto) {
-    this.router.navigate(['/pasaje']);
+  
+  abrirDetallePasaje(pasajeId: number): void {
+    this.dialog.open(DetallePasajeCompletoDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: { pasajeId: pasajeId },
+      disableClose: true,
+      autoFocus: false,
+    });
+  }
+
+  getStatusChipClass(estado: string): string {
+    const estadoNormalizado = estado.toLowerCase().replace(/_/g, '-');
+    switch (estadoNormalizado) {
+      case 'completada':
+        return 'badge-completada';
+      case 'pendiente':
+        return 'badge-pendiente';
+      case 'cancelada':
+        return 'badge-cancelada';
+      case 'reembolsada':
+        return 'badge-reembolsada';
+      case 'parcialmente-reembolsada':
+        return 'badge-parcialmente-reembolsada';
+      default:
+        return 'badge-pendiente';
+    }
+  }
+
+  getPasajeStatusChipClass(estado: string): string {
+    const estadoNormalizado = estado.toLowerCase().replace(/_/g, '-');
+    switch (estadoNormalizado) {
+      case 'confirmado':
+        return 'badge-completada';
+      case 'pendiente':
+        return 'badge-pendiente';
+      case 'cancelado':
+        return 'badge-cancelada';
+      case 'devuelto':
+        return 'badge-reembolsada';
+      case 'parcialmente-reembolsado':
+        return 'badge-parcialmente-reembolsada';
+      default:
+        return 'badge-pendiente';
+    }
+  }
+
+  formatToTitleCase(text: string): string {
+    if (!text) return '';
+    return text.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, s => s.toUpperCase());
+  }
+
+  // NUEVO: determinar si el PDF puede descargarse según el estado
+  puedeDescargarPdf(): boolean {
+    if (!this.detalle) return false;
+    const estado = this.detalle.estado as TipoEstadoCompra;
+    return estado === TipoEstadoCompra.COMPLETADA ||
+           estado === TipoEstadoCompra.PARCIALMENTE_REEMBOLSADA;
   }
 }

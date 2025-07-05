@@ -36,7 +36,7 @@
             <mat-icon>flag</mat-icon>
             <div class="pasaje-content">
               <label>Estado</label>
-              <span [ngClass]="getEstadoBadgeClass(pasaje.estadoPasaje)" class="badge">
+              <span class="badge" [ngStyle]="getEstadoColors(pasaje.estadoPasaje)">
                 {{ getEstadoText(pasaje.estadoPasaje) }}
               </span>
             </div>

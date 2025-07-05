@@ -62,7 +62,8 @@ export class BusDetailDialogComponent implements OnInit {
 
     abrirAltaViajeExpreso() {
         const ref = this.dialog.open(AltaViajeExpresoComponent, {
-            width: '600px', data: { omnibusId: this.busId }
+            width: '600px', data: { omnibusId: this.busId },
+            disableClose: true
         });
         ref.afterClosed().subscribe(res => {
             if (res === true || res === 'viajeRegistrado') {
@@ -73,7 +74,8 @@ export class BusDetailDialogComponent implements OnInit {
 
     abrirAsignarMantenimiento() {
         const ref = this.dialog.open(AsignarMantenimientoComponent, {
-            width: '600px', data: { omnibusId: this.busId }
+            width: '600px', data: { omnibusId: this.busId },
+            disableClose: true
         });
         ref.afterClosed().subscribe(res => {
             if (res === 'mantenimientoCreado') {

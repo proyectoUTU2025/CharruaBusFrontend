@@ -233,7 +233,7 @@ export class AltaViajeExpresoComponent implements OnInit, OnDestroy {
         this.viajeExpresoService.crearViajeExpreso(dto).subscribe({
             next: () => {
                 this.errorMensaje = '';
-                this.showSnackbar('¡Viaje registrado correctamente!');
+                this.showSnackbar('Viaje creado correctamente');
                 this.isLoading = false;
                 this.form.reset();
                 this.dialogRef.close('viajeRegistrado');

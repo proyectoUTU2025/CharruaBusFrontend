@@ -124,6 +124,21 @@
   font-weight: 500;
 }
 
+.pasaje-content .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1.5px solid;
+  text-transform: none;
+  line-height: 1;
+}
+
 .asiento-numero {
   font-size: 18px !important;
   font-weight: 600 !important;
@@ -193,28 +208,30 @@
 }
 
 /* Badges */
-.badge {
-  padding: 4px 12px;
+.detalle-item .label {
+  font-size: 0.8rem;
+  color: #616161;
+}
+
+.detalle-item .value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212121;
+}
+
+.detalle-item-content .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
   border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.badge-confirmado {
-  background-color: #e8f5e8;
-  color: #2e7d32;
-}
-
-.badge-pendiente {
-  background-color: #fff3e0;
-  color: #f57c00;
-}
-
-.badge-cancelado {
-  background-color: #ffebee;
-  color: #c62828;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1.5px solid;
+  text-transform: none;
+  line-height: 1;
 }
 
 /* Viaje Info */
@@ -513,8 +530,6 @@
   cursor: not-allowed;
 }
 
-
-
 /* Reembolsado Notice */
 .reembolsado-notice {
   display: flex;
@@ -532,8 +547,6 @@
   color: #2e7d32;
   font-size: 18px;
 }
-
-
 
 /* Responsive */
 @media (max-width: 600px) {
@@ -574,7 +587,7 @@
     padding: 16px;
   }
   
-  .economia-datos {
+ .economia-datos {
     grid-template-columns: 1fr;
     gap: 8px;
   }
@@ -627,4 +640,10 @@
   .action-btn {
     width: 100%;
   }
+}
+
+/* Actions */
+.dialog-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
 }

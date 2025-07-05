@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Configuracion } from '../models/configuracion';
 import { environment } from '../../environments/environment';
+import { ApiResponse } from '../models/api';
 
 interface Paged<T> { content: T[]; page: { totalElements: number; [key: string]: any }; }
 
@@ -32,5 +33,10 @@ export class ConfiguracionDelSistemaService {
 
     delete(id: number): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    }
+
+    findByNombre(nombre: string): Observable<Configuracion> {
+        return this.http.get<ApiResponse<Configuracion>>(`${this.baseUrl}/nombre/${nombre}`)
+            .pipe(map(response => response.data));
     }
 }

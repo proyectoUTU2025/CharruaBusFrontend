@@ -5,6 +5,7 @@ import { firstValueFrom, map, Observable } from 'rxjs';
 import {
   AltaViajeDto, ViajeDisponibleDto, FiltroBusquedaViajeDto, CompraViajeDto,
   DetalleViajeDto,
+  ViajeExpresoRequest,
 } from '../models/viajes';
 import { Page } from '../models';
 
@@ -65,6 +66,7 @@ export class ViajeService {
     return this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
       .pipe(map(resp => resp));
   }
+
   getAllViajes(page = 0, size = 5): Promise<Page<CompraViajeDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -76,14 +78,19 @@ export class ViajeService {
     );
   }
 
-  altaViaje(dto: AltaViajeDto): Promise<void> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}`, dto))
-      .then(() => { })
-      .catch(err => {
-        const message = err?.error?.message || 'Error desconocido al registrar el viaje';
-        throw message;
-      });
+  // altaViaje(dto: AltaViajeDto): Promise<void> {
+  //   return firstValueFrom(this.http.post(`${this.baseUrl}`, dto))
+  //     .then(() => { })
+  //     .catch(err => {
+  //       const message = err?.error?.message || 'Error desconocido al registrar el viaje';
+  //       throw message;
+  //     });
+  // }
+
+  altaViaje(dto: AltaViajeDto): Observable<any> {
+    return this.http.post(this.baseUrl, dto);
   }
+
   reasignar(viajeId: number, body: { nuevoOmnibusId: number, confirm: boolean }): Promise<void> {
     return firstValueFrom(this.http.post<void>(`${this.baseUrl}/${viajeId}/reasignar`, body));
   }

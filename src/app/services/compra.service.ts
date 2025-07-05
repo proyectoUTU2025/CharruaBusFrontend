@@ -35,11 +35,13 @@ export class CompraService {
   }
 
 
-  cancelarCompra(sessionId: string): Observable<void> {
-    return this.http.post<void>(
-      `${this.base}/cancelar`,
-      { sessionId } as CancelarCompraRequestDto
-    );
+  cancelarCompra(sessionId: string): Observable<CompraResponseDto> {
+    return this.http
+      .post<{ data: CompraResponseDto }>(
+        `${this.base}/cancelar`,
+        { sessionId } as CancelarCompraRequestDto
+      )
+      .pipe(map(r => r.data));
   }
 
   getHistorialCliente(

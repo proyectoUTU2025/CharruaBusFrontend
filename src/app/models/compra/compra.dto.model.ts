@@ -58,6 +58,8 @@ export interface DetalleCompraDto {
   cantidadPasajes: number;
   estado: string;
   pasajes: PasajeDto[];
+  clienteNombre?: string;
+  vendedorNombre?: string;
 }
 
 export interface FiltroBusquedaCompraDto {

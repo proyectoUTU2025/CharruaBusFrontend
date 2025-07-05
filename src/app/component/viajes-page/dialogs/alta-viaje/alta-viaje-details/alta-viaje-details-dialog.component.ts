@@ -25,6 +25,7 @@ import { LocalidadDto } from '../../../../../models/localidades/localidades-dto.
 import { FiltroDisponibilidadOmnibusDto, OmnibusDisponibleDto } from '../../../../../models/buses';
 import { WarningDialogComponent } from '../../warning-dialog/warning-dialog/warning-dialog.component';
 import { LocalidadNombreDepartamentoDto } from '../../../../../models/localidades/localidad-nombre-departamento-dto.model';
+import { MaterialUtilsService } from '../../../../../shared/material-utils.service';
 
 @Component({
   standalone: true,
@@ -80,7 +81,8 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     private localidadesService: LocalidadService,
     private viajeService: ViajeService,
     private dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private materialUtilsService: MaterialUtilsService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -269,7 +271,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   cancelar(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(false);
   }
 
   agregarParadaIntermedia(): void {
@@ -289,7 +291,10 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   confirmar(): void {
-    if (!this.busSeleccionado || !this.fechaSalida || !this.fechaLlegada) return;
+    if (this.deberiaDeshabilitarSiguiente()) {
+      this.errorMensaje = 'Por favor, complete todos los campos requeridos y corrija los errores.';
+      return;
+    }
 
     const total = 2 + this.paradasIntermedias.length;
     const salida = new Date(this.formatFecha(this.fechaSalida, this.horaSalida));
@@ -303,55 +308,53 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       fechaHoraLlegada: new Date(salida.getTime() + idx * intervalo).toISOString()
     }));
 
-    const alta = {
+    const altaDto = {
+      omnibusId: this.busSeleccionado!.id,
       origenId: this.origenId,
       destinoId: this.destinoId,
       fechaHoraSalida: this.formatFecha(this.fechaSalida, this.horaSalida),
       fechaHoraLlegada: this.formatFecha(this.fechaLlegada, this.horaLlegada),
       precio: this.precio,
-      omnibusId: this.busSeleccionado.id,
-      paradas,
+      paradas: paradas,
       confirm: false
     };
 
-    this.isLoadingConfirm = true;
-    this.viajeService.altaViaje(alta)
-      .then(() => {
-        this.isLoadingConfirm = false;
-        this.dialogRef.close(true);
-      })
-      .catch(err => {
-        this.isLoadingConfirm = false;
+    this.enviarAltaViaje(altaDto);
+  }
 
-        // Error de conflicto (409) -> mostrar diálogo de advertencia
-        if (err?.status === 409) {
-          const mensaje409 = err?.error?.message || 'Conflicto detectado. ¿Desea continuar?';
+  private enviarAltaViaje(dto: any): void {
+    this.isLoadingConfirm = true;
+    this.errorMensaje = '';
+
+    this.viajeService.altaViaje(dto).subscribe({
+      next: () => {
+        this.isLoadingConfirm = false;
+        this.materialUtilsService.showSuccess('Viaje creado correctamente.');
+        this.dialogRef.close(true);
+      },
+      error: (err) => {
+        this.isLoadingConfirm = false;
+        if (err.status === 409 && err.error?.message) {
           const dialogRef = this.dialog.open(WarningDialogComponent, {
-            data: { message: mensaje409 },
+            data: { 
+              message: err.error.message,
+              confirmButtonText: 'Confirmar de todos modos'
+            },
             disableClose: true,
           });
 
           dialogRef.afterClosed().subscribe(confirmado => {
             if (confirmado) {
-              this.isLoadingConfirm = true;
-              this.viajeService.altaViaje({ ...alta, confirm: true })
-                .then(() => {
-                  this.isLoadingConfirm = false;
-                  this.dialogRef.close(true);
-                })
-                .catch(finalErr => {
-                  this.isLoadingConfirm = false;
-                  const fallback = typeof finalErr === 'string' ? finalErr : (finalErr?.message || 'Error al confirmar el viaje');
-                  this.errorMensaje = fallback;
-                });
+              this.enviarAltaViaje({ ...dto, confirm: true });
             }
           });
         } else {
-          // Otros errores -> mostrar banner rojo
-          const mensaje = typeof err === 'string' ? err : (err?.message || 'Error inesperado al crear el viaje.');
-          this.errorMensaje = mensaje;
+          this.errorMensaje = typeof err.error?.message === 'string' 
+            ? err.error.message 
+            : 'Error inesperado al crear el viaje.';
         }
-      });
+      }
+    });
   }
 
   cargarBuses(): void {

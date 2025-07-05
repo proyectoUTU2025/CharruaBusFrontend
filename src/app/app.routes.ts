@@ -66,9 +66,8 @@ export const routes: Routes = [
       
       // Rutas compartidas VENDEDOR y CLIENTE
       { path: 'comprar', component: CompraPageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
-      { path: 'compras/exito', component: StripeRedirectComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
-      { path: 'compras/cancelada', component: StripeRedirectComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
-      { path: 'compras/:id', component: CompraDetallePageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
+      { path: 'comprar/redirect/:estado', component: StripeRedirectComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
+      { path: 'compra/:id', component: CompraDetallePageComponent, canActivate: [RoleGuard], data: { roles: ['VENDEDOR', 'CLIENTE'] } },
 
 
       // Rutas específicas para CLIENTE

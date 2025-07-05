@@ -1,69 +1,76 @@
-<div class="seats-legend">
-  <div class="legend-item">
-    <div class="seat-icon-legend disponible">
-      <mat-icon>event_seat</mat-icon>
+<div class="seats-container">
+  <!-- Leyenda -->
+  <div class="seats-legend">
+    <div class="legend-item">
+      <div class="seat-icon-legend disponible"><mat-icon>event_seat</mat-icon></div>
+      <span>Disponible</span>
     </div>
-    <span>Disponible</span>
-  </div>
-  <div class="legend-item">
-    <div class="seat-icon-legend seleccionado">
-      <mat-icon>event_seat</mat-icon>
+    <div class="legend-item">
+      <div class="seat-icon-legend reservado"><mat-icon>event_seat</mat-icon></div>
+      <span>Seleccionado</span>
     </div>
-    <span>Seleccionado</span>
-  </div>
-  <div class="legend-item">
-    <div class="seat-icon-legend ocupado">
-      <mat-icon>event_seat</mat-icon>
+    <div class="legend-item">
+      <div class="seat-icon-legend confirmado"><mat-icon>event_seat</mat-icon></div>
+      <span>Ocupado</span>
     </div>
-    <span>Ocupado</span>
   </div>
-</div>
 
-<mat-card class="bus-diagram-card">
-  <div class="bus-container">
-    <div class="bus-header">
-      <div class="driver-section">
-        <mat-icon class="steering-wheel-icon">settings</mat-icon>
-        <span>CONDUCTOR</span>
+  <!-- Diagrama del bus -->
+  <mat-card class="bus-diagram-card">
+    <div class="bus-container">
+      <!-- Frente -->
+      <div class="bus-front">
+        <div class="driver-section">
+          <mat-icon class="steering-wheel">radio_button_unchecked</mat-icon>
+          <span class="driver-label">Conductor</span>
+        </div>
+        <div class="entrance-door">
+          <mat-icon>sensor_door</mat-icon>
+          <span class="door-label">Puerta</span>
+        </div>
       </div>
-      <div class="door-section">
-        <span>Puerta</span>
-        <mat-icon class="door-icon">sensor_door</mat-icon>
-      </div>
-    </div>
 
-    <div class="bus-body">
-      <div class="bus-aisle"></div>
-      <div class="seat-grid">
-        <div *ngFor="let fila of filas" class="seat-row">
-          <div class="row-number">{{ fila.numero }}</div>
-          <div class="seats-in-row">
-            <div *ngFor="let asiento of fila.asientos" 
-                 class="seat"
-                 [ngClass]="{
-                   'disponible': esDisponible(asiento),
-                   'ocupado': esOcupado(asiento),
-                   'seleccionado': esSeleccionado(asiento),
-                   'empty': !asiento
-                 }"
-                 (click)="toggleSeat(asiento)">
-              <mat-icon *ngIf="asiento">{{ getSeatIcon(asiento) }}</mat-icon>
-              <span *ngIf="asiento" class="seat-number">{{ asiento.numero }}</span>
+      <!-- Área de asientos -->
+      <div class="seats-area">
+        <div class="seats-rows">
+          <div *ngFor="let fila of seatRows; let i = index" class="seat-row">
+            <div class="row-number">{{ i + 1 }}</div>
+            <!-- Lado izquierdo -->
+            <div class="seats-left">
+              <div *ngFor="let asiento of fila.izquierda" class="bus-seat" [ngClass]="getSeatClass(asiento)" (click)="onSeatClick(asiento)">
+                <mat-icon class="seat-icon">event_seat</mat-icon>
+                <span class="seat-number">{{ asiento.numero }}</span>
+              </div>
+            </div>
+            <!-- Pasillo -->
+            <div class="aisle"></div>
+            <!-- Lado derecho -->
+            <div class="seats-right">
+              <div *ngFor="let asiento of fila.derecha" class="bus-seat" [ngClass]="getSeatClass(asiento)" (click)="onSeatClick(asiento)">
+                <mat-icon class="seat-icon">event_seat</mat-icon>
+                <span class="seat-number">{{ asiento.numero }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="bus-footer">
-      <mat-icon class="emergency-exit-icon">crisis_alert</mat-icon>
-      <span>SALIDA DE EMERGENCIA</span>
+      <!-- Trasera -->
+      <div class="bus-back">
+        <div class="emergency-exit">
+          <mat-icon>exit_to_app</mat-icon>
+          <span class="exit-label">Salida de emergencia</span>
+        </div>
+      </div>
     </div>
-  </div>
-</mat-card>
+  </mat-card>
+</div>
 
-<div class="actions">
-  <button mat-flat-button color="primary" (click)="confirmSelection()" [disabled]="asientosSeleccionados.length === 0">
+<div class="actions-footer" *ngIf="showConfirmButton">
+  <button mat-raised-button 
+          class="confirm-btn"
+          (click)="confirmSelection()" 
+          [disabled]="selectedSeats.length !== maxSeleccion">
     Confirmar Asientos
   </button>
 </div>

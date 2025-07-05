@@ -192,24 +192,24 @@ export class DetallePasajeCompletoDialogComponent {
            !this.isReembolsando;
   }
 
-  getEstadoText(estado: TipoEstadoPasaje): string {
-    const estados = {
-      [TipoEstadoPasaje.CONFIRMADO]: 'Confirmado',
-      [TipoEstadoPasaje.PENDIENTE]: 'Pendiente',
-      [TipoEstadoPasaje.CANCELADO]: 'Cancelado',
-      [TipoEstadoPasaje.DEVUELTO]: 'Devuelto'
-    };
-    return estados[estado] || estado;
+  private formatToTitleCase(str: string): string {
+    if (!str) return '';
+    return str.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, s => s.toUpperCase());
   }
 
-  getEstadoBadgeClass(estado: TipoEstadoPasaje): string {
-    const clases = {
-      [TipoEstadoPasaje.CONFIRMADO]: 'badge-confirmado',
-      [TipoEstadoPasaje.PENDIENTE]: 'badge-pendiente',
-      [TipoEstadoPasaje.CANCELADO]: 'badge-cancelado',
-      [TipoEstadoPasaje.DEVUELTO]: 'badge-cancelado'
+  getEstadoText(estado: TipoEstadoPasaje): string {
+    const estadoStr = estado.toString();
+    return this.formatToTitleCase(estadoStr);
+  }
+
+  getEstadoColors(estado: TipoEstadoPasaje): { [key: string]: string } {
+    const styles = {
+      [TipoEstadoPasaje.CONFIRMADO]: { 'background-color': '#e6f4ea', color: '#2e7d32', 'border-color': '#2e7d32' },
+      [TipoEstadoPasaje.PENDIENTE]: { 'background-color': '#fff3e0', color: '#ef6c00', 'border-color': '#ef6c00' },
+      [TipoEstadoPasaje.CANCELADO]: { 'background-color': '#fdecea', color: '#c62828', 'border-color': '#c62828' },
+      [TipoEstadoPasaje.DEVUELTO]: { 'background-color': '#e3f2fd', color: '#1976d2', 'border-color': '#1976d2' }
     };
-    return clases[estado] || 'badge-pendiente';
+    return styles[estado] || { 'background-color': '#fff3e0', color: '#ef6c00', 'border-color': '#ef6c00' };
   }
 
   cerrar(): void {

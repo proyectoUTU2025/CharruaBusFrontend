@@ -394,7 +394,7 @@ export class BusesPageComponent implements OnInit {
       maxWidth: '1200px',
       maxHeight: '90vh',
       data: { busId: bus.id },
-      disableClose: false
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(() => {

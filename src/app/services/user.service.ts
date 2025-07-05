@@ -88,6 +88,7 @@ export class UserService {
     return firstValueFrom(this.http.patch<ApiResponse<UsuarioDto>>(`${this.base}/${id}`, dto))
       .then(resp => resp.data);
   }
+
   buscarClientes(query: string, page = 0, size = 5): Observable<UsuarioDto[]> {
     const params = new HttpParams()
       .set('query', query)

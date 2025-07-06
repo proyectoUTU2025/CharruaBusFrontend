@@ -78,4 +78,10 @@ export class CompraService {
       { responseType: 'blob' }
     );
   }
+
+  reembolsarCompra(compraId: number): Observable<string> {
+    return this.http
+      .post<{ message: string }>(`${this.base}/${compraId}/reembolsar`, {})
+      .pipe(map(resp => resp.message));
+  }
 }

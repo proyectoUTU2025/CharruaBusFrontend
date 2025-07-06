@@ -358,179 +358,191 @@
 
       <!-- Paso 4: Resumen (si es solo ida) -->
       <div *ngIf="step === 4 && !esIdaYVuelta() && !estadoCompra" class="viajes-card confirmation-container">
-        <!-- Resumen para viaje de IDA -->
-        <div class="confirmation-section">
-          <h3>Confirme los detalles del viaje de IDA</h3>
-          <div class="details-grid">
-            <div>
-              <span class="label">Fecha de salida</span>
-              <span class="value">{{ formatearFechaSalida() }}</span>
-            </div>
-            <div>
-              <span class="label">Fecha de llegada</span>
-              <span class="value">{{ formatearFechaLlegada() }}</span>
-            </div>
-            <div>
-              <span class="label">Hora de salida</span>
-              <span class="value">{{ formatearHoraSalida() }}</span>
-            </div>
-            <div>
-              <span class="label">Hora de llegada</span>
-              <span class="value">{{ formatearHoraLlegada() }}</span>
-            </div>
-            <div>
-              <span class="label">Origen</span>
-              <span class="value">{{ formatearOrigen() }}</span>
-            </div>
-            <div>
-              <span class="label">Destino</span>
-              <span class="value">{{ formatearDestino() }}</span>
-            </div>
-            <div>
-              <span class="label">N° de asientos seleccionados</span>
-              <span class="value">{{ formatearAsientosSeleccionados() }}</span>
-            </div>
-          </div>
+        <div *ngIf="isLoadingPrecios" class="loading-overlay">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Calculando precios...</p>
         </div>
-        
-        <div class="price-summary-container">
-          <div *ngIf="isLoadingPrecios" class="loading-overlay">
-            <mat-spinner diameter="40"></mat-spinner>
-            <span>Calculando precios...</span>
-          </div>
 
-          <div *ngIf="!isLoadingPrecios" class="price-breakdown">
-            <div class="price-row">
-              <span>Viaje Ida x {{ searchForm.value.pasajeros }}</span>
-              <span>{{ (viajeIdaSeleccionado!.precioEstimado * searchForm.value.pasajeros) | currency:'UYU':'$' }}</span>
-            </div>
-            <div class="price-row subtotal" *ngIf="montoDescuento > 0">
-              <strong>Subtotal</strong>
-              <strong>{{ subtotal | currency:'UYU':'$' }}</strong>
-            </div>
-            <div class="price-row discount" *ngIf="montoDescuento > 0">
-              <span>{{ nombreDescuento }}</span>
-              <span>- {{ montoDescuento | currency:'UYU':'$' }}</span>
-            </div>
-            <div class="price-row total">
-              <strong>Precio Total</strong>
-              <strong>{{ precioFinal | currency:'UYU':'$' }}</strong>
+        <ng-container *ngIf="!isLoadingPrecios">
+          <div *ngIf="errorMensaje" class="error-banner">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMensaje }}</span>
+          </div>
+          <!-- Resumen para viaje de IDA -->
+          <div class="confirmation-section">
+            <h3>Confirme los detalles del viaje de IDA</h3>
+            <div class="details-grid">
+              <div>
+                <span class="label">Fecha de salida</span>
+                <span class="value">{{ formatearFechaSalida() }}</span>
+              </div>
+              <div>
+                <span class="label">Fecha de llegada</span>
+                <span class="value">{{ formatearFechaLlegada() }}</span>
+              </div>
+              <div>
+                <span class="label">Hora de salida</span>
+                <span class="value">{{ formatearHoraSalida() }}</span>
+              </div>
+              <div>
+                <span class="label">Hora de llegada</span>
+                <span class="value">{{ formatearHoraLlegada() }}</span>
+              </div>
+              <div>
+                <span class="label">Origen</span>
+                <span class="value">{{ formatearOrigen() }}</span>
+              </div>
+              <div>
+                <span class="label">Destino</span>
+                <span class="value">{{ formatearDestino() }}</span>
+              </div>
+              <div>
+                <span class="label">N° de asientos seleccionados</span>
+                <span class="value">{{ formatearAsientosSeleccionados() }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="confirmation-notice">
-          <mat-icon class="check-icon">check_circle</mat-icon>
-          <span>Al confirmar, será dirigido a la plataforma de pago para finalizar su compra.</span>
-        </div>
+          
+          <div class="price-summary-container">
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Viaje Ida x {{ searchForm.value.pasajeros }}</span>
+                <span>{{ (viajeIdaSeleccionado!.precioEstimado * searchForm.value.pasajeros) | currency:'UYU':'$' }}</span>
+              </div>
+              <div class="price-row subtotal" *ngIf="montoDescuento > 0">
+                <strong>Subtotal</strong>
+                <strong>{{ subtotal | currency:'UYU':'$' }}</strong>
+              </div>
+              <div class="price-row discount" *ngIf="montoDescuento > 0">
+                <span>{{ nombreDescuento }}</span>
+                <span>- {{ montoDescuento | currency:'UYU':'$' }}</span>
+              </div>
+              <div class="price-row total">
+                <strong>Precio Total</strong>
+                <strong>{{ precioFinal | currency:'UYU':'$' }}</strong>
+              </div>
+            </div>
+          </div>
+          
+          <div class="confirmation-notice">
+            <mat-icon class="check-icon">check_circle</mat-icon>
+            <span>Al confirmar, será dirigido a la plataforma de pago para finalizar su compra.</span>
+          </div>
+        </ng-container>
       </div>
 
       <!-- Paso 6: Resumen (si es ida y vuelta) -->
       <div *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 6" class="viajes-card confirmation-container">
-        <!-- Resumen para viaje de IDA -->
-        <div class="confirmation-section">
-          <h3>Confirme los detalles del viaje de IDA</h3>
-          <div class="details-grid">
-            <div>
-              <span class="label">Fecha de salida</span>
-              <span class="value">{{ formatearFechaSalida() }}</span>
-            </div>
-            <div>
-              <span class="label">Fecha de llegada</span>
-              <span class="value">{{ formatearFechaLlegada() }}</span>
-            </div>
-            <div>
-              <span class="label">Hora de salida</span>
-              <span class="value">{{ formatearHoraSalida() }}</span>
-            </div>
-            <div>
-              <span class="label">Hora de llegada</span>
-              <span class="value">{{ formatearHoraLlegada() }}</span>
-            </div>
-            <div>
-              <span class="label">Origen</span>
-              <span class="value">{{ formatearOrigen() }}</span>
-            </div>
-            <div>
-              <span class="label">Destino</span>
-              <span class="value">{{ formatearDestino() }}</span>
-            </div>
-            <div>
-              <span class="label">N° de asientos seleccionados</span>
-              <span class="value">{{ formatearAsientosSeleccionados() }}</span>
-            </div>
-          </div>
+        <div *ngIf="isLoadingPrecios" class="loading-overlay">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Calculando precios...</p>
         </div>
 
-        <!-- Resumen para viaje de VUELTA -->
-        <div *ngIf="viajeVueltaSeleccionado" class="confirmation-section">
-          <h3>Confirme los detalles del viaje de VUELTA</h3>
-          <div class="details-grid">
-            <div>
-              <span class="label">Fecha de salida</span>
-              <span class="value">{{ formatearFechaSalida(true) }}</span>
-            </div>
-            <div>
-              <span class="label">Fecha de llegada</span>
-              <span class="value">{{ formatearFechaLlegada(true) }}</span>
-            </div>
-            <div>
-              <span class="label">Hora de salida</span>
-              <span class="value">{{ formatearHoraSalida(true) }}</span>
-            </div>
-            <div>
-              <span class="label">Hora de llegada</span>
-              <span class="value">{{ formatearHoraLlegada(true) }}</span>
-            </div>
-            <div>
-              <span class="label">Origen</span>
-              <span class="value">{{ formatearOrigen(true) }}</span>
-            </div>
-            <div>
-              <span class="label">Destino</span>
-              <span class="value">{{ formatearDestino(true) }}</span>
-            </div>
-            <div>
-              <span class="label">N° de asientos seleccionados</span>
-              <span class="value">{{ formatearAsientosSeleccionados(true) }}</span>
+        <ng-container *ngIf="!isLoadingPrecios">
+          <div *ngIf="errorMensaje" class="error-banner">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMensaje }}</span>
+          </div>
+          <!-- Resumen para viaje de IDA -->
+          <div class="confirmation-section">
+            <h3>Confirme los detalles del viaje de IDA</h3>
+            <div class="details-grid">
+              <div>
+                <span class="label">Fecha de salida</span>
+                <span class="value">{{ formatearFechaSalida() }}</span>
+              </div>
+              <div>
+                <span class="label">Fecha de llegada</span>
+                <span class="value">{{ formatearFechaLlegada() }}</span>
+              </div>
+              <div>
+                <span class="label">Hora de salida</span>
+                <span class="value">{{ formatearHoraSalida() }}</span>
+              </div>
+              <div>
+                <span class="label">Hora de llegada</span>
+                <span class="value">{{ formatearHoraLlegada() }}</span>
+              </div>
+              <div>
+                <span class="label">Origen</span>
+                <span class="value">{{ formatearOrigen() }}</span>
+              </div>
+              <div>
+                <span class="label">Destino</span>
+                <span class="value">{{ formatearDestino() }}</span>
+              </div>
+              <div>
+                <span class="label">N° de asientos seleccionados</span>
+                <span class="value">{{ formatearAsientosSeleccionados() }}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="price-summary-container">
-          <div *ngIf="isLoadingPrecios" class="loading-overlay">
-            <mat-spinner diameter="40"></mat-spinner>
-            <span>Calculando precios...</span>
+          <!-- Resumen para viaje de VUELTA -->
+          <div *ngIf="viajeVueltaSeleccionado" class="confirmation-section">
+            <h3>Confirme los detalles del viaje de VUELTA</h3>
+            <div class="details-grid">
+              <div>
+                <span class="label">Fecha de salida</span>
+                <span class="value">{{ formatearFechaSalida(true) }}</span>
+              </div>
+              <div>
+                <span class="label">Fecha de llegada</span>
+                <span class="value">{{ formatearFechaLlegada(true) }}</span>
+              </div>
+              <div>
+                <span class="label">Hora de salida</span>
+                <span class="value">{{ formatearHoraSalida(true) }}</span>
+              </div>
+              <div>
+                <span class="label">Hora de llegada</span>
+                <span class="value">{{ formatearHoraLlegada(true) }}</span>
+              </div>
+              <div>
+                <span class="label">Origen</span>
+                <span class="value">{{ formatearOrigen(true) }}</span>
+              </div>
+              <div>
+                <span class="label">Destino</span>
+                <span class="value">{{ formatearDestino(true) }}</span>
+              </div>
+              <div>
+                <span class="label">N° de asientos seleccionados</span>
+                <span class="value">{{ formatearAsientosSeleccionados(true) }}</span>
+              </div>
+            </div>
           </div>
 
-          <div *ngIf="!isLoadingPrecios" class="price-breakdown">
-            <div class="price-row">
-              <span>Viaje Ida x {{ searchForm.value.pasajeros }}</span>
-              <span>{{ (viajeIdaSeleccionado!.precioEstimado * searchForm.value.pasajeros) | currency:'UYU':'$' }}</span>
-            </div>
-            <div class="price-row" *ngIf="viajeVueltaSeleccionado">
-              <span>Viaje Vuelta x {{ searchForm.value.pasajeros }}</span>
-              <span>{{ (viajeVueltaSeleccionado.precioEstimado * searchForm.value.pasajeros) | currency:'UYU':'$' }}</span>
-            </div>
-            <div class="price-row subtotal" *ngIf="montoDescuento > 0 || esIdaYVuelta()">
-              <strong>Subtotal</strong>
-              <strong>{{ subtotal | currency:'UYU':'$' }}</strong>
-            </div>
-            <div class="price-row discount" *ngIf="montoDescuento > 0">
-              <span>{{ nombreDescuento }}</span>
-              <span>- {{ montoDescuento | currency:'UYU':'$' }}</span>
-            </div>
-            <div class="price-row total">
-              <strong>Precio Total</strong>
-              <strong>{{ precioFinal | currency:'UYU':'$' }}</strong>
+          <div class="price-summary-container">
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Viaje Ida x {{ searchForm.value.pasajeros }}</span>
+                <span>{{ (viajeIdaSeleccionado!.precioEstimado * searchForm.value.pasajeros) | currency:'UYU':'$' }}</span>
+              </div>
+              <div class="price-row" *ngIf="viajeVueltaSeleccionado">
+                <span>Viaje Vuelta x {{ searchForm.value.pasajeros }}</span>
+                <span>{{ (viajeVueltaSeleccionado.precioEstimado * searchForm.value.pasajeros) | currency:'UYU':'$' }}</span>
+              </div>
+              <div class="price-row subtotal" *ngIf="montoDescuento > 0 || esIdaYVuelta()">
+                <strong>Subtotal</strong>
+                <strong>{{ subtotal | currency:'UYU':'$' }}</strong>
+              </div>
+              <div class="price-row discount" *ngIf="montoDescuento > 0">
+                <span>{{ nombreDescuento }}</span>
+                <span>- {{ montoDescuento | currency:'UYU':'$' }}</span>
+              </div>
+              <div class="price-row total">
+                <strong>Precio Total</strong>
+                <strong>{{ precioFinal | currency:'UYU':'$' }}</strong>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="confirmation-notice">
-          <mat-icon class="check-icon">check_circle</mat-icon>
-          <span>Al confirmar, será dirigido a la plataforma de pago para finalizar su compra.</span>
-        </div>
+          <div class="confirmation-notice">
+            <mat-icon class="check-icon">check_circle</mat-icon>
+            <span>Al confirmar, será dirigido a la plataforma de pago para finalizar su compra.</span>
+          </div>
+        </ng-container>
       </div>
 
       <!-- Paso final: Estado de la compra -->
@@ -577,7 +589,7 @@
         <ng-container *ngIf="(step === 4 && !esIdaYVuelta()) || (step === 6 && esIdaYVuelta())">
           <button mat-raised-button class="primary-btn" (click)="confirmarCompra()" [disabled]="!puedeConfirmar() || isProcessingPayment" [class.processing]="isProcessingPayment">
             <mat-spinner *ngIf="isProcessingPayment" diameter="20"></mat-spinner>
-            <span>{{ isProcessingPayment ? 'Procesando...' : 'Confirmar y Pagar' }}</span>
+            <span *ngIf="!isProcessingPayment">Confirmar y Pagar</span>
           </button>
         </ng-container>
       </ng-container>

@@ -113,6 +113,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   opcionesPasajeros: number[] = [];
   isLoadingAsientos = false;
   isProcessingPayment = false;
+  errorMensaje = '';
 
   // Nuevas propiedades para el viaje de vuelta
   isSearchingVuelta = false;
@@ -319,7 +320,8 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       idLocalidadOrigen: f.localidadDestinoId,
       idLocalidadDestino: f.localidadOrigenId,
       fechaViaje: this.formatFecha(f.fechaVuelta),
-      cantidadPasajes: f.pasajeros
+      cantidadPasajes: f.pasajeros,
+      fechaHoraDesde: this.viajeIdaSeleccionado?.fechaHoraLlegada || null
     };
     const fechaLlegadaIda = new Date(this.viajeIdaSeleccionado?.fechaHoraLlegada || '');
     this.viajeService.buscarDisponibles(filtro, this.pageIndexVuelta, this.pageSizeVuelta)
@@ -328,7 +330,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       )
       .subscribe(page => {
         const viajesFiltrados = page.content
-          .filter(v => new Date(v.fechaHoraSalida) > fechaLlegadaIda)
           .map(v => ({
             ...v,
             seleccionado: this.viajeVueltaSeleccionado?.idViaje === v.idViaje
@@ -431,6 +432,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     if (!this.puedeConfirmar()) return;
 
     this.isProcessingPayment = true;
+    this.errorMensaje = '';
 
     const request: CompraRequestDto = {
       viajeIdaId: this.viajeIdaSeleccionado!.idViaje,
@@ -455,6 +457,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       },
       error: err => {
         this.isProcessingPayment = false;
+        this.errorMensaje = err.error?.message || 'Ocurrió un error al intentar procesar la compra. Por favor, intente de nuevo.';
         console.error('Error al iniciar la compra:', err);
       }
     });
@@ -507,6 +510,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   }
 
   anteriorPaso(): void {
+    this.errorMensaje = '';
     if (this.step > 0) {
       this.step--;
 

@@ -83,6 +83,7 @@ $shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .page-container {
+  position: relative;
   padding: 2rem;
   max-width: 900px;
   margin: auto;
@@ -130,32 +131,78 @@ $shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .download-button {
-      background-color: #1976d2;
-      color: white;
+      background-color: #1da1f2;
+      color: #fff;
       text-transform: none;
-      height: 40px;
-      border-radius: 8px;
-      font-weight: 500;
-      padding: 0 1.25rem;
+      height: 32px;
+      border-radius: 6px;
+      font-weight: bold;
+      padding: 0 0.6rem;
       border: none;
-      transition: all 0.2s ease-in-out;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
+      box-shadow: none;
+      margin-right: 12px;
 
       mat-icon {
         margin-right: 8px;
+        color: #fff;
+        font-size: 0.95em;
+        vertical-align: middle;
       }
 
       &:hover {
-        background: #1565c0;
-        transform: translateY(-1px);
+        background: #1a8cd8;
+        transform: none;
       }
 
-      // Opacidad cuando el botón está deshabilitado
       &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background: #1976d2; // mantiene color para consistencia
+        background: #1da1f2;
+      }
+    }
+
+    .refund-button {
+      background-color: #f5faff;
+      color: #1da1f2;
+      text-transform: none;
+      height: 32px;
+      border-radius: 6px;
+      font-weight: bold;
+      padding: 0 0.6rem;
+      border: 2px solid #1da1f2;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      box-shadow: none;
+      margin-left: 0;
+
+      mat-icon {
+        margin-right: 8px;
+        color: #1da1f2;
+        font-size: 0.95em;
+        vertical-align: middle;
+      }
+
+      &:hover {
+        background: #e3f2fd;
+        color: #1565c0;
+        border-color: #1565c0;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f5faff;
+        color: #1da1f2;
+        border-color: #1da1f2;
+      }
+
+      &.loading {
+        background: #f5faff;
+        cursor: not-allowed;
       }
     }
 
@@ -364,4 +411,69 @@ $shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
       }
     }
   }
+}
+
+.error-container-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  text-align: center;
+  margin-top: 40px;
+
+  .error-icon {
+    font-size: 64px;
+    color: #bdbdbd;
+    margin-bottom: 16px;
+  }
+  .error-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  .error-subtitle {
+    font-size: 1.05rem;
+    color: #757575;
+    margin-bottom: 24px;
+  }
+  button {
+    margin-top: 8px;
+    font-weight: 600;
+  }
+}
+
+.reload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.price-row.reembolsado .refund-amount {
+  color: #e53935;
+  font-weight: 600;
+}
+.price-row.penalizacion .penalizacion-amount {
+  color: #ff9800;
+  font-weight: 600;
+}
+.price-row.total strong {
+  font-size: 1.1rem;
+}
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.price-row.subtotal strong {
+  font-size: 1rem;
 }

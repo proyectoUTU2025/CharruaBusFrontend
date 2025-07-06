@@ -14,6 +14,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-viajes-por-omnibus',
@@ -35,6 +36,7 @@ import { MatIconModule } from '@angular/material/icon';
     styleUrls: ['./viajes-por-omnibus.component.scss']
     })
     export class ViajesPorOmnibusComponent implements OnInit {
+    private readonly BASE = `${environment.apiBaseUrl}`;
     fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
     fechaFin = new FormControl<Date | null>(new Date());
     displayedColumns = ['matricula', 'cantidad'];
@@ -163,7 +165,7 @@ import { MatIconModule } from '@angular/material/icon';
             ascendente: 'true',
             token: token
         });
-        const url = `http://localhost:8080/omnibus/viajes/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/omnibus/viajes/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 

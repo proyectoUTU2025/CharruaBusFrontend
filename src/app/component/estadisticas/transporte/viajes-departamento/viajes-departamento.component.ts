@@ -16,6 +16,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-viajes-departamento',
@@ -38,6 +39,8 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./viajes-departamento.component.scss']
 })
 export class ViajesDepartamentoComponent implements OnInit {
+  private readonly BASE = `${environment.apiBaseUrl}`;
+
   fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
   fechaFin = new FormControl<Date | null>(new Date());
   origen = new FormControl<TipoDepartamento | null>(TipoDepartamento.ARTIGAS);
@@ -203,7 +206,7 @@ export class ViajesDepartamentoComponent implements OnInit {
       token
     });
 
-    const url = `http://localhost:8080/viajes/departamento/export/pdf?${params.toString()}`;
+    const url = `${this.BASE}/viajes/departamento/export/pdf?${params.toString()}`;
     window.open(url, '_blank');
   }
 

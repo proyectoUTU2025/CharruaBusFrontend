@@ -17,6 +17,7 @@ import { Page } from '../../../../models';
 import { TipoDepartamento } from '../../../../models/estadisticas/transporte/tipo-departamento';
 import { EstadisticaTransporteService } from '../../../../services/estadistica-transporte.service';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-estadisticas-pasajes',
@@ -41,6 +42,8 @@ import { CommonModule } from '@angular/common';
 })
 export class EstadisticasPasajesComponent implements OnInit {
 
+    private readonly BASE = `${environment.apiBaseUrl}`;
+    
     // filtros
     fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
     fechaFin = new FormControl<Date | null>(new Date());
@@ -234,7 +237,7 @@ export class EstadisticasPasajesComponent implements OnInit {
             token
         });
 
-        const url = `http://localhost:8080/pasajes/estadisticas/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/pasajes/estadisticas/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 
@@ -251,7 +254,7 @@ export class EstadisticasPasajesComponent implements OnInit {
             token
         });
 
-        const url = `http://localhost:8080/pasajes/estadisticas/agrupado/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/pasajes/estadisticas/agrupado/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 

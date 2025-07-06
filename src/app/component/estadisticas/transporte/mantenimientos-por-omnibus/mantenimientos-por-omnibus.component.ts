@@ -14,6 +14,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-mantenimientos-por-omnibus',
@@ -35,6 +36,9 @@ import { MatIconModule } from '@angular/material/icon';
     styleUrls: ['./mantenimientos-por-omnibus.component.scss']
 })
 export class MantenimientosPorOmnibusComponent implements OnInit {
+
+    private readonly BASE = `${environment.apiBaseUrl}`;
+    
     fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
     fechaFin = new FormControl<Date | null>(new Date());
     displayedColumns = ['matricula', 'cantidad'];
@@ -173,7 +177,7 @@ export class MantenimientosPorOmnibusComponent implements OnInit {
             token: token
         });
     
-        const url = `http://localhost:8080/omnibus/mantenimientos/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/omnibus/mantenimientos/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 

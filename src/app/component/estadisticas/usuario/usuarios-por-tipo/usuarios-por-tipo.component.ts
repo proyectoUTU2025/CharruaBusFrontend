@@ -11,6 +11,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-usuarios-por-tipo',
@@ -29,6 +30,7 @@ import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
     styleUrls: ['./usuarios-por-tipo.component.scss']
 })
 export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
+    private readonly BASE = `${environment.apiBaseUrl}`;
     @ViewChild(MatSort) sort!: MatSort;
 
     data: EstadisticaUsuario[] = [];
@@ -114,7 +116,7 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
             ascendente: this.ascendente.toString(),
             token
         });
-        const url = `http://localhost:8080/usuarios/estadisticas/tipo/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/usuarios/estadisticas/tipo/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 

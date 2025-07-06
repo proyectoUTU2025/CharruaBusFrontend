@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-logueos-usuarios',
@@ -39,6 +40,7 @@ import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
     styleUrls: ['./logueos-usuarios.component.scss']
 })
 export class LogueosUsuariosComponent implements OnInit, AfterViewInit {
+    private readonly BASE = `${environment.apiBaseUrl}`;
     @ViewChild(MatSort) sort!: MatSort;
 
     data: EstadisticaLogueos[] = [];
@@ -149,7 +151,7 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit {
             ascendente: this.ascendente.toString(),
             token
         });
-        const url = `http://localhost:8080/usuarios/estadisticas/logueos/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/usuarios/estadisticas/logueos/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 

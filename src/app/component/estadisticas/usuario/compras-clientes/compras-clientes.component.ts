@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-compras-clientes',
@@ -40,6 +41,7 @@ import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 })
 
 export class ComprasClientesComponent implements OnInit, AfterViewInit {
+    private readonly BASE = `${environment.apiBaseUrl}`;
     @ViewChild(MatSort) sort!: MatSort;
 
     data: EstadisticaClienteCompras[] = [];
@@ -151,7 +153,7 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit {
             ascendente: this.ascendente.toString(),
             token
         });
-        const url = `http://localhost:8080/usuarios/estadisticas/compras-clientes/export/pdf?${params.toString()}`;
+        const url = `${this.BASE}/usuarios/estadisticas/compras-clientes/export/pdf?${params.toString()}`;
         window.open(url, '_blank');
     }
 

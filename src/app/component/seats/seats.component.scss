@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $font-family: 'Roboto', sans-serif;
 $color-available: #1976d2;
 $color-selected: #ffc107;
@@ -117,7 +119,7 @@ $shadow: 0 2px 8px rgba(0,0,0,0.1);
     min-width: 180px;
     
     &:disabled {
-      background-color: lighten($color-success, 25%);
+      background-color: color.adjust($color-success, $lightness: 25%);
     }
   }
 }

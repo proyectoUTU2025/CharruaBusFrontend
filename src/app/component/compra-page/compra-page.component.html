@@ -247,7 +247,7 @@
         </div>
         
         <app-seats 
-          [totalAsientos]="viajeIdaSeleccionado.asientosDisponibles + (asientosOcupadosIda?.length || 0)"
+          [totalAsientos]="viajeIdaSeleccionado.asientosDisponibles + (asientosOcupadosIda.length || 0)"
           [asientosOcupados]="asientosOcupadosIda"
           [asientosSeleccionados]="selectedSeats"
           [maxSeleccion]="searchForm.value.pasajeros"
@@ -337,7 +337,7 @@
         </div>
 
         <app-seats 
-          [totalAsientos]="viajeVueltaSeleccionado.asientosDisponibles + (asientosOcupadosVuelta?.length || 0)"
+          [totalAsientos]="viajeVueltaSeleccionado.asientosDisponibles + (asientosOcupadosVuelta.length || 0)"
           [asientosOcupados]="asientosOcupadosVuelta"
           [asientosSeleccionados]="selectedSeatsVuelta"
           [maxSeleccion]="searchForm.value.pasajeros"

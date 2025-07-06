@@ -1,3 +1,6 @@
+@use 'sass:color';
+
+// Variables locales
 $primary-color: #1976d2;
 $success-color: #4caf50;
 $danger-color: #f44336;
@@ -97,14 +100,14 @@ $shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
     font-weight: 500;
 
     &.success {
-      background-color: lighten($success-color, 35%);
-      color: darken($success-color, 15%);
-      border: 1px solid lighten($success-color, 20%);
+      background-color: color.adjust($success-color, $lightness: 35%);
+      color: color.adjust($success-color, $lightness: -15%);
+      border: 1px solid color.adjust($success-color, $lightness: 20%);
     }
     &.cancelled, &.failed {
-      background-color: lighten($danger-color, 30%);
-      color: darken($danger-color, 15%);
-      border: 1px solid lighten($danger-color, 20%);
+      background-color: color.adjust($danger-color, $lightness: 30%);
+      color: color.adjust($danger-color, $lightness: -15%);
+      border: 1px solid color.adjust($danger-color, $lightness: 20%);
     }
 
     mat-icon {

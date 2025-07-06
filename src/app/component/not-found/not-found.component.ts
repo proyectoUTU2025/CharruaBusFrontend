@@ -65,16 +65,13 @@ import { MaterialUtilsService } from '../../shared/material-utils.service';
     </div>
   `,
   styles: [`
-    $primary-color: #1976d2;
-    $background: #f5f7fa;
-
     :host {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: calc(100vh - 4rem);
       width: 100vw;
-      background: $background;
+      background: #f5f7fa;
       padding: 0;
       box-sizing: border-box;
     }
@@ -105,7 +102,7 @@ import { MaterialUtilsService } from '../../shared/material-utils.service';
 
     .header-bar {
       height: 8px;
-      background-color: $primary-color;
+      background-color: #1976d2;
     }
 
     .logo-container {

@@ -27,7 +27,6 @@ import { CompraService } from '../../services/compra.service';
 import { UserService } from '../../services/user.service';
 import { UsuarioDto } from '../../models';
 import { ActivatedRoute } from '@angular/router';
-import { SelectSeatsDialogComponent } from './dialogs/select-seats-dialog/select-seats-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfiguracionDelSistemaService } from '../../services/configuracion-del-sistema.service';
 import { finalize } from 'rxjs';
@@ -199,7 +198,9 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
 
     this.pasajerosForm = this.fb.group({ pasajeros: this.fb.array([]) });
     this.searchForm.get('pasajeros')!.valueChanges.subscribe(n => this.generarFormularioPasajeros(n));
+    
     this.localidadService.getLocalidadesOrigenValidas().subscribe(list => this.localidades = list);
+
     this.searchForm.get('localidadOrigenId')!.valueChanges.subscribe(origenId => {
       this.destinos = [];
       this.searchForm.get('localidadDestinoId')?.setValue(null);
@@ -288,6 +289,9 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       this.isSearching = false;
       return;
     }
+    const fechaDesde = new Date(f.fechaDesde);
+    fechaDesde.setHours(0, 0, 0, 0);
+
     const filtro = {
       idLocalidadOrigen: f.localidadOrigenId,
       idLocalidadDestino: f.localidadDestinoId,
@@ -311,19 +315,28 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       });
   }
 
-
   buscarViajesVueltaConPaginacion(): void {
     this.isSearchingVuelta = true;
     this.noViajesVueltaEncontrados = false;
     const f = this.searchForm.value;
+
+    if (!this.viajeIdaSeleccionado) {
+      this.isSearchingVuelta = false;
+      this.noViajesVueltaEncontrados = true;
+      return;
+    }
+
     const filtro = {
       idLocalidadOrigen: f.localidadDestinoId,
       idLocalidadDestino: f.localidadOrigenId,
       fechaViaje: this.formatFecha(f.fechaVuelta),
       cantidadPasajes: f.pasajeros,
-      fechaHoraDesde: this.viajeIdaSeleccionado?.fechaHoraLlegada || null
+      fechaHoraDesde: (() => {
+        const d = new Date(this.viajeIdaSeleccionado.fechaHoraLlegada);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
+      })()
     };
-    const fechaLlegadaIda = new Date(this.viajeIdaSeleccionado?.fechaHoraLlegada || '');
+    
     this.viajeService.buscarDisponibles(filtro, this.pageIndexVuelta, this.pageSizeVuelta)
       .pipe(
         finalize(() => this.isSearchingVuelta = false)
@@ -633,31 +646,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     return this.searchForm.value.tipoViaje === 'IDA_Y_VUELTA';
   }
 
-  abrirDialogoAsientos(esVuelta: boolean): void {
-    const viajeSeleccionado = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
-    if (!viajeSeleccionado) return;
-
-    const dialogRef = this.dialog.open(SelectSeatsDialogComponent, {
-      width: '800px',
-      data: {
-        totalAsientos: viajeSeleccionado.asientosDisponibles + (esVuelta ? this.asientosOcupadosVuelta.length : this.asientosOcupadosIda.length),
-        asientosOcupados: esVuelta ? this.asientosOcupadosVuelta : this.asientosOcupadosIda,
-        asientosSeleccionados: esVuelta ? this.selectedSeatsVuelta : this.selectedSeats,
-        maxSeleccion: this.searchForm.value.pasajeros
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (esVuelta) {
-          this.onAsientosVueltaChange(result);
-        } else {
-          this.onAsientosIdaChange(result);
-        }
-      }
-    });
-  }
-
   hasOrigenDestinoError(): boolean {
     return !!(this.searchForm.hasError('origenDestinoIguales') && 
            (this.searchForm.get('localidadOrigenId')?.touched || this.searchForm.get('localidadDestinoId')?.touched));
@@ -672,7 +660,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
     if (!viaje?.fechaHoraSalida) return '';
     const fecha = new Date(viaje.fechaHoraSalida);
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Montevideo' };
     return fecha.toLocaleDateString('es-ES', options);
   }
 
@@ -680,7 +668,7 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
     if (!viaje?.fechaHoraLlegada) return '';
     const fecha = new Date(viaje.fechaHoraLlegada);
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Montevideo' };
     return fecha.toLocaleDateString('es-ES', options);
   }
 
@@ -688,14 +676,14 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
     if (!viaje?.fechaHoraSalida) return '';
     const fecha = new Date(viaje.fechaHoraSalida);
-    return fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+    return fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Montevideo' });
   }
 
   formatearHoraLlegada(esVuelta = false): string {
     const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
     if (!viaje?.fechaHoraLlegada) return '';
     const fecha = new Date(viaje.fechaHoraLlegada);
-    return fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+    return fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Montevideo' });
   }
 
   formatearOrigen(esVuelta = false): string {

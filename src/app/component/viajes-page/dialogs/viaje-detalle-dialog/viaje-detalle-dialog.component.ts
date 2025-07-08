@@ -416,22 +416,25 @@ export class ViajeDetalleDialogComponent implements OnInit {
     return this.data.viaje.cantidadPasajesVendibles || 0;
   }
 
-  cerrar() {
-    this.dialogRef.close();
+  cerrar(result: any = null) {
+    this.dialogRef.close(result);
   }
 
   abrirReasignarOmnibus() {
-    this.dialog.open(ReasignarOmnibusDialogComponent, {
-      data: { viaje: this.data.viaje },
+    const reasignarDialog = this.dialog.open(ReasignarOmnibusDialogComponent, {
       width: '600px',
-      disableClose: true
-    }).afterClosed().subscribe(reasignado => {
-      if (reasignado) this.dialogRef.close({ reasignado: true });
+      data: { viaje: this.data.viaje }
+    });
+
+    reasignarDialog.afterClosed().subscribe(reasignado => {
+      if (reasignado) {
+        this.cerrar(true);
+      }
     });
   }
 
   get puedeReasignar(): boolean {
-    // Verificar que el viaje no haya partido todavía
+    // Solo se puede reasignar si el viaje aún no ha comenzado.
     const fechaHoraSalida = new Date(this.data.viaje.fechaHoraSalida);
     const ahora = new Date();
     return fechaHoraSalida > ahora;

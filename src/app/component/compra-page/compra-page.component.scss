@@ -387,6 +387,18 @@ ul {
     margin-top: 0.75rem !important;
     font-weight: 500;
   }
+
+  .success-message {
+    background-color: #e8f5e9;
+    color: #388e3c;
+    border-color: #4caf50;
+  }
+}
+
+.selection-summary .success-message {
+  background-color: #e8f5e9;
+  color: #388e3c;
+  border-color: #4caf50;
 }
 
 .price-summary-container {
@@ -925,4 +937,41 @@ ul {
     width: 1.5rem;
     height: 1.5rem;
   }
+}
+
+.messages-container {
+  margin-top: 1rem;
+  min-height: 42px; // Para evitar saltos de layout
+}
+
+.info-message,
+.warning-message,
+.success-message {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  margin: 0;
+  border-left: 4px solid;
+}
+
+.info-message {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-color: #1976d2;
+}
+
+.warning-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-color: #f44336;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #388e3c;
+  border-color: #4caf50;
+}
+
+.asientos-seleccionados-chips {
+  margin-top: 1rem;
 }

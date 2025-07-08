@@ -12,6 +12,7 @@ import {
   DetalleCompraDto,
   FiltroBusquedaCompraDto
 } from '../models';
+import { Page } from '../models/api';
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
@@ -48,19 +49,21 @@ export class CompraService {
     clienteId: number,
     filtro: FiltroBusquedaCompraDto,
     page = 0,
-    size = 20
-  ): Observable<{ content: CompraDto[]; totalElements: number }> {
+    size = 20,
+    sort = 'fechaCompra,desc'
+  ): Observable<Page<CompraDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
-    if (filtro.estados) params = params.set('estados', filtro.estados.join(','));
+    if (filtro.estados && filtro.estados.length > 0) params = params.set('estados', filtro.estados.join(','));
     if (filtro.fechaDesde) params = params.set('fechaDesde', filtro.fechaDesde);
     if (filtro.fechaHasta) params = params.set('fechaHasta', filtro.fechaHasta);
     if (filtro.montoMin != null) params = params.set('montoMin', filtro.montoMin.toString());
     if (filtro.montoMax != null) params = params.set('montoMax', filtro.montoMax.toString());
 
-    return this.http.get<{ content: CompraDto[]; totalElements: number }>(
+    return this.http.get<Page<CompraDto>>(
       `${this.base}/cliente/${clienteId}`,
       { params }
     );

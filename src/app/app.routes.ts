@@ -21,6 +21,7 @@ import { PasajeHistoryComponent } from './component/pasaje-history/pasaje-histor
 import { UsuariosPorTipoComponent } from './component/estadisticas/usuario/usuarios-por-tipo/usuarios-por-tipo.component';
 import { ComprasClientesComponent } from './component/estadisticas/usuario/compras-clientes/compras-clientes.component';
 import { LogueosUsuariosComponent } from './component/estadisticas/usuario/logueos-usuarios/logueos-usuarios.component';
+import { ComprasHistoryComponent } from './component/compras-history/compras-history.component';
 import { ViajesDepartamentoComponent } from './component/estadisticas/transporte/viajes-departamento/viajes-departamento.component';
 import { ViajesPorOmnibusComponent } from './component/estadisticas/transporte/viajes-por-omnibus/viajes-por-omnibus.component';
 import { MantenimientosPorOmnibusComponent } from './component/estadisticas/transporte/mantenimientos-por-omnibus/mantenimientos-por-omnibus.component';
@@ -29,6 +30,7 @@ import { PasajesPorViajeComponent } from './component/pasajes-por-viaje/pasajes-
 import { CompraDetallePageComponent } from './component/compra-detalle/compra-detalle-page.component';
 import { LandingPageComponent } from './component/landing-page/landing-page.component';
 import { NotFoundComponent } from './component/not-found/not-found.component';
+import { HomePageComponent } from './component/home-page/home-page.component';
 import { AppComponent } from './app.component';
 
 export const routes: Routes = [
@@ -51,7 +53,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       
       // Rutas comunes para todos los usuarios logueados
-      { path: 'home', loadComponent: () => import('./component/home-page/home-page.component').then(m => m.HomePageComponent) },
+      { path: 'home', component: HomePageComponent },
       { path: 'perfil', component: ProfilePageComponent },
       
       // Rutas específicas para ADMIN
@@ -72,6 +74,7 @@ export const routes: Routes = [
 
       // Rutas específicas para CLIENTE
       { path: 'pasajes', component: PasajeHistoryComponent, canActivate: [RoleGuard], data: { roles: ['CLIENTE'] } },
+      { path: 'compras', component: ComprasHistoryComponent, canActivate: [RoleGuard], data: { roles: ['CLIENTE'] } },
       
       // Estadísticas para ADMIN
       { path: 'estadisticas/usuarios-por-tipo', component: UsuariosPorTipoComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },

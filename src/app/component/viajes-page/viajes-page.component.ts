@@ -126,11 +126,15 @@ export class ViajesPageComponent implements OnInit {
     private localidadService: LocalidadService,
     private materialUtils: MaterialUtilsService
   ) {
+    const hoy = new Date();
+    const unMesDespues = new Date();
+    unMesDespues.setMonth(unMesDespues.getMonth() + 1);
+
     this.filterForm = this.fb.group({
       localidadOrigenId: [null],
       localidadDestinoId: [null],
-      fechaDesde: [null],
-      fechaHasta: [null],
+      fechaDesde: [hoy],
+      fechaHasta: [unMesDespues],
       horaDesde: [''],
       horaHasta: ['']
     }, { validators: [origenDestinoValidator, fechasValidator] });
@@ -296,7 +300,7 @@ export class ViajesPageComponent implements OnInit {
         data: { viaje: detalle },
         disableClose: true
       }).afterClosed().subscribe(r => {
-        if (r?.reasignado) this.buscar();
+        if (r) this.buscar();
       });
     });
   }

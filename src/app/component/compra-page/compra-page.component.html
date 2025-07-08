@@ -243,13 +243,17 @@
         <div class="selection-header">
           <div class="selection-summary">
             <h4>Asientos de Ida Seleccionados</h4>
-            <mat-chip-listbox *ngIf="selectedSeats.length > 0">
-              <mat-chip *ngFor="let seat of selectedSeats">Asiento {{seat}}</mat-chip>
-            </mat-chip-listbox>
-            <p *ngIf="selectedSeats.length === 0">Selecciona exactamente {{searchForm.value.pasajeros}} asientos.</p>
-            <p *ngIf="selectedSeats.length > 0 && selectedSeats.length < searchForm.value.pasajeros" class="warning-message">
-              Faltan {{ searchForm.value.pasajeros - selectedSeats.length }} asientos por seleccionar
-            </p>
+            <div class="messages-container">
+              <p *ngIf="selectedSeats.length === 0" class="info-message">
+                Selecciona exactamente {{searchForm.value.pasajeros}} {{searchForm.value.pasajeros === 1 ? 'asiento' : 'asientos'}}.
+              </p>
+              <p *ngIf="selectedSeats.length > 0 && selectedSeats.length < searchForm.value.pasajeros" class="warning-message">
+                Faltan {{searchForm.value.pasajeros - selectedSeats.length}} {{ (searchForm.value.pasajeros - selectedSeats.length) === 1 ? 'asiento' : 'asientos' }} por seleccionar.
+              </p>
+              <p *ngIf="selectedSeats.length > 0 && selectedSeats.length === searchForm.value.pasajeros" class="success-message">
+                Asientos seleccionados correctamente.
+              </p>
+            </div>
           </div>
           <div class="price-summary">
             <p>Precio por pasaje: <strong>{{ viajeIdaSeleccionado.precioEstimado | currency }}</strong></p>
@@ -334,13 +338,17 @@
         <div class="selection-header">
           <div class="selection-summary">
             <h4>Asientos de Vuelta Seleccionados</h4>
-            <mat-chip-listbox *ngIf="selectedSeatsVuelta.length > 0">
-              <mat-chip *ngFor="let seat of selectedSeatsVuelta">Asiento {{seat}}</mat-chip>
-            </mat-chip-listbox>
-            <p *ngIf="selectedSeatsVuelta.length === 0">Selecciona exactamente {{searchForm.value.pasajeros}} asientos.</p>
-            <p *ngIf="selectedSeatsVuelta.length > 0 && selectedSeatsVuelta.length < searchForm.value.pasajeros" class="warning-message">
-              Faltan {{ searchForm.value.pasajeros - selectedSeatsVuelta.length }} asientos por seleccionar
-            </p>
+            <div class="messages-container">
+              <p *ngIf="selectedSeatsVuelta.length === 0" class="info-message">
+                Selecciona exactamente {{searchForm.value.pasajeros}} {{searchForm.value.pasajeros === 1 ? 'asiento' : 'asientos'}}.
+              </p>
+              <p *ngIf="selectedSeatsVuelta.length > 0 && selectedSeatsVuelta.length < searchForm.value.pasajeros" class="warning-message">
+                Faltan {{searchForm.value.pasajeros - selectedSeatsVuelta.length}} {{ (searchForm.value.pasajeros - selectedSeatsVuelta.length) === 1 ? 'asiento' : 'asientos' }} por seleccionar.
+              </p>
+              <p *ngIf="selectedSeatsVuelta.length > 0 && selectedSeatsVuelta.length === searchForm.value.pasajeros" class="success-message">
+                Asientos seleccionados correctamente.
+              </p>
+            </div>
           </div>
           <div class="price-summary">
             <p>Precio por pasaje: <strong>{{ viajeVueltaSeleccionado.precioEstimado | currency }}</strong></p>

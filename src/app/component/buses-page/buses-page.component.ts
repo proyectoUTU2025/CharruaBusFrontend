@@ -278,13 +278,18 @@ export class BusesPageComponent implements OnInit {
       const fechaSalida = new Date(f.fechaSalida);
       const fechaLlegada = new Date(f.fechaLlegada);
       
+      // Inicializar horas para evitar problemas de zona horaria con fechas sin hora
+      fechaSalida.setHours(0, 0, 0, 0);
+      fechaLlegada.setHours(0, 0, 0, 0);
+
       // Aplicar horas específicas si están presentes
-      if (f.horaSalida && f.horaLlegada) {
+      if (f.horaSalida) {
         const [hSalida, mSalida] = f.horaSalida.split(':').map(Number);
+        fechaSalida.setHours(hSalida, mSalida);
+      }
+      if (f.horaLlegada) {
         const [hLlegada, mLlegada] = f.horaLlegada.split(':').map(Number);
-        
-        fechaSalida.setHours(hSalida, mSalida, 0, 0);
-        fechaLlegada.setHours(hLlegada, mLlegada, 0, 0);
+        fechaLlegada.setHours(hLlegada, mLlegada);
       }
       
       if (fechaLlegada <= fechaSalida) {

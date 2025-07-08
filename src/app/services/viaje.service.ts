@@ -50,6 +50,7 @@ export class ViajeService {
       idLocalidadDestino: number;
       fechaViaje: string;
       cantidadPasajes: number;
+      fechaHoraDesde?: string | null;
     },
     page = 0,
     size = 5
@@ -62,6 +63,10 @@ export class ViajeService {
       .set('idLocalidadDestino', filtro.idLocalidadDestino.toString())
       .set('fechaViaje', filtro.fechaViaje)
       .set('cantidadPasajes', filtro.cantidadPasajes.toString());
+
+    if (filtro.fechaHoraDesde) {
+      params = params.set('fechaHoraDesde', filtro.fechaHoraDesde);
+    }
 
     return this.http.get<Page<CompraViajeDto>>(`${this.baseUrl}/disponibles`, { params })
       .pipe(map(resp => resp));

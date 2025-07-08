@@ -271,7 +271,7 @@ export class CompraDetallePageComponent implements OnInit {
    * Verifica si una compra se puede reembolsar
    */
   puedeReembolsar(): boolean {
-    if (!this.detalle) return false;
+    if (!this.detalle || this.isCliente) return false;
     
     return this.detalle.estado !== TipoEstadoCompra.REEMBOLSADA && 
            (this.detalle.estado === TipoEstadoCompra.COMPLETADA ||

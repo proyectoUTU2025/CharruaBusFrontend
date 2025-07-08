@@ -81,6 +81,7 @@ export class HomePageComponent implements OnInit {
       this.quickActions = [
         { title: 'Comprar Pasajes', icon: 'shopping_cart', route: '/comprar', color: '#1976d2', description: 'Comprar pasajes de ómnibus' },
         { title: 'Mis Pasajes', icon: 'history', route: '/pasajes', color: '#2e7d32', description: 'Ver historial de pasajes' },
+        { title: 'Mis Compras', icon: 'history', route: '/compras', color: '#2e7d32', description: 'Ver historial de compras' },
         { title: 'Mi Perfil', icon: 'person', route: '/perfil', color: '#455a64', description: 'Ver y editar mi perfil' }
       ];
     }

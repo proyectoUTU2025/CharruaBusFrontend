@@ -3,32 +3,32 @@
     width: 100%;
     min-height: calc(100vh - 4rem);
     background: #f5f5f5;
-  }
-  
-  .page-container {
+}
+
+.page-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 24px;
-  }
-  
-  .page-header {
+}
+
+.page-header {
     margin-bottom: 24px;
-  
+
     h1 {
-      margin: 0;
-      font-size: 1.75rem;
-      font-weight: 600;
-      letter-spacing: -0.5px;
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: -0.5px;
     }
-  
+
     p {
-      margin: 4px 0 0 0;
-      color: #555;
-      font-size: 1rem;
+        margin: 4px 0 0 0;
+        color: #555;
+        font-size: 1rem;
     }
-  }
-  
-  .content-card {
+}
+
+.content-card {
     background-color: white;
     padding: 24px;
     margin-bottom: 24px;
@@ -36,30 +36,34 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     
     &:first-of-type {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      gap: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 1.5rem;
     }
-  }
-  
-  .filters-grid {
+}
+
+.filters-container {
+    display: contents;
+}
+
+.filters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
     flex: 1 1 60%;
     min-width: 300px;
-  }
+}
 
-  .filter-actions {
+.filter-actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
     flex: 1 1 20%;
     align-self: center;
-  }
-  
-  .massive-btn {
+}
+
+.massive-btn {
     border: 1.5px solid #1976d2;
     color: #1976d2;
     background: white;
@@ -69,14 +73,14 @@
     font-weight: 500;
     padding: 0 1.25rem;
     transition: all 0.2s ease-in-out;
-  }
+}
 
-  .massive-btn:hover {
+.massive-btn:hover {
     background: #e3f2fd;
     transform: translateY(-1px);
-  }
+}
 
-  .create-btn {
+.create-btn {
     background-color: #1976d2;
     color: white;
     text-transform: none;
@@ -86,31 +90,31 @@
     padding: 0 1.25rem;
     border: none;
     transition: all 0.2s ease-in-out;
-  }
+}
 
-  .create-btn:hover {
+.create-btn:hover {
     background: #1565c0;
     transform: translateY(-1px);
-  }
-  
-  .table-header-row {
+}
+
+.table-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
-  }
-  
-  .card-title {
+}
+
+.card-title {
     font-size: 1.25rem;
     font-weight: 500;
-  }
-  
-  .table-container {
+}
+
+.table-container {
     overflow-x: auto;
     position: relative;
-  }
-  
-  .loading-container {
+}
+
+.loading-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -118,17 +122,17 @@
     min-height: 250px;
     gap: 1rem;
     color: #555;
-  }
-  
-  table {
-    width: 100%;
-  }
+}
 
-  mat-paginator {
+table {
+    width: 100%;
+}
+
+mat-paginator {
     margin-top: 20px;
-  }
-  
-  .loading-shade {
+}
+
+.loading-shade {
     position: absolute;
     top: 0;
     left: 0;
@@ -139,34 +143,34 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .mat-mdc-row:hover .mat-mdc-cell {
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
     background-color: #f5f5f5;
-  }
-  
-  .mat-column-acciones {
+}
+
+.mat-column-acciones {
     width: 120px;
     text-align: center;
-  }
-  
-  .no-data-message {
+}
+
+.no-data-message {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem;
     color: #777;
-  
+
     mat-icon {
-      font-size: 3rem;
-      width: 3rem;
-      height: 3rem;
-      margin-bottom: 1rem;
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+        margin-bottom: 1rem;
     }
-  }
-  
-  .badge {
+}
+
+.badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -178,28 +182,38 @@
     font-weight: 500;
     border: 1.5px solid;
     text-transform: none;
-  }
-    
-  .badge-confirmado {
+}
+
+.badge-confirmado {
     background: #e6f4ea;
     color: #2e7d32;
     border-color: #2e7d32;
-  }
-    
-  .badge-pendiente {
+}
+
+.badge-pendiente {
     background: #fff3e0;
     color: #ef6c00;
     border-color: #ef6c00;
-  }
-    
-  .badge-cancelado {
+}
+
+.badge-cancelado {
     background: #fdecea;
     color: #c62828;
     border-color: #c62828;
-  }
-    
-  .badge-devuelto {
+}
+
+.badge-devuelto {
     background: #e3f2fd;
     color: #1976d2;
     border-color: #1976d2;
-  }
+}
+
+.badge-parcialmente-reembolsada {
+    background: #f3e5f5;
+    color: #9c27b0;
+    border-color: #9c27b0;
+}
+
+mat-card-header {
+    margin-bottom: 1rem;
+} 

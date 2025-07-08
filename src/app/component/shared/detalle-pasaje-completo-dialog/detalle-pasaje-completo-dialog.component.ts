@@ -10,6 +10,7 @@ import { PasajeService } from '../../../services/pasaje.service';
 import { MaterialUtilsService } from '../../../shared/material-utils.service';
 import { TipoEstadoPasaje } from '../../../models/pasajes/tipo-estado-pasaje.enum';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/confirm-dialog/confirm-dialog.component';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-detalle-pasaje-completo-dialog',
@@ -30,14 +31,17 @@ export class DetallePasajeCompletoDialogComponent {
   isLoading = false;
   isOpeningPdf = false;
   isReembolsando = false;
+  isCliente = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { pasajeId: number },
     private dialogRef: MatDialogRef<DetallePasajeCompletoDialogComponent>,
     private pasajeService: PasajeService,
     private materialUtils: MaterialUtilsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService,
   ) {
+    this.isCliente = this.authService.rol === 'CLIENTE';
     this.cargarDetallePasaje();
   }
 
@@ -173,7 +177,7 @@ export class DetallePasajeCompletoDialogComponent {
    * Verifica si un pasaje se puede reembolsar (solo pasajes confirmados)
    */
   puedeReembolsar(): boolean {
-    if (!this.pasaje) return false;
+    if (!this.pasaje || this.isCliente) return false;
     
     return !this.pasaje.fueReembolsado && 
            this.pasaje.estadoPasaje === TipoEstadoPasaje.CONFIRMADO &&

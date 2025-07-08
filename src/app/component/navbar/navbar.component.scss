@@ -1,6 +1,9 @@
 $primary-color: #1976d2;
 
 .navbar-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   background: #fff;
   color: #222;
   box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.07);
@@ -100,6 +103,19 @@ $primary-color: #1976d2;
   letter-spacing: 0.0125rem;
 }
 
+// Estilo específico para el botón que dispara el menú de estadísticas
+.nav-btn[mat-menu-trigger-for] {
+  .mat-icon:not(.mat-menu-trigger) { // Icono principal (ej: bar_chart)
+    margin-right: 0.375rem;
+  }
+
+  // Contenedor para el icono principal y el texto
+  .mat-button-wrapper {
+    display: flex;
+    align-items: center;
+  }
+}
+
 .nav-btn.active-link,
 .nav-btn.active-link:focus {
   color: #1976d2 !important;
@@ -116,7 +132,7 @@ $primary-color: #1976d2;
   border: 0.09375rem solid #1976d2;
 }
 
-button[mat-stroked-button].logout-button {
+.logout-button {
   font-weight: 500;
   font-size: 1.0625rem;
   padding: 0.625rem 1.125rem;
@@ -129,9 +145,10 @@ button[mat-stroked-button].logout-button {
   align-items: center;
   gap: 0.5rem;
   box-shadow: none;
+  text-decoration: none;
 }
 
-button[mat-stroked-button].logout-button:hover {
+.logout-button:hover {
   background: #f5f7fa !important;
   color: #1251a3 !important;
   border-color: #1251a3 !important;

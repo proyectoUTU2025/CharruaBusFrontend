@@ -236,13 +236,13 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   get fechaSalidaFormateada(): string {
     if (!this.fechaSalida) return '';
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Montevideo' };
     return this.fechaSalida.toLocaleDateString('es-ES', options);
   }
 
   get fechaLlegadaFormateada(): string {
     if (!this.fechaLlegada) return '';
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Montevideo' };
     return this.fechaLlegada.toLocaleDateString('es-ES', options);
   }
 
@@ -435,17 +435,23 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   private formatFecha(fecha: Date | null, hora: string = ''): string {
     if (!fecha) return '';
+    
+    // Get date components from the Date object. These are based on the user's local timezone,
+    // but for a date-only object from a datepicker, they give us the selected calendar date.
+    const y = fecha.getFullYear();
+    const m = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const d = fecha.getDate().toString().padStart(2, '0');
+
     const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
-    const fechaConHora = new Date(fecha);
-    fechaConHora.setHours(Number(hh));
-    fechaConHora.setMinutes(Number(mm));
-    fechaConHora.setSeconds(0);
-    const y = fechaConHora.getFullYear();
-    const m = (fechaConHora.getMonth() + 1).toString().padStart(2, '0');
-    const d = fechaConHora.getDate().toString().padStart(2, '0');
-    const h = fechaConHora.getHours().toString().padStart(2, '0');
-    const min = fechaConHora.getMinutes().toString().padStart(2, '0');
-    return `${y}-${m}-${d}T${h}:${min}:00`;
+
+    // We construct a string representing the date and time in Uruguay's timezone (UTC-3)
+    const dateTimeString = `${y}-${m}-${d}T${hh}:${mm}:00-03:00`;
+    
+    // We create a new Date object from this string. The JS engine will parse the timezone offset.
+    const dateInUruguayTimezone = new Date(dateTimeString);
+    
+    // toISOString() will then return the date in UTC, which is the standard for APIs.
+    return dateInUruguayTimezone.toISOString();
   }
 
   ngAfterViewChecked(): void {

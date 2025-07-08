@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -40,7 +40,7 @@ import { environment } from '../../../../../environments/environment';
     styleUrls: ['./compras-clientes.component.scss']
 })
 
-export class ComprasClientesComponent implements OnInit, AfterViewInit {
+export class ComprasClientesComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly BASE = `${environment.apiBaseUrl}`;
     @ViewChild(MatSort) sort!: MatSort;
 
@@ -51,7 +51,10 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit {
     ordenarPor = 'totalGastado';
     ascendente = false;
 
-    fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
+    today = new Date();
+    firstDayOfYear = new Date(this.today.getFullYear(), 0, 1);
+
+    fechaInicio = new FormControl<Date | null>(this.firstDayOfYear);
     fechaFin = new FormControl<Date | null>(new Date());
 
     isExportingCsv = false;
@@ -81,6 +84,12 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit {
             this.pageIndex = 0;
             this.load();
         });
+    }
+
+    ngOnDestroy() {
+        // Resetear filtros al salir del componente
+        this.fechaInicio.setValue(this.firstDayOfYear);
+        this.fechaFin.setValue(new Date());
     }
 
     load(event?: PageEvent) {

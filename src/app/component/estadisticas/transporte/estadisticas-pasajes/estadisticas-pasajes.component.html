@@ -63,7 +63,7 @@
           <mat-icon>download</mat-icon>
           Detalle CSV
         </button>
-        <button mat-flat-button (click)="exportDetallePdf()" class="accent-btn">
+        <button mat-flat-button (click)="exportDetallePdf()" class="primary-btn">
           <mat-icon>picture_as_pdf</mat-icon>
           Detalle PDF
         </button>
@@ -92,8 +92,7 @@
       <canvas baseChart
               [data]="{ labels: chartLabels, datasets: chartData }"
               [type]="chartType"
-              [options]="chartOptions"
-              height="250">
+              [options]="chartOptions">
       </canvas>
     </div>
   </div>
@@ -121,7 +120,14 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)">
+      <mat-paginator
+        *ngIf="dataSource.length > 0"
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="load($event)"
+        showFirstLastButtons>
       </mat-paginator>
     </div>
   </div>

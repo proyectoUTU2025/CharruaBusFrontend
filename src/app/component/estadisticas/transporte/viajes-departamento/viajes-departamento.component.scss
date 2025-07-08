@@ -119,6 +119,14 @@ $primary-color: #675992;
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grafico-container canvas {
+  display: block;
+  max-width: 100%;
 }
 
 .tabla-container {

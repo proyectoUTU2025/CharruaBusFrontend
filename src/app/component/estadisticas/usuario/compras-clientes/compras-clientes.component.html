@@ -83,7 +83,14 @@
         <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
       </table>
 
-      <mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)">
+      <mat-paginator
+        *ngIf="data.length > 0"
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="load($event)"
+        showFirstLastButtons>
       </mat-paginator>
     </div>
   </div>

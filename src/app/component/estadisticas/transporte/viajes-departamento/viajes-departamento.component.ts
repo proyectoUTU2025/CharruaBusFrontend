@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
@@ -38,13 +38,21 @@ import { environment } from '../../../../../environments/environment';
   templateUrl: './viajes-departamento.component.html',
   styleUrls: ['./viajes-departamento.component.scss']
 })
-export class ViajesDepartamentoComponent implements OnInit {
+export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
   private readonly BASE = `${environment.apiBaseUrl}`;
 
-  fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
-  fechaFin = new FormControl<Date | null>(new Date());
-  origen = new FormControl<TipoDepartamento | null>(TipoDepartamento.ARTIGAS);
-  destino = new FormControl<TipoDepartamento | null>(null);
+  today = new Date();
+  firstDayOfYear = new Date(this.today.getFullYear(), 0, 1);
+
+  fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
+  fechaFinPorDefecto = new Date();
+  origenPorDefecto = TipoDepartamento.MONTEVIDEO;
+  destinoPorDefecto = null;
+
+  fechaInicio = new FormControl<Date | null>(this.fechaInicioPorDefecto);
+  fechaFin = new FormControl<Date | null>(this.fechaFinPorDefecto);
+  origen = new FormControl<TipoDepartamento | null>(this.origenPorDefecto);
+  destino = new FormControl<TipoDepartamento | null>(this.destinoPorDefecto);
 
   departamentos = Object.values(TipoDepartamento);
   displayedColumns = ['departamento', 'cantidadViajes'];
@@ -83,19 +91,12 @@ export class ViajesDepartamentoComponent implements OnInit {
   constructor(private svc: EstadisticaTransporteService) {}
 
   ngOnInit() {
-    const saved = localStorage.getItem('filtrosViajesDepartamento');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      this.fechaInicio.setValue(parsed.fechaInicio ? new Date(parsed.fechaInicio) : new Date('2000-01-01'));
-      this.fechaFin.setValue(parsed.fechaFin ? new Date(parsed.fechaFin) : new Date());
-      this.origen.setValue(parsed.origen ?? null);
-      this.destino.setValue(parsed.destino ?? null);
-    } else {
-      this.fechaInicio.setValue(new Date('2000-01-01'));
-      this.fechaFin.setValue(new Date());
-      this.origen.setValue(TipoDepartamento.MONTEVIDEO);
-      this.destino.setValue(null);
-    }
+    // Siempre setear los valores por defecto
+    this.fechaInicio.setValue(this.fechaInicioPorDefecto);
+    this.fechaFin.setValue(this.fechaFinPorDefecto);
+    this.origen.setValue(this.origenPorDefecto);
+    this.destino.setValue(this.destinoPorDefecto);
+    localStorage.removeItem('filtrosViajesDepartamento');
     this.load();
   }
 
@@ -222,5 +223,14 @@ export class ViajesDepartamentoComponent implements OnInit {
 
   get mostrarGrafico(): boolean {
     return this.dataSource.length > 1 || (this.dataSource.length === 1 && this.dataSource[0].departamento !== 'TODOS');
+  }
+
+  ngOnDestroy() {
+    // Limpiar localStorage y resetear los filtros al salir del componente
+    localStorage.removeItem('filtrosViajesDepartamento');
+    this.fechaInicio.setValue(this.fechaInicioPorDefecto);
+    this.fechaFin.setValue(this.fechaFinPorDefecto);
+    this.origen.setValue(this.origenPorDefecto);
+    this.destino.setValue(this.destinoPorDefecto);
   }
 }

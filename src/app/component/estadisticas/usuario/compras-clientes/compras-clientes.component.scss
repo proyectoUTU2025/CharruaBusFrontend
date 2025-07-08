@@ -19,13 +19,18 @@ $primary-color: #675992;
 }
 
 .grafico-container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
-    max-width: 800px;
-    max-height: 300px;
-    margin-left: auto;
-    margin-right: auto;
+    align-items: center;
+}
+
+.grafico-container canvas {
+    display: block;
+    max-width: 100%;
+    height: auto !important;
 }
 
 table {
@@ -218,12 +223,6 @@ table {
 
 .export-btn[color="primary"]:hover {
   background: #1565c0;
-}
-
-.grafico-container {
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
 }
 
 .tabla-container {

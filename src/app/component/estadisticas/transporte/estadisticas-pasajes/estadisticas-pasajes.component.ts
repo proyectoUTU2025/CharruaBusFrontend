@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
@@ -40,15 +40,20 @@ import { environment } from '../../../../../environments/environment';
     templateUrl: './estadisticas-pasajes.component.html',
     styleUrls: ['./estadisticas-pasajes.component.scss']
 })
-export class EstadisticasPasajesComponent implements OnInit {
+export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
 
     private readonly BASE = `${environment.apiBaseUrl}`;
     
+    fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
+    fechaFinPorDefecto = new Date();
+    origenPorDefecto = null;
+    destinoPorDefecto = null;
+
     // filtros
-    fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
-    fechaFin = new FormControl<Date | null>(new Date());
-    origen = new FormControl<TipoDepartamento | null>(null);
-    destino = new FormControl<TipoDepartamento | null>(null);
+    fechaInicio = new FormControl<Date | null>(this.fechaInicioPorDefecto);
+    fechaFin = new FormControl<Date | null>(this.fechaFinPorDefecto);
+    origen = new FormControl<TipoDepartamento | null>(this.origenPorDefecto);
+    destino = new FormControl<TipoDepartamento | null>(this.destinoPorDefecto);
     departamentos = Object.values(TipoDepartamento);
 
     // resumen
@@ -82,15 +87,22 @@ export class EstadisticasPasajesComponent implements OnInit {
     constructor(private svc: EstadisticaTransporteService) { }
 
     ngOnInit() {
-        const saved = localStorage.getItem('filtrosEstadisticasPasajes');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            this.fechaInicio.setValue(parsed.fechaInicio ? new Date(parsed.fechaInicio) : new Date('2000-01-01'));
-            this.fechaFin.setValue(parsed.fechaFin ? new Date(parsed.fechaFin) : new Date());
-            this.origen.setValue(parsed.origen ?? null);
-            this.destino.setValue(parsed.destino ?? null);
-        }
+        // Siempre setear los valores por defecto
+        this.fechaInicio.setValue(this.fechaInicioPorDefecto);
+        this.fechaFin.setValue(this.fechaFinPorDefecto);
+        this.origen.setValue(this.origenPorDefecto);
+        this.destino.setValue(this.destinoPorDefecto);
+        localStorage.removeItem('filtrosEstadisticasPasajes');
         this.load();
+    }
+
+    ngOnDestroy() {
+        // Limpiar localStorage y resetear los filtros al salir del componente
+        localStorage.removeItem('filtrosEstadisticasPasajes');
+        this.fechaInicio.setValue(this.fechaInicioPorDefecto);
+        this.fechaFin.setValue(this.fechaFinPorDefecto);
+        this.origen.setValue(this.origenPorDefecto);
+        this.destino.setValue(this.destinoPorDefecto);
     }
 
     load(event?: PageEvent) {

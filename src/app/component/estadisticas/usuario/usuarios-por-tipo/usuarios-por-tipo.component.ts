@@ -55,6 +55,10 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
         plugins: { legend: { display: false } }
     };
 
+    agrupado: boolean = true;
+
+    dataOriginal: EstadisticaUsuario[] = [];
+
     constructor(private svc: EstadisticaUsuarioService) { }
 
     ngOnInit() {
@@ -70,21 +74,58 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
         });
     }
 
+    toggleAgrupado() {
+        this.agrupado = !this.agrupado;
+        this.procesarDatos();
+    }
+
     load() {
         this.svc.getUsuariosPorTipo(this.pageIndex, this.pageSize, this.ordenarPor, this.ascendente)
             .subscribe({
                 next: (res: Page<EstadisticaUsuario>) => {
-                    this.data = res.content;
+                    this.dataOriginal = res.content;
                     this.total = res.page.totalElements;
-                    this.chartLabels = this.data.map(x => x.tipo);
-                    this.chartData = [{
-                        label: 'Usuarios por Tipo',
-                        data: this.data.map(x => x.cantidad),
-                        backgroundColor: '#1976d2'
-                    }];
+                    this.procesarDatos();
                 },
                 error: err => console.error('Error cargando estadísticas:', err)
             });
+    }
+
+    procesarDatos() {
+        if (this.agrupado) {
+            // Agrupar subtipos de cliente bajo 'CLIENTE', pero si ya existe CLIENTE usar solo ese
+            const tieneCliente = this.dataOriginal.some(x => x.tipo === 'CLIENTE');
+            const agrupados: { [key: string]: number } = {};
+            for (const item of this.dataOriginal) {
+                if (item.tipo === 'CLIENTE') {
+                    agrupados['CLIENTE'] = item.cantidad;
+                } else if (item.tipo.startsWith('CLIENTE')) {
+                    if (!tieneCliente) {
+                        agrupados['CLIENTE'] = (agrupados['CLIENTE'] || 0) + item.cantidad;
+                    }
+                } else {
+                    agrupados[item.tipo] = (agrupados[item.tipo] || 0) + item.cantidad;
+                }
+            }
+            this.data = Object.entries(agrupados).map(([tipo, cantidad]) => ({ tipo, cantidad }));
+        } else {
+            // Vista detallada: mostrar SOLO los subtipos de cliente con nombres amigables
+            const subtipos = ['CLIENTE_ESTUDIANTE', 'CLIENTE_JUBILADO', 'CLIENTE_OTRO'];
+            const nombreAmigable: { [key: string]: string } = {
+                'CLIENTE_ESTUDIANTE': 'ESTUDIANTE',
+                'CLIENTE_JUBILADO': 'JUBILADO',
+                'CLIENTE_OTRO': 'OTRO'
+            };
+            this.data = this.dataOriginal
+                .filter(x => subtipos.includes(x.tipo))
+                .map(x => ({ tipo: nombreAmigable[x.tipo] || x.tipo, cantidad: x.cantidad }));
+        }
+        this.chartLabels = this.data.map(x => x.tipo);
+        this.chartData = [{
+            label: 'Usuarios por Tipo',
+            data: this.data.map(x => x.cantidad),
+            backgroundColor: '#1976d2'
+        }];
     }
 
     pageChanged(e: PageEvent) {

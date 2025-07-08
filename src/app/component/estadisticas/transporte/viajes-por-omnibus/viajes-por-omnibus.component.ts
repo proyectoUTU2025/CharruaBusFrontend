@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
@@ -35,10 +35,13 @@ import { environment } from '../../../../../environments/environment';
     templateUrl: './viajes-por-omnibus.component.html',
     styleUrls: ['./viajes-por-omnibus.component.scss']
     })
-    export class ViajesPorOmnibusComponent implements OnInit {
+    export class ViajesPorOmnibusComponent implements OnInit, OnDestroy {
     private readonly BASE = `${environment.apiBaseUrl}`;
-    fechaInicio = new FormControl<Date | null>(new Date('2000-01-01'));
-    fechaFin = new FormControl<Date | null>(new Date());
+    fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
+    fechaFinPorDefecto = new Date();
+
+    fechaInicio = new FormControl<Date | null>(this.fechaInicioPorDefecto);
+    fechaFin = new FormControl<Date | null>(this.fechaFinPorDefecto);
     displayedColumns = ['matricula', 'cantidad'];
     dataSource: EstadisticaOmnibus[] = [];
     total = 0;
@@ -65,13 +68,18 @@ import { environment } from '../../../../../environments/environment';
     constructor(private svc: EstadisticaTransporteService) {}
 
     ngOnInit() {
-        const saved = localStorage.getItem('filtrosViajesOmnibus');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            this.fechaInicio.setValue(parsed.fechaInicio ? new Date(parsed.fechaInicio) : new Date('2000-01-01'));
-            this.fechaFin.setValue(parsed.fechaFin ? new Date(parsed.fechaFin) : new Date());
-        }
+        // Siempre setear los valores por defecto
+        this.fechaInicio.setValue(this.fechaInicioPorDefecto);
+        this.fechaFin.setValue(this.fechaFinPorDefecto);
+        localStorage.removeItem('filtrosViajesOmnibus');
         this.load();
+    }
+
+    ngOnDestroy() {
+        // Limpiar localStorage y resetear los filtros al salir del componente
+        localStorage.removeItem('filtrosViajesOmnibus');
+        this.fechaInicio.setValue(this.fechaInicioPorDefecto);
+        this.fechaFin.setValue(this.fechaFinPorDefecto);
     }
 
     load(event?: PageEvent) {

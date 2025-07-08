@@ -179,6 +179,15 @@ $primary-color: #675992;
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grafico-container canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
 }
 
 .tabla-container {
@@ -197,6 +206,22 @@ $primary-color: #675992;
     padding: 12px 16px;
     border-bottom: 1px solid #ececec;
     text-align: left;
+  }
+
+  th.mat-header-cell {
+    position: relative;
+    min-width: 180px;
+  }
+
+  th.mat-header-cell span {
+    display: inline-block;
+    width: 18px;
+    text-align: center;
+    visibility: hidden;
+  }
+
+  th.mat-header-cell.sort-active span {
+    visibility: visible;
   }
 }
 

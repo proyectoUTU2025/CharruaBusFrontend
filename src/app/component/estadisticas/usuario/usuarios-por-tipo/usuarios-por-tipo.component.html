@@ -16,6 +16,10 @@
           <mat-icon>picture_as_pdf</mat-icon>
           PDF
         </button>
+        <button mat-stroked-button (click)="toggleAgrupado()" class="secondary-btn">
+          <mat-icon>tune</mat-icon>
+          {{ agrupado ? 'Ver detalle de clientes' : 'Ver agrupado' }}
+        </button>
       </div>
     </div>
 
@@ -50,10 +54,13 @@
         </table>
 
         <mat-paginator
+            *ngIf="data.length > 0"
             [length]="total"
             [pageSize]="pageSize"
             [pageIndex]="pageIndex"
-            (page)="pageChanged($event)">
+            [pageSizeOptions]="[6]"
+            (page)="pageChanged($event)"
+            showFirstLastButtons>
         </mat-paginator>
     </div>
   </div>

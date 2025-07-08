@@ -50,8 +50,7 @@
       <canvas baseChart
               [data]="{ labels: chartLabels, datasets: chartData }"
               [type]="chartType"
-              [options]="chartOptions"
-              height="250">
+              [options]="chartOptions">
       </canvas>
     </div>
   </div>
@@ -60,17 +59,17 @@
     <div class="tabla-container">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
         <ng-container matColumnDef="matricula">
-          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('matricula')">
+          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('matricula')" [class.sort-active]="ordenarPor==='matricula'">
             Matrícula
-            <span *ngIf="ordenarPor==='matricula'">{{ ascendente ? '↑' : '↓' }}</span>
+            <span [style.color]="ordenarPor==='matricula' ? '#333' : 'transparent'">{{ ascendente && ordenarPor==='matricula' ? '↑' : '↓' }}</span>
           </th>
           <td mat-cell *matCellDef="let e">{{ e.matricula }}</td>
         </ng-container>
 
         <ng-container matColumnDef="cantidad">
-          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidad')">
+          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidad')" [class.sort-active]="ordenarPor==='cantidad'">
             Cantidad de Viajes
-            <span *ngIf="ordenarPor==='cantidad'">{{ ascendente ? '↑' : '↓' }}</span>
+            <span [style.color]="ordenarPor==='cantidad' ? '#333' : 'transparent'">{{ ascendente && ordenarPor==='cantidad' ? '↑' : '↓' }}</span>
           </th>
           <td mat-cell *matCellDef="let e">{{ e.cantidad }}</td>
         </ng-container>
@@ -79,7 +78,14 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <mat-paginator [length]="total" [pageSize]="pageSize" [pageIndex]="pageIndex" (page)="load($event)">
+      <mat-paginator
+        *ngIf="dataSource.length > 0"
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="load($event)"
+        showFirstLastButtons>
       </mat-paginator>
     </div>
   </div>

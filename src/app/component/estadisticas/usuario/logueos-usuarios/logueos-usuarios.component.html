@@ -77,10 +77,13 @@
       </table>
 
       <mat-paginator
+          *ngIf="data.length > 0"
           [length]="total"
           [pageSize]="pageSize"
           [pageIndex]="pageIndex"
-          (page)="pageChanged($event)">
+          [pageSizeOptions]="[5, 10, 20]"
+          (page)="pageChanged($event)"
+          showFirstLastButtons>
       </mat-paginator>
     </div>
   </div>

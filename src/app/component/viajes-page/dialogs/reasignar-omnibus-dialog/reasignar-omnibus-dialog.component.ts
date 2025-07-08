@@ -13,6 +13,7 @@ import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MaterialUtilsService } from '../../../../shared/material-utils.service';
 
 @Component({
   selector: 'app-reasignar-omnibus-dialog',
@@ -36,13 +37,15 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
   omnibusSeleccionadoId: number | null = null;
   isLoadingBuses = false;
   isLoadingConfirm = false;
+  errorMensaje = '';
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { viaje: DetalleViajeDto },
     private busService: BusService,
     private viajeService: ViajeService,
     private dialogRef: MatDialogRef<ReasignarOmnibusDialogComponent>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private materialUtils: MaterialUtilsService,
   ) {}
 
   ngOnInit(): void {
@@ -96,47 +99,58 @@ export class ReasignarOmnibusDialogComponent implements OnInit {
     if (!this.puedeReasignar || !this.omnibusSeleccionadoId) return;
     
     this.isLoadingConfirm = true;
+    this.errorMensaje = '';
     const body = { nuevoOmnibusId: this.omnibusSeleccionadoId, confirm: false };
 
     this.viajeService
       .reasignar(this.data.viaje.id, body)
-      .then(() => {
-        this.isLoadingConfirm = false;
-        this.dialogRef.close(true);
-      })
-      .catch((err: any) => {
-        this.isLoadingConfirm = false;
-        const resp = err.error || {};
-        const message =
-          typeof resp === 'string'
-            ? resp
-            : resp.message || 'Error inesperado al reasignar';
-        this.dialog
-          .open(WarningDialogComponent, { data: { message }, disableClose: true })
-          .afterClosed()
-          .subscribe((confirmed) => {
-            if (!confirmed) return;
+      .subscribe({
+        next: () => {
+          this.isLoadingConfirm = false;
+          this.materialUtils.showSuccess('Ómnibus reasignado exitosamente.');
+          this.dialogRef.close(true);
+        },
+        error: (err: any) => {
+          this.isLoadingConfirm = false;
+          
+          if (err.status === 409 && err.error?.message) {
+            const resp = err.error || {};
+            const message = typeof resp === 'string'
+                ? resp
+                : resp.message || 'Error inesperado al reasignar';
             
-            this.isLoadingConfirm = true;
-            this.viajeService
-              .reasignar(this.data.viaje.id, { ...body, confirm: true })
-              .then(() => {
-                this.isLoadingConfirm = false;
-                this.dialogRef.close(true);
-              })
-              .catch((err2: any) => {
-                this.isLoadingConfirm = false;
-                const resp2 = err2.error || {};
-                const message2 =
-                  typeof resp2 === 'string'
-                    ? resp2
-                    : resp2.message || 'Error al confirmar reasignación';
-                this.dialog.open(WarningDialogComponent, {
-                  data: { message: message2 },
-                  disableClose: true
-                });
+            this.dialog
+              .open(WarningDialogComponent, { data: { message }, disableClose: true })
+              .afterClosed()
+              .subscribe((confirmed) => {
+                if (!confirmed) return;
+                
+                this.isLoadingConfirm = true;
+                this.errorMensaje = '';
+                this.viajeService
+                  .reasignar(this.data.viaje.id, { ...body, confirm: true })
+                  .subscribe({
+                    next: () => {
+                      this.isLoadingConfirm = false;
+                      this.materialUtils.showSuccess('Ómnibus reasignado exitosamente.');
+                      this.dialogRef.close(true);
+                    },
+                    error: (err2: any) => {
+                      this.isLoadingConfirm = false;
+                      const resp2 = err2.error || {};
+                      this.errorMensaje = typeof resp2 === 'string'
+                          ? resp2
+                          : resp2.message || 'Error al confirmar reasignación';
+                    }
+                  });
               });
-          });
+          } else {
+            const resp = err.error || {};
+            this.errorMensaje = typeof resp === 'string'
+                ? resp
+                : resp.message || 'Error inesperado al reasignar';
+          }
+        }
       });
   }
 

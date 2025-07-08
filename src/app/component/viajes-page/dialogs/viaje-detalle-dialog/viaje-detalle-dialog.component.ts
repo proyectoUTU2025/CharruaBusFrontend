@@ -428,6 +428,7 @@ export class ViajeDetalleDialogComponent implements OnInit {
 
     reasignarDialog.afterClosed().subscribe(reasignado => {
       if (reasignado) {
+        this.materialUtils.showSuccess('Ómnibus reasignado exitosamente.');
         this.cerrar(true);
       }
     });

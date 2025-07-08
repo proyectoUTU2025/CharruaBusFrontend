@@ -96,8 +96,8 @@ export class ViajeService {
     return this.http.post(this.baseUrl, dto);
   }
 
-  reasignar(viajeId: number, body: { nuevoOmnibusId: number, confirm: boolean }): Promise<void> {
-    return firstValueFrom(this.http.post<void>(`${this.baseUrl}/${viajeId}/reasignar`, body));
+  reasignar(viajeId: number, body: { nuevoOmnibusId: number, confirm: boolean }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${viajeId}/reasignar`, body);
   }
   getDetalleViaje(idViaje: number): Promise<DetalleViajeDto> {
     return firstValueFrom(

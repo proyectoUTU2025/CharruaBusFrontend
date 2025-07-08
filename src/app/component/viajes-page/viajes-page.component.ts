@@ -278,8 +278,8 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
         maxHeight: '95vh',
         data: { viaje: detalle },
         disableClose: true
-      }).afterClosed().subscribe(r => {
-        if (r) this.buscar();
+      }).afterClosed().subscribe(() => {
+        this.buscar();
       });
     });
   }

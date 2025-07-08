@@ -36,6 +36,21 @@
   overflow-y: auto;
 }
 
+.error-container {
+  padding: 0 24px 16px;
+  text-align: center;
+
+  .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #c62828;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
 .bus-selection-section {
   .subtitle {
     font-size: 1rem;

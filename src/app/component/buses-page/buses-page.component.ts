@@ -24,7 +24,8 @@ import { BulkUploadBusDialogComponent } from './dialogs/bulk-upload-bus-dialog/b
 import { BusDetailDialogComponent } from './dialogs/bus-detail-dialog/bus-detail-dialog.component';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { LocalidadService } from '../../services/localidades.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -59,27 +60,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   templateUrl: './buses-page.component.html',
   styleUrls: ['./buses-page.component.scss']
 })
-export class BusesPageComponent implements OnInit {
-  private paginator!: MatPaginator;
-  private sort!: MatSort;
+export class BusesPageComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   
-  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    if (mp) {
-      this.paginator = mp;
-    }
-  }
-
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
-    if (ms) {
-      this.sort = ms;
-      this.sort.sortChange.subscribe((event: Sort) => {
-        console.log('SortChange event', event);
-        this.pageIndex = 0;
-        this.loadBuses(event);
-      });
-    }
-  }
-
   filterForm: FormGroup;
   buses: BusDto[] = [];
   totalElements = 0;
@@ -128,74 +112,40 @@ export class BusesPageComponent implements OnInit {
 
   async ngOnInit() { 
     this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
-    // Cargar datos iniciales sin filtros
-    this.loadInitialData();
   }
 
-  private getCurrentSort(): Sort | undefined {
-    return this.sort?.active && this.sort?.direction ? 
-      { active: this.sort.active, direction: this.sort.direction } as Sort : 
-      undefined;
-  }
+  ngAfterViewInit(): void {
+    // Resetear a la primera página si el usuario cambia el orden
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.loadBuses(this.getCurrentSort());
-  }
+    // Unificar eventos de sort y paginación para recargar los datos
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => this.loadBuses())
+      )
+      .subscribe();
 
-  loadInitialData() {
-    // Cargar datos iniciales sin filtros
+    // Carga inicial
+    this.loadBuses();
+  }
+  
+  private loadBuses() {
     this.isLoading = true;
-    const filtro: FiltroBusquedaBusDto = {};
-    
-    this.busService.getAll(filtro, 0, this.pageSize, 'matricula,asc')
-      .then((res: Page<BusDto>) => {
-        console.log('Respuesta del backend:', res); // Debug
-        this.buses = res.content || [];
-        this.totalElements = res.page?.totalElements || 0;
-        this.pageIndex = res.page?.number || 0;
-        this.pageSize = res.page?.size || this.pageSize;
-        this.hasSearched = true; // Marcar como buscado después de la carga inicial
-      })
-      .catch((error) => {
-        console.error('Error al cargar datos:', error);
-        this.materialUtils.showError('Error al cargar los datos. Por favor, intenta nuevamente.');
-        this.buses = [];
-        this.totalElements = 0;
-      })
-      .finally(() => {
-        this.isLoading = false;
-        this.changeDetectorRef.detectChanges();
-      });
-  }
-
-  private loadBuses(sortEvent?: Sort) {
-    const isSortRequest = !!sortEvent;
-    if (!isSortRequest) {
-      this.isLoading = true;
-    }
     this.hasSearched = true;
     const f = this.filterForm.value;
     
-    // Función para combinar fecha y hora (manteniendo zona horaria local)
     const buildDateTime = (fecha: Date | null, hora: string): string | undefined => {
       if (!fecha) return undefined;
-      
-      // Si no hay hora especificada, usar 00:00 por defecto
       const timeToUse = hora || '00:00';
       const [hh, mm] = timeToUse.split(':').map(Number);
       const dt = new Date(fecha);
       dt.setHours(hh, mm, 0, 0);
-      
-      // Formatear como YYYY-MM-DDTHH:mm:ss sin conversión de zona horaria
       const year = dt.getFullYear();
       const month = (dt.getMonth() + 1).toString().padStart(2, '0');
       const day = dt.getDate().toString().padStart(2, '0');
       const hours = dt.getHours().toString().padStart(2, '0');
       const minutes = dt.getMinutes().toString().padStart(2, '0');
       const seconds = dt.getSeconds().toString().padStart(2, '0');
-      
       return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
     };
     
@@ -209,20 +159,18 @@ export class BusesPageComponent implements OnInit {
       fechaHoraLlegada: buildDateTime(f.fechaLlegada, f.horaLlegada)
     };
 
-    let sortParam = 'matricula,asc';
-    const activeField = sortEvent?.active || this.sort?.active;
-    const direction = sortEvent?.direction || this.sort?.direction;
-    if (activeField && direction) {
-      // Mapear "capacidad" a "cantidadAsientos" para el backend
-      const backendField = activeField === 'capacidad' ? 'cantidadAsientos' : activeField;
-      sortParam = `${backendField},${direction.toUpperCase()}`;
-    }
-
-    console.log('Sort param enviado al backend:', sortParam);
+    // Obtener el ordenamiento del MatSort, con valores por defecto para la carga inicial
+    const sortActive = this.sort?.active || 'matricula';
+    const sortDirection = this.sort?.direction || 'asc';
+    const backendField = sortActive === 'capacidad' ? 'cantidadAsientos' : sortActive;
+    const sortParam = `${backendField},${sortDirection}`;
     
-    this.busService.getAll(filtro, this.pageIndex, this.pageSize, sortParam)
+    // Obtener paginación del MatPaginator
+    const pageIndex = this.paginator?.pageIndex || 0;
+    const pageSize = this.paginator?.pageSize || 5;
+    
+    this.busService.getAll(filtro, pageIndex, pageSize, sortParam)
       .then((res: Page<BusDto>) => {
-        console.log('Respuesta del backend:', res); // Debug
         this.buses = res.content || [];
         this.totalElements = res.page?.totalElements || 0;
         this.pageIndex = res.page?.number || 0;
@@ -235,9 +183,7 @@ export class BusesPageComponent implements OnInit {
         this.totalElements = 0;
       })
       .finally(() => {
-        if (!isSortRequest) {
-          this.isLoading = false;
-        }
+        this.isLoading = false;
         this.changeDetectorRef.detectChanges();
       });
   }
@@ -313,11 +259,8 @@ export class BusesPageComponent implements OnInit {
     }
     
     // 4. Todas las validaciones pasaron - proceder con la búsqueda
-    this.pageIndex = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.loadBuses(this.getCurrentSort());
+    this.paginator.pageIndex = 0;
+    this.loadBuses();
   }
 
   onClear() {
@@ -332,7 +275,10 @@ export class BusesPageComponent implements OnInit {
       fechaLlegada: null,
       horaLlegada: ''
     });
-    this.onSearch();
+    this.paginator.pageIndex = 0;
+    this.sort.active = 'matricula';
+    this.sort.direction = 'asc';
+    this.loadBuses();
   }
 
   openBulkUpload() {
@@ -343,7 +289,7 @@ export class BusesPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadBuses(this.getCurrentSort());
+        this.loadBuses();
       }
     });
   }
@@ -357,7 +303,7 @@ export class BusesPageComponent implements OnInit {
       .subscribe((result: boolean | undefined) => {
         if (result) {
           this.materialUtils.showSuccess('Ómnibus creado exitosamente.');
-          this.onSearch();
+          this.loadBuses();
         }
       });
   }
@@ -381,7 +327,7 @@ export class BusesPageComponent implements OnInit {
           try {
             await this.busService.cambiarEstado(bus.id, newActive);
             this.materialUtils.showSuccess(`Ómnibus ${actionPast} correctamente.`);
-            this.loadBuses(this.getCurrentSort());
+            this.loadBuses();
           } catch (err: any) {
             this.materialUtils.showError(err.error?.message || `Error al ${action} el ómnibus.`);
           }
@@ -403,8 +349,7 @@ export class BusesPageComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      // Recargar los datos de la lista por si hubo cambios
-      this.loadBuses(this.getCurrentSort());
+      this.loadBuses();
     });
   }
 }

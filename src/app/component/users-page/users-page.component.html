@@ -86,7 +86,7 @@
     </app-loading-spinner>
 
     <!-- Sin resultados -->
-    <div *ngIf="!isLoading && hasSearched && dataSource.data.length === 0" class="no-results-container">
+    <div class="no-results-container" *ngIf="!isLoading && hasSearched && dataSource.data.length === 0">
       <div class="no-results-content">
         <mat-icon class="no-results-icon">people</mat-icon>
         <h3>No se encontraron usuarios</h3>
@@ -95,40 +95,40 @@
     </div>
 
     <!-- Table content -->
-    <div *ngIf="!isLoading && !(hasSearched && dataSource.data.length === 0)" class="table-container">
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1" matSort matSortDisableClear>
+    <div class="table-container" [hidden]="isLoading || (hasSearched && dataSource.data.length === 0)">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1" matSort>
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
           <td mat-cell *matCellDef="let u">{{ u.id }}</td>
         </ng-container>
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre">Nombre</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
           <td mat-cell *matCellDef="let u">{{ u.nombre }}</td>
         </ng-container>
         <ng-container matColumnDef="apellido">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="apellido">Apellido</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Apellido</th>
           <td mat-cell *matCellDef="let u">{{ u.apellido }}</td>
         </ng-container>
         <ng-container matColumnDef="fechaNacimiento">
-          <th mat-header-cell *matHeaderCellDef class="hide-on-small" mat-sort-header="fechaNacimiento">F. Nac.</th>
+          <th mat-header-cell *matHeaderCellDef class="hide-on-small" mat-sort-header>F. Nac.</th>
           <td mat-cell *matCellDef="let u" class="hide-on-small">{{ u.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
         </ng-container>
         <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef class="hide-on-small" mat-sort-header="email">Correo</th>
+          <th mat-header-cell *matHeaderCellDef class="hide-on-small" mat-sort-header>Correo</th>
           <td mat-cell *matCellDef="let u" class="hide-on-small">{{ u.email }}</td>
         </ng-container>
         <ng-container matColumnDef="documento">
-          <th mat-header-cell *matHeaderCellDef class="hide-on-small" mat-sort-header="documento">Documento</th>
+          <th mat-header-cell *matHeaderCellDef class="hide-on-small" mat-sort-header>Documento</th>
           <td mat-cell *matCellDef="let u" class="hide-on-small">{{ u.documento }}</td>
         </ng-container>
         <ng-container matColumnDef="rol">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="rol">Rol</th>
           <td mat-cell *matCellDef="let u">
-            <mat-chip [ngClass]="getRoleChipClass(u.rol)" selected>{{ getRoleChipText(u.rol) }}</mat-chip>
+            <span class="badge" [ngClass]="getRoleChipClass(u.rol)">{{ getRoleChipText(u.rol) }}</span>
           </td>
         </ng-container>
         <ng-container matColumnDef="activo">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="activo">Status</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
           <td mat-cell *matCellDef="let u">
             <span [ngClass]="u.activo ? 'badge-active' : 'badge-inactive'" class="badge">
               {{ u.activo ? 'Activo' : 'Inactivo' }}
@@ -156,13 +156,12 @@
         <tr mat-row *matRowDef="let row; columns: columns;"></tr>
       </table>
     </div>
+    
     <mat-paginator
-      *ngIf="!isLoading && dataSource.data.length > 0"
+      [hidden]="isLoading || (dataSource.data.length === 0 && hasSearched)"
       [length]="totalElements"
-      [pageSize]="pageSize"
-      [pageIndex]="pageIndex"
-      [pageSizeOptions]="[5, 10]"
-      (page)="onPageChange($event)"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="10"
       showFirstLastButtons>
     </mat-paginator>
   </div>

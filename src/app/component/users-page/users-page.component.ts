@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { MatSort, Sort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { UserService } from '../../services/user.service';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
@@ -22,46 +24,26 @@ import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-sp
   templateUrl: './users-page.component.html',
   styleUrls: ['./users-page.component.scss']
 })
-export class UsersPageComponent implements OnInit {
-  isLoading = false;
+export class UsersPageComponent implements OnInit, AfterViewInit {
+  isLoading = true;
   columns: string[] = ['id', 'nombre', 'apellido', 'fechaNacimiento', 'email', 'documento', 'rol', 'activo', 'acciones'];
   dataSource = new MatTableDataSource<UsuarioDto>();
-  pageIndex = 0;
-  pageSize = 10;
   totalElements = 0;
   filterForm: FormGroup;
   bulkErrors: string[] = [];
   hasSearched = false;
 
-  roles = Object.values(TipoRol) 
+  roles = Object.values(TipoRol)
     .map(value => ({ value, viewValue: value }));
-    
+
   estados = [
     { value: 'todos', viewValue: 'TODOS' },
     { value: 'activos', viewValue: 'ACTIVOS' },
     { value: 'inactivos', viewValue: 'INACTIVOS' }
   ];
 
-  private paginator!: MatPaginator;
-  private sort!: MatSort;
-  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    if (mp) {
-      this.paginator = mp;
-    }
-  }
-
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
-    if (ms) {
-      this.sort = ms; // mantenemos el sort solo para capturar eventos, sin aplicar orden local
-
-      // Al cambiar el orden, recargar desde el backend con la dirección correcta
-      this.sort.sortChange.subscribe((event: Sort) => {
-        console.log('SortChange event', event);
-        this.pageIndex = 0;
-        this.loadUsers(event);
-      });
-    }
-  }
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private fb: FormBuilder,
@@ -77,45 +59,24 @@ export class UsersPageComponent implements OnInit {
       rol: [null],
       estado: ['todos']
     });
-
-    // Configurar acceso de datos para ordenamiento personalizado
-    this.dataSource.sortingDataAccessor = (item: UsuarioDto, property: string): string | number => {
-      const value: any = (item as any)[property];
-      if (value === null || value === undefined) {
-        return '';
-      }
-      if (property === 'fechaNacimiento') {
-        return new Date(value).getTime();
-      }
-      if (typeof value === 'boolean') {
-        return value ? 1 : 0;
-      }
-      return value as string | number;
-    };
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => this.loadUsers())
+      )
+      .subscribe();
+
     this.loadUsers();
   }
 
-  private getCurrentSort(): Sort | undefined {
-    return this.sort?.active && this.sort?.direction ? 
-      { active: this.sort.active, direction: this.sort.direction } as Sort : 
-      undefined;
-  }
-
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.loadUsers(this.getCurrentSort());
-  }
-
-  async loadUsers(sortEvent?: Sort): Promise<void> {
-    // Solo mostrar spinner si no viene de un cambio de orden
-    const isSortRequest = !!sortEvent;
-    if (!isSortRequest) {
-      this.isLoading = true;
-    }
+  async loadUsers(): Promise<void> {
+    this.isLoading = true;
     this.hasSearched = true;
     const { nombre, apellido, email, documento, rol, estado } = this.filterForm.value;
 
@@ -127,42 +88,39 @@ export class UsersPageComponent implements OnInit {
       roles: rol ? [rol] : undefined,
       activo: estado === 'todos' ? undefined : estado === 'activos'
     };
-    
-    let sortParam = 'nombre,asc';
-    // Si recibimos evento, usarlo; si no, usar sort actual
-    const activeField = sortEvent?.active || this.sort?.active;
-    const direction = sortEvent?.direction || this.sort?.direction;
-    if (activeField && direction) {
-      sortParam = `${activeField},${direction.toUpperCase()}`;
-    }
 
-    console.log('Sort param enviado al backend:', sortParam);
+    const sortActive = this.sort?.active || 'nombre';
+    const sortDirection = this.sort?.direction || 'asc';
+    const sortParam = `${sortActive},${sortDirection}`;
+
+    const pageIndex = this.paginator?.pageIndex || 0;
+    const pageSize = this.paginator?.pageSize || 10;
 
     try {
-      const page = await this.userService.getAll(filtro, this.pageIndex, this.pageSize, sortParam);
+      const page = await this.userService.getAll(filtro, pageIndex, pageSize, sortParam);
       this.dataSource.data = page.content;
       this.totalElements = page.page.totalElements;
     } catch (err) {
       console.error("Error loading users", err);
       this.materialUtils.showError('Error al cargar la lista de usuarios.');
+      this.dataSource.data = [];
+      this.totalElements = 0;
     } finally {
-      if (!isSortRequest) {
-        this.isLoading = false;
-      }
+      this.isLoading = false;
     }
   }
 
   onSearch() {
-    this.pageIndex = 0;
-    if(this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.loadUsers(this.getCurrentSort());
+    this.paginator.pageIndex = 0;
+    this.loadUsers();
   }
 
   onClear() {
     this.filterForm.reset({ nombre: '', apellido: '', email: '', documento: '', rol: null, estado: 'todos' });
-    this.onSearch();
+    this.paginator.pageIndex = 0;
+    this.sort.active = 'nombre';
+    this.sort.direction = 'asc';
+    this.loadUsers();
   }
 
   add() {
@@ -173,7 +131,7 @@ export class UsersPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadUsers(this.getCurrentSort()); 
+        this.loadUsers();
       }
     });
   }
@@ -187,7 +145,7 @@ export class UsersPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadUsers(this.getCurrentSort());
+        this.loadUsers();
       }
     });
   }
@@ -195,7 +153,7 @@ export class UsersPageComponent implements OnInit {
   toggleUserStatus(user: UsuarioDto) {
     const action = user.activo ? 'desactivar' : 'activar';
     const actionPast = user.activo ? 'desactivado' : 'activado';
-    
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: `Confirmar ${action}`,
@@ -204,19 +162,19 @@ export class UsersPageComponent implements OnInit {
       disableClose: true
     });
 
-          dialogRef.afterClosed().subscribe(async confirmed => {
-        if (confirmed) {
-          try {
-            await this.userService.cambiarEstado(user.id);
-            this.materialUtils.showSuccess(`Usuario ${actionPast} correctamente.`);
-            this.loadUsers(this.getCurrentSort());
-          } catch (err: any) {
-            this.materialUtils.showError(err.error?.message || `Error al ${action} el usuario.`);
-          }
+    dialogRef.afterClosed().subscribe(async confirmed => {
+      if (confirmed) {
+        try {
+          await this.userService.cambiarEstado(user.id);
+          this.materialUtils.showSuccess(`Usuario ${actionPast} correctamente.`);
+          this.loadUsers();
+        } catch (err: any) {
+          this.materialUtils.showError(err.error?.message || `Error al ${action} el usuario.`);
         }
-      });
+      }
+    });
   }
-  
+
   openBulkUpload() {
     const dialogRef = this.dialog.open(BulkUploadDialogComponent, {
       width: '600px',
@@ -225,7 +183,7 @@ export class UsersPageComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadUsers(this.getCurrentSort());
+        this.loadUsers();
       }
     });
   }

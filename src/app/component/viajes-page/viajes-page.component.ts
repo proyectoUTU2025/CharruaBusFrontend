@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -22,6 +22,8 @@ import { LocalidadService } from '../../services/localidades.service';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { Page } from '../../models';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
+import { merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 // Validadores personalizados
 export const origenDestinoValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -75,7 +77,7 @@ export const fechasValidator: ValidatorFn = (control: AbstractControl): Validati
   templateUrl: './viajes-page.component.html',
   styleUrls: ['./viajes-page.component.scss']
 })
-export class ViajesPageComponent implements OnInit {
+export class ViajesPageComponent implements OnInit, AfterViewInit {
   columns = [
     'id',
     'nombreLocalidadOrigen',
@@ -92,33 +94,14 @@ export class ViajesPageComponent implements OnInit {
   viajes: ViajeDisponibleDto[] = [];
   totalElements = 0;
   localidades: LocalidadNombreDepartamentoDto[] = [];
-  pageIndex = 0;
-  pageSize = 5;
   isLoading = true;
   hasSearched = false;
   
-  private paginator!: MatPaginator;
-  private sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   
   horasDisponibles = this.generateTimeOptions();
   
-  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    if (mp) {
-      this.paginator = mp;
-    }
-  }
-
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
-    if (ms) {
-      this.sort = ms;
-      this.sort.sortChange.subscribe((event: Sort) => {
-        console.log('SortChange event', event);
-        this.pageIndex = 0;
-        this.buscar(event);
-      });
-    }
-  }
-
   constructor(
     private fb: FormBuilder,
     private viajeService: ViajeService,
@@ -142,18 +125,23 @@ export class ViajesPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.localidadService.getAllFlat().subscribe(ls => this.localidades = ls);
+  }
+
+  ngAfterViewInit(): void {
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => this.buscar())
+      )
+      .subscribe();
+
     this.buscar();
   }
 
-  private getCurrentSort(): Sort | undefined {
-    return this.sort?.active && this.sort?.direction ? 
-      { active: this.sort.active, direction: this.sort.direction } as Sort : 
-      undefined;
-  }
-
-  private buildSortParam(sortEvent?: Sort): string {
-    const activeField = sortEvent?.active || this.sort?.active;
-    const direction = sortEvent?.direction || this.sort?.direction;
+  private buildSortParam(): string {
+    const activeField = this.sort?.active;
+    const direction = this.sort?.direction;
     if (!activeField || !direction) {
       return 'fechaHoraSalida,asc';
     }
@@ -167,11 +155,8 @@ export class ViajesPageComponent implements OnInit {
     return `${backendField},${dir}`;
   }
 
-  buscar(sortEvent?: Sort): void {
-    const isSortRequest = !!sortEvent;
-    if (!isSortRequest) {
-      this.isLoading = true;
-    }
+  buscar(): void {
+    this.isLoading = true;
     this.hasSearched = true;
 
     const f = this.filterForm.value;
@@ -203,19 +188,23 @@ export class ViajesPageComponent implements OnInit {
       fechaHasta
     };
 
-    const sortParam = this.buildSortParam(sortEvent);
+    const sortParam = this.buildSortParam();
+    const pageIndex = this.paginator?.pageIndex || 0;
+    const pageSize = this.paginator?.pageSize || 5;
 
-    this.viajeService.buscar(filtroTransformado, this.pageIndex, this.pageSize, sortParam)
+    this.viajeService.buscar(filtroTransformado, pageIndex, pageSize, sortParam)
       .then((res: Page<ViajeDisponibleDto>) => {
-        this.viajes = res.content;
-        this.totalElements = res.page.totalElements;
-        this.pageIndex = res.page.number;
+        this.viajes = res.content || [];
+        this.totalElements = res.page?.totalElements || 0;
       })
-      .catch(err => console.error('Error al buscar viajes', err))
+      .catch(err => {
+        console.error('Error al buscar viajes', err)
+        this.materialUtils.showError('Error al cargar los viajes. Por favor, intente de nuevo.');
+        this.viajes = [];
+        this.totalElements = 0;
+      })
       .finally(() => {
-        if (!isSortRequest) {
-          this.isLoading = false;
-        }
+        this.isLoading = false;
       });
   }
 
@@ -259,11 +248,8 @@ export class ViajesPageComponent implements OnInit {
       }
     }
 
-    this.pageIndex = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.buscar(this.getCurrentSort());
+    this.paginator.pageIndex = 0;
+    this.buscar();
   }
 
   onClear(): void {
@@ -275,17 +261,10 @@ export class ViajesPageComponent implements OnInit {
       horaDesde: '',
       horaHasta: ''
     });
-    this.pageIndex = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.buscar(this.getCurrentSort());
-  }
-
-  cambiarPagina(e: PageEvent): void {
-    this.pageIndex = e.pageIndex;
-    this.pageSize = e.pageSize;
-    this.buscar(this.getCurrentSort());
+    this.paginator.pageIndex = 0;
+    this.sort.active = 'fechaHoraSalida';
+    this.sort.direction = 'asc';
+    this.buscar();
   }
 
   crearViaje(): void {

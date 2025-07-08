@@ -49,20 +49,20 @@
       </div>
     </div>
 
-    <div *ngIf="!isLoading && !(hasSearched && localidades.length === 0)" class="table-container">
-      <table mat-table [dataSource]="localidades" class="mat-elevation-z1" matSort matSortDisableClear>
+    <div class="table-container" [hidden]="isLoading || (hasSearched && localidades.length === 0)">
+      <table mat-table [dataSource]="localidades" class="mat-elevation-z1" matSort>
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
           <td mat-cell *matCellDef="let l">{{ l.id }}</td>
         </ng-container>
-
+        
         <ng-container matColumnDef="departamento">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="departamento">Departamento</th>
-          <td mat-cell *matCellDef="let l">{{ l.departamento }}</td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Departamento</th>
+          <td mat-cell *matCellDef="let l">{{ formatDepartmentName(l.departamento) }}</td>
         </ng-container>
-
+        
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre">Nombre</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
           <td mat-cell *matCellDef="let l">{{ l.nombre }}</td>
         </ng-container>
 
@@ -71,8 +71,11 @@
       </table>
     </div>
 
-    <mat-paginator *ngIf="!isLoading && localidades.length > 0" [length]="totalElements" [pageSize]="pageSize"
-      [pageIndex]="pageIndex" [pageSizeOptions]="[5,10]" (page)="cambiarPagina($event)" showFirstLastButtons>
+    <mat-paginator [hidden]="isLoading || localidades.length === 0" 
+      [length]="totalElements" 
+      [pageSizeOptions]="[5, 10]"
+      [pageSize]="10"
+      showFirstLastButtons>
     </mat-paginator>
   </div>
 </div>

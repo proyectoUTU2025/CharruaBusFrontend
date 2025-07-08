@@ -118,7 +118,7 @@
 
     <!-- Loading spinner -->
     <app-loading-spinner 
-      *ngIf="isLoading" 
+      [hidden]="!isLoading" 
       type="spinner" 
       message="Cargando ómnibus..."
       [diameter]="40">
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Table content -->
-    <div *ngIf="!isLoading && !(hasSearched && buses.length === 0)" class="table-container">
+    <div [hidden]="isLoading || (hasSearched && buses.length === 0)" class="table-container">
       <table mat-table [dataSource]="buses" class="mat-elevation-z1" matSort matSortDisableClear>
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
@@ -185,12 +185,11 @@
     </div>
 
     <mat-paginator
-      *ngIf="!isLoading && buses.length > 0"
+      [hidden]="isLoading || buses.length === 0"
       [length]="totalElements"
       [pageSize]="pageSize"
       [pageIndex]="pageIndex"
       [pageSizeOptions]="[5, 10]"
-      (page)="onPageChange($event)"
       showFirstLastButtons>
     </mat-paginator>
   </div>

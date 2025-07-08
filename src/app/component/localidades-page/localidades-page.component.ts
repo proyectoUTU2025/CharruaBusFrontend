@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -13,6 +13,8 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { SharedModule } from '../../shared/shared.module';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
+import { merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { LocalidadService } from '../../services/localidades.service';
 import { LocalidadDto, FiltroBusquedaLocalidadDto } from '../../models/localidades/localidades-dto.model';
@@ -50,36 +52,17 @@ import { MaterialUtilsService } from '../../shared/material-utils.service';
   templateUrl: './localidades-page.component.html',
   styleUrls: ['./localidades-page.component.scss']
 })
-export class LocalidadesPageComponent implements OnInit {
+export class LocalidadesPageComponent implements OnInit, AfterViewInit {
   displayedColumns = ['id', 'departamento', 'nombre'];
   filterForm!: FormGroup;
   departamentos: { value: string; viewValue: string }[] = [];
   localidades: LocalidadDto[] = [];
   totalElements = 0;
-  pageIndex = 0;
-  pageSize = 10;
-  isLoading = false;
+  isLoading = true;
   hasSearched = false;
   
-  private paginator!: MatPaginator;
-  private sort!: MatSort;
-  
-  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    if (mp) {
-      this.paginator = mp;
-    }
-  }
-
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
-    if (ms) {
-      this.sort = ms;
-      this.sort.sortChange.subscribe((event: Sort) => {
-        console.log('SortChange event', event);
-        this.pageIndex = 0;
-        this.buscar(event);
-      });
-    }
-  }
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private fb: FormBuilder,
@@ -98,24 +81,26 @@ export class LocalidadesPageComponent implements OnInit {
       departamentos: [null],
       nombre: [''],
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        tap(() => this.buscar())
+      )
+      .subscribe();
+
     this.buscar();
   }
 
-  private formatDepartmentName(departmentValue: string): string {
+  formatDepartmentName(departmentValue: string): string {
     return departmentValue.replace(/_/g, ' ');
   }
 
-  private getCurrentSort(): Sort | undefined {
-    return this.sort?.active && this.sort?.direction ? 
-      { active: this.sort.active, direction: this.sort.direction } as Sort : 
-      undefined;
-  }
-
-  buscar(sortEvent?: Sort): void {
-    const isSortRequest = !!sortEvent;
-    if (!isSortRequest) {
-      this.isLoading = true;
-    }
+  buscar(): void {
+    this.isLoading = true;
     this.hasSearched = true;
 
     const filtro: FiltroBusquedaLocalidadDto = {
@@ -123,17 +108,15 @@ export class LocalidadesPageComponent implements OnInit {
       departamentos: this.filterForm.get('departamentos')?.value ? [this.filterForm.get('departamentos')?.value] : undefined,
     };
 
-    let sortParam = 'nombre,asc';
-    const activeField = sortEvent?.active || this.sort?.active;
-    const direction = sortEvent?.direction || this.sort?.direction;
-    if (activeField && direction) {
-      sortParam = `${activeField},${direction}`;
-    }
-
-    console.log('Sort param enviado al backend:', sortParam);
+    const sortActive = this.sort?.active || 'nombre';
+    const sortDirection = this.sort?.direction || 'asc';
+    const sortParam = `${sortActive},${sortDirection}`;
+    
+    const pageIndex = this.paginator?.pageIndex || 0;
+    const pageSize = this.paginator?.pageSize || 10;
 
     this.localidadService
-      .getAll(filtro, this.pageIndex, this.pageSize, sortParam)
+      .getAll(filtro, pageIndex, pageSize, sortParam)
       .subscribe({
         next: (page) => {
           this.localidades = page.content;
@@ -141,36 +124,26 @@ export class LocalidadesPageComponent implements OnInit {
         },
         error: () => {
           this.materialUtils.showError('Error al cargar las localidades');
+          this.localidades = [];
+          this.totalElements = 0;
         },
         complete: () => {
-          if (!isSortRequest) {
-            this.isLoading = false;
-          }
+          this.isLoading = false;
         }
     });
   }
 
   onSearch(): void {
-    this.pageIndex = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.buscar(this.getCurrentSort());
+    this.paginator.pageIndex = 0;
+    this.buscar();
   }
 
   onClear(): void {
     this.filterForm.reset({ departamentos: null, nombre: '' });
-    this.pageIndex = 0;
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-    this.buscar(this.getCurrentSort());
-  }
-
-  cambiarPagina(event: PageEvent) {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.buscar(this.getCurrentSort());
+    this.paginator.pageIndex = 0;
+    this.sort.active = 'nombre';
+    this.sort.direction = 'asc';
+    this.buscar();
   }
 
   openAltaMasivaDialog() {
@@ -182,7 +155,7 @@ export class LocalidadesPageComponent implements OnInit {
         if (result?.errors) {
           this.dialog.open(BulkErrorsDialogComponent, { data: { results: result.errors } });
         } else if (result?.success) {
-          this.buscar(this.getCurrentSort());
+          this.buscar();
         }
       });
   }
@@ -196,7 +169,7 @@ export class LocalidadesPageComponent implements OnInit {
     
     dialogRef.afterClosed().subscribe(loc => {
       if (!loc) return;
-      this.buscar(this.getCurrentSort());
+      this.buscar();
     });
   }
 }

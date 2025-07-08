@@ -27,7 +27,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Origen</mat-label>
         <mat-select [formControl]="origen">
-          <mat-option [value]="null">Todos</mat-option>
+          <mat-option [value]="null">TODOS</mat-option>
           <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
         </mat-select>
       </mat-form-field>
@@ -35,7 +35,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Destino</mat-label>
         <mat-select [formControl]="destino">
-          <mat-option [value]="null">Todos</mat-option>
+          <mat-option [value]="null">TODOS</mat-option>
           <mat-option *ngFor="let d of departamentos" [value]="d">{{ d }}</mat-option>
         </mat-select>
       </mat-form-field>

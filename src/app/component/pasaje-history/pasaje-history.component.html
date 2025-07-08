@@ -25,7 +25,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Origen</mat-label>
           <mat-select [(ngModel)]="filtro.origenId" name="origenId">
-            <mat-option [value]="undefined">Todos</mat-option>
+            <mat-option [value]="undefined">TODOS</mat-option>
             <mat-option *ngFor="let o of todasLasLocalidades" [value]="o.id">
               {{ o.nombreConDepartamento }}
             </mat-option>
@@ -35,7 +35,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Destino</mat-label>
           <mat-select [(ngModel)]="filtro.destinoId" name="destinoId">
-            <mat-option [value]="undefined">Todos</mat-option>
+            <mat-option [value]="undefined">TODOS</mat-option>
             <mat-option *ngFor="let d of todasLasLocalidades" [value]="d.id">
               {{ d.nombreConDepartamento }}
             </mat-option>
@@ -45,7 +45,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Estado</mat-label>
           <mat-select [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoChange()" name="estado">
-            <mat-option value="">Todos</mat-option>
+            <mat-option value="">TODOS</mat-option>
             <mat-option *ngFor="let e of estadosOpts" [value]="e">
               {{ e }}
             </mat-option>

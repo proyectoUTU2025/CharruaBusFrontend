@@ -122,7 +122,13 @@
             <mat-icon>receipt</mat-icon>
             <div>
               <label>ID de Compra</label>
-              <span>#{{ pasaje.compraId }}</span>
+              <span class="info-label">ID Compra</span>
+              <span class="info-value">
+                #{{ pasaje.compraId }}
+                <a (click)="verCompra()" *ngIf="mostrarLinkCompra" class="ver-compra-link">
+                  (Ver Compra)
+                </a>
+              </span>
             </div>
           </div>
           

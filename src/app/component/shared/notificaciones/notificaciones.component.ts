@@ -86,6 +86,7 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
     this.notificaciones = [];
     this.hayMasNotificaciones = true;
     
+    this.marcarTodasLeidas();
     this.cargarNotificaciones();
   }
 
@@ -147,14 +148,11 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
     // Verificar si hay notificaciones no leídas, ya sea por contador o por notificaciones locales
     const tieneNoLeidasLocales = this.notificaciones.some(n => !n.leido);
     if (this.contadorNoLeidas === 0 && !tieneNoLeidasLocales) {
-      console.log('No hay notificaciones no leídas para marcar');
       return;
     }
 
-    console.log('Marcando todas las notificaciones como leídas...');
     this.notificacionService.marcarLeidas(this.clienteId).subscribe({
       next: () => {
-        console.log('Notificaciones marcadas como leídas exitosamente');
         // Actualizar las notificaciones localmente
         this.notificaciones = this.notificaciones.map(notif => ({
           ...notif,

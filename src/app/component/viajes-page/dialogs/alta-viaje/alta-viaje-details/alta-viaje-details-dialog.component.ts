@@ -296,16 +296,10 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       return;
     }
 
-    const total = 2 + this.paradasIntermedias.length;
-    const salida = new Date(this.formatFecha(this.fechaSalida, this.horaSalida));
-    const llegada = new Date(this.formatFecha(this.fechaLlegada, this.horaLlegada));
-    const intervalo = (llegada.getTime() - salida.getTime()) / (total - 1);
-
     const localidadesIds = [this.origenId, ...this.paradasIntermedias, this.destinoId];
     const paradas = localidadesIds.map((id, idx) => ({
       localidadId: id,
       orden: idx + 1,
-      fechaHoraLlegada: new Date(salida.getTime() + idx * intervalo).toISOString()
     }));
 
     const altaDto = {
@@ -434,24 +428,12 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   private formatFecha(fecha: Date | null, hora: string = ''): string {
-    if (!fecha) return '';
-    
-    // Get date components from the Date object. These are based on the user's local timezone,
-    // but for a date-only object from a datepicker, they give us the selected calendar date.
-    const y = fecha.getFullYear();
-    const m = (fecha.getMonth() + 1).toString().padStart(2, '0');
-    const d = fecha.getDate().toString().padStart(2, '0');
-
-    const [hh, mm] = hora ? hora.split(':') : ['00', '00'];
-
-    // We construct a string representing the date and time in Uruguay's timezone (UTC-3)
-    const dateTimeString = `${y}-${m}-${d}T${hh}:${mm}:00-03:00`;
-    
-    // We create a new Date object from this string. The JS engine will parse the timezone offset.
-    const dateInUruguayTimezone = new Date(dateTimeString);
-    
-    // toISOString() will then return the date in UTC, which is the standard for APIs.
-    return dateInUruguayTimezone.toISOString();
+    if (!fecha || !hora) return '';
+    const f = new Date(fecha);
+    const yyyy = f.getFullYear();
+    const mm = (f.getMonth() + 1).toString().padStart(2, '0');
+    const dd = f.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}T${hora}:00`;
   }
 
   ngAfterViewChecked(): void {

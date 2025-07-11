@@ -1,4 +1,4 @@
-import { Component, Inject, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, Inject, ViewEncapsulation, OnInit, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +24,8 @@ import { DetallePasajeCompletoDialogComponent } from '../../../shared/detalle-pa
 import { PasajeService } from '../../../../services/pasaje.service';
 import { PasajeDto, TipoEstadoPasaje, FiltroPasajeViajeDto } from '../../../../models/pasajes';
 import { MaterialUtilsService } from '../../../../shared/material-utils.service';
+import { Subject, takeUntil } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 
@@ -55,7 +57,7 @@ import { MaterialUtilsService } from '../../../../shared/material-utils.service'
     ReactiveFormsModule
   ],
 })
-export class ViajeDetalleDialogComponent implements OnInit {
+export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
   selectedTabIndex = 0;
   pasajes: PasajeDto[] = [];
   pasajesFiltrados: PasajeDto[] = [];
@@ -72,6 +74,8 @@ export class ViajeDetalleDialogComponent implements OnInit {
   pageSize = 10;
   totalElements = 0;
   pageSizeOptions = [5, 10];
+  minDateForHasta: Date | null = null;
+  private destroy$ = new Subject<void>();
   
   displayedColumns = ['id', 'asiento', 'origen', 'destino', 'subtotal', 'estado', 'fechaCompra', 'acciones'];
 
@@ -80,7 +84,8 @@ export class ViajeDetalleDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<ViajeDetalleDialogComponent>,
     private dialog: MatDialog,
     private pasajeService: PasajeService,
-    private materialUtils: MaterialUtilsService
+    private materialUtils: MaterialUtilsService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -90,6 +95,25 @@ export class ViajeDetalleDialogComponent implements OnInit {
       Validators.min(1),
       Validators.max(this.cantidadMaximaAsientos)
     ]);
+    this.setupDateFilters();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  setupDateFilters(): void {
+    this.fechaDesdeFilter.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        this.minDateForHasta = value ? new Date(value) : null;
+        
+        const fechaHastaControl = this.fechaHastaFilter;
+        if (fechaHastaControl?.value && this.minDateForHasta && fechaHastaControl.value < this.minDateForHasta) {
+          fechaHastaControl.setValue(null);
+        }
+      });
   }
 
   onTabChange(index: number) {
@@ -151,11 +175,11 @@ export class ViajeDetalleDialogComponent implements OnInit {
     
     // Filtro por fechas
     if (this.fechaDesdeFilter.value) {
-      filtro.fechaDesde = this.fechaDesdeFilter.value.toISOString();
+      filtro.fechaDesde = this.formatDateForBackend(this.fechaDesdeFilter.value);
     }
     
     if (this.fechaHastaFilter.value) {
-      filtro.fechaHasta = this.fechaHastaFilter.value.toISOString();
+      filtro.fechaHasta = this.formatDateForBackend(this.fechaHastaFilter.value);
     }
     
     // Filtro por origen
@@ -194,6 +218,24 @@ export class ViajeDetalleDialogComponent implements OnInit {
   }
 
   /**
+   * Formats a date to YYYY-MM-DDTHH:mm:ss without timezone info.
+   * @param date The date to format.
+   * @param endOfDay If true, sets the time to 23:59:59. Otherwise, 00:00:00.
+   */
+  private formatDateForBackend(date: Date, endOfDay: boolean = false): string {
+    if (!date) return '';
+
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
+
+    if (endOfDay) {
+      return `${yyyy}-${mm}-${dd}T23:59:59`;
+    }
+    return `${yyyy}-${mm}-${dd}T00:00:00`;
+  }
+
+  /**
    * Maneja el evento de cambio de página
    */
   onPageChange(event: PageEvent) {
@@ -201,6 +243,7 @@ export class ViajeDetalleDialogComponent implements OnInit {
     this.pageSize = event.pageSize;
     this.aplicarFiltros();
   }
+
 
   /**
    * Recarga los pasajes con filtros del servidor
@@ -260,9 +303,13 @@ export class ViajeDetalleDialogComponent implements OnInit {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      // Recargar la lista de pasajes para reflejar posibles cambios (como reembolsos)
-      this.aplicarFiltros();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'VER_COMPRA' && result.compraId) {
+        this.dialogRef.close();
+        this.router.navigate(['/compra', result.compraId]);
+      } else {
+        this.aplicarFiltros();
+      }
     });
   }
 

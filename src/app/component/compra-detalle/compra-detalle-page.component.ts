@@ -145,7 +145,7 @@ export class CompraDetallePageComponent implements OnInit {
     const dialogRef = this.dialog.open(DetallePasajeCompletoDialogComponent, {
       width: '600px',
       maxWidth: '95vw',
-      data: { pasajeId: pasajeId },
+      data: { pasajeId: pasajeId, mostrarLinkCompra: false },
       disableClose: true,
       autoFocus: false,
     });

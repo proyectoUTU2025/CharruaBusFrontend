@@ -76,7 +76,7 @@
         <div class="datetime-group">
           <mat-form-field appearance="outline" class="date-field">
             <mat-label>Fecha Llegada</mat-label>
-            <input matInput [matDatepicker]="dpLlegada" formControlName="fechaLlegada">
+            <input matInput [matDatepicker]="dpLlegada" formControlName="fechaLlegada" [min]="fechaSalida">
             <mat-datepicker-toggle matSuffix [for]="dpLlegada"></mat-datepicker-toggle>
             <mat-datepicker #dpLlegada></mat-datepicker>
             <mat-hint>Requerida si especifica ubicación</mat-hint>

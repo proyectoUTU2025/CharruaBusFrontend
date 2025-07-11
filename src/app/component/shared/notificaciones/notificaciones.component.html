@@ -15,15 +15,6 @@
   <mat-menu #notificacionesMenu="matMenu" class="notifications-menu" [overlapTrigger]="false" xPosition="before">
   <div class="notifications-header" (click)="$event.stopPropagation()">
     <h3>Notificaciones</h3>
-    <button 
-      mat-button 
-      color="primary" 
-      *ngIf="hayNotificacionesNoLeidas"
-      (click)="marcarTodasLeidas()"
-      class="mark-all-read-btn"
-    >
-      Marcar todas como leídas
-    </button>
   </div>
 
   <mat-divider></mat-divider>

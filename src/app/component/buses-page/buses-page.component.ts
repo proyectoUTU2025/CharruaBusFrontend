@@ -9,12 +9,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
 import { FiltroBusquedaBusDto, BusDto, Page } from '../../models';
@@ -44,7 +44,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule,
     MatCardModule,
     MatSortModule,
     MatDatepickerModule,
@@ -97,6 +96,10 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     });
   }
 
+  get fechaSalida(): Date | null {
+    return this.filterForm.get('fechaSalida')?.value;
+  }
+
   private generateTimeOptions() {
     const options = [];
     for (let h = 0; h < 24; h++) {
@@ -112,6 +115,16 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
 
   async ngOnInit() { 
     this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
+    this.subscribeToDateChanges();
+  }
+
+  private subscribeToDateChanges(): void {
+    this.filterForm.get('fechaSalida')?.valueChanges.subscribe(value => {
+      const fechaLlegadaControl = this.filterForm.get('fechaLlegada');
+      if (value && fechaLlegadaControl?.value && new Date(value) > new Date(fechaLlegadaControl.value)) {
+        fechaLlegadaControl.setValue(null);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -249,16 +262,15 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
     const tieneLocalidad = f.localidadId && f.localidadId !== null;
     
     if (tieneFechas && !tieneLocalidad) {
-      this.materialUtils.showError('Si especificas fechas de salida y llegada, también debes seleccionar una ubicación del ómnibus.');
+      this.materialUtils.showError('Si especificas fechas, también debes especificar una ubicación.');
       return;
     }
     
     if (tieneLocalidad && !tieneFechas) {
-      this.materialUtils.showError('Si especificas una ubicación del ómnibus, también debes especificar las fechas de salida y llegada.');
+      this.materialUtils.showError('Si especificas una ubicación, también debes especificar un rango de fechas.');
       return;
     }
-    
-    // 4. Todas las validaciones pasaron - proceder con la búsqueda
+
     this.paginator.pageIndex = 0;
     this.loadBuses();
   }
@@ -276,8 +288,12 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       horaLlegada: ''
     });
     this.paginator.pageIndex = 0;
-    this.sort.active = 'matricula';
-    this.sort.direction = 'asc';
+    
+    if (this.sort) {
+      this.sort.active = 'matricula';
+      this.sort.direction = 'asc';
+    }
+
     this.loadBuses();
   }
 
@@ -287,8 +303,9 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {
+        this.materialUtils.showSuccess('Carga masiva completada con éxito.');
         this.loadBuses();
       }
     });
@@ -316,23 +333,24 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: `Confirmar ${action}`,
-        message: `¿Está seguro de que desea ${action} el ómnibus ${bus.matricula}?`
-      },
-      disableClose: true
+        title: `Confirmar cambio de estado`,
+        message: `¿Estás seguro de que deseas ${bus.activo ? 'desactivar' : 'activar'} el ómnibus con matrícula ${bus.matricula}?`,
+        type: bus.activo ? 'warning' : 'info'
+      }
     });
 
-        dialogRef.afterClosed().subscribe(async confirmed => {
-        if (confirmed) {
-          try {
-            await this.busService.cambiarEstado(bus.id, newActive);
-            this.materialUtils.showSuccess(`Ómnibus ${actionPast} correctamente.`);
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.busService.cambiarEstado(bus.id, newActive)
+          .then(() => {
+            this.materialUtils.showSuccess(`Ómnibus ${bus.activo ? 'desactivado' : 'activado'} correctamente.`);
             this.loadBuses();
-          } catch (err: any) {
+          })
+          .catch((err: any) => {
             this.materialUtils.showError(err.error?.message || `Error al ${action} el ómnibus.`);
-          }
-        }
-      });
+          });
+      }
+    });
   }
 
   localidadNombre(id: number): string {

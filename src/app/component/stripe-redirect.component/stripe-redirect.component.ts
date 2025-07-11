@@ -37,7 +37,6 @@ export class StripeRedirectComponent implements OnInit {
     setTimeout(() => {
       const sessionId = this.route.snapshot.queryParamMap.get('session_id');
       const estado = this.route.snapshot.paramMap.get('estado');
-      debugger;
       if (sessionId && estado === 'exito') {
         this.compraService.confirmarCompra(sessionId).subscribe({
           next: (response) => {

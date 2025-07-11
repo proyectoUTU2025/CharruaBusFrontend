@@ -11,7 +11,37 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, ErrorStateMatcher } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { Subscription } from 'rxjs';
+import { ImmediateErrorStateMatcher } from '../../shared/immediate-error-state-matcher';
 
+
+function cedulaValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) {
+    return null;
+  }
+
+  const cedula = control.value.toString().replace(/[.-]/g, '');
+  if (cedula.length > 0 && cedula.length < 8) {
+    return { invalidCedulaLength: true };
+  }
+
+  if (!/^\d{8}$/.test(cedula)) {
+    return null; // No validar si no tiene 8 dígitos
+  }
+
+  const digitos = cedula.substring(0, 7).split('').map(Number);
+  const digitoVerificador = parseInt(cedula.substring(7, 8), 10);
+
+  const factores = [2, 9, 8, 7, 6, 3, 4];
+  let suma = 0;
+  for (let i = 0; i < digitos.length; i++) {
+    suma += digitos[i] * factores[i];
+  }
+
+  const digitoCalculado = (10 - (suma % 10)) % 10;
+
+  return digitoCalculado === digitoVerificador ? null : { invalidCedula: { digitoCalculado } };
+}
 
 export const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password');
@@ -57,6 +87,9 @@ export class SignupPageComponent implements OnInit {
   today: Date;
   yesterday: Date;
   matcher = new PasswordsMatchErrorStateMatcher();
+  documentoMatcher = new ImmediateErrorStateMatcher();
+  private subs = new Subscription();
+  digitoVerificadorSugerido: number | null = null;
 
   passwordValidationStatus = {
     minLength: false,
@@ -66,7 +99,7 @@ export class SignupPageComponent implements OnInit {
     hasSpecialChar: false
   };
 
-  tiposDocumento = ['CEDULA', 'OTRO', 'PASAPORTE'];
+  tiposDocumento = ['CEDULA', 'PASAPORTE', 'OTRO'];
   situacionesLaborales = ['ESTUDIANTE', 'JUBILADO', 'OTRO'];
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
@@ -100,9 +133,102 @@ export class SignupPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.signupForm.get('password')?.valueChanges.subscribe(value => {
+    this.subs.add(this.signupForm.get('password')?.valueChanges.subscribe(value => {
       this.updatePasswordValidationStatus(value || '');
-    });
+    }));
+
+    this.subs.add(
+      this.signupForm.get('tipoDocumento')?.valueChanges.subscribe((tipo) => {
+        const documentoControl = this.signupForm.get('documento');
+        documentoControl?.setValue('');
+        documentoControl?.clearValidators();
+        documentoControl?.setErrors(null);
+
+        if (tipo === 'CEDULA') {
+          documentoControl?.setValidators([Validators.required, cedulaValidator]);
+        } else {
+          documentoControl?.setValidators([Validators.required]);
+        }
+        documentoControl?.updateValueAndValidity();
+      })
+    );
+
+    this.subs.add(
+      this.signupForm.get('documento')?.valueChanges.subscribe((value) => {
+        const documentoControl = this.signupForm.get('documento');
+        if (!documentoControl) return;
+
+        const tipo = this.signupForm.get('tipoDocumento')?.value;
+
+        if (tipo === 'CEDULA') {
+          if (value) {
+            const soloNumeros = value.replace(/\D/g, '');
+            if (value !== soloNumeros) {
+              documentoControl.setValue(soloNumeros, { emitEvent: false });
+            }
+          }
+
+          const errors = documentoControl.errors;
+          if (errors && errors['invalidCedula']) {
+            this.digitoVerificadorSugerido = errors['invalidCedula'].digitoCalculado;
+          } else {
+            this.digitoVerificadorSugerido = null;
+          }
+        } else if (tipo === 'PASAPORTE') {
+          if (!value) {
+            documentoControl.setErrors({ required: true });
+            return;
+          }
+
+          let formatted = value.replace(/[^A-Za-z0-9]/g, '');
+          if (formatted.length > 0) {
+            formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1).replace(/[^0-9]/g, '');
+          }
+          if (formatted.length > 8) {
+            formatted = formatted.substring(0, 8);
+          }
+          
+          if (value !== formatted) {
+            documentoControl.setValue(formatted, { emitEvent: false });
+          }
+
+          let errors: ValidationErrors | null = null;
+          const lettersCount = formatted.replace(/[0-9]/g, '').length;
+          const pasaporteRegex = /^[A-Z][0-9]{7}$/;
+          
+          if (formatted.length === 0) {
+            errors = { required: true };
+          } else if (formatted.length < 8) {
+             if (lettersCount === 0) {
+                errors = { pasaporteNeedsLetter: true };
+             } else if (lettersCount > 1) {
+                errors = { pasaporteTooManyLetters: true };
+             } else if (!/^[A-Z]/.test(formatted)) {
+                errors = { pasaporteMustStartWithLetter: true };
+             } else {
+                errors = { pasaporteInvalidLength: true };
+             }
+          } else {
+             if (!pasaporteRegex.test(formatted)) {
+                if (lettersCount === 0) {
+                    errors = { pasaporteNeedsLetter: true };
+                } else if (lettersCount > 1) {
+                    errors = { pasaporteTooManyLetters: true };
+                } else if (!/^[A-Z]/.test(formatted)) {
+                    errors = { pasaporteMustStartWithLetter: true };
+                } else {
+                    errors = { pasaporteInvalidFormat: true };
+                }
+             }
+          }
+          documentoControl.setErrors(errors);
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   updatePasswordValidationStatus(password: string): void {
@@ -113,17 +239,28 @@ export class SignupPageComponent implements OnInit {
     this.passwordValidationStatus.hasSpecialChar = /[!@#$%^&*]/.test(password);
   }
 
+  get isTipoCedula(): boolean {
+    return this.signupForm.get('tipoDocumento')?.value === 'CEDULA';
+  }
 
+  get isTipoPasaporte(): boolean {
+    return this.signupForm.get('tipoDocumento')?.value === 'PASAPORTE';
+  }
 
   async onSubmit(): Promise<void> {
     if (this.signupForm.invalid) return;
     try {
-      await this.authService.registrarCliente(this.signupForm.value);
+      const formValue = { ...this.signupForm.getRawValue() };
+
+      const date = new Date(formValue.fechaNacimiento);
+      // Formatear la fecha a 'YYYY-MM-DD' para evitar problemas de zona horaria
+      formValue.fechaNacimiento = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+        .toISOString()
+        .slice(0, 10);
+
+      await this.authService.registrarCliente(formValue);
       this.router.navigate(['/verificar-codigo'], { state: { email: this.signupForm.value.email } });
     } catch (error: HttpErrorResponse | any) {
-      debugger;
-      console.error('Error al registrar usuario:', error);
-          
       // Extraer mensaje específico del backend
       if (error?.error?.message) {
         this.error = error.error.message;

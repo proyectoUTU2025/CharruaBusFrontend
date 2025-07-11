@@ -54,9 +54,10 @@
         <div class="datetime-group">
           <mat-form-field appearance="outline" class="date-field">
             <mat-label>Fecha hasta</mat-label>
-            <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" />
+            <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" [min]="minDateForHasta">
             <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
             <mat-datepicker #pickerHasta></mat-datepicker>
+            <mat-error *ngIf="filterForm.hasError('fechaDesdeInvalida')">La fecha desde no puede ser posterior a la de hasta.</mat-error>
           </mat-form-field>
           <mat-form-field appearance="outline" class="time-field">
             <mat-label>Hora</mat-label>

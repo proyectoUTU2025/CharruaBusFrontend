@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { CompraService } from '../../services/compra.service';
@@ -25,14 +25,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 import { Router } from '@angular/router';
-import { merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { merge, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { Page } from '../../models/api';
 
 @Component({
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
+        ReactiveFormsModule,
         MatDialogModule,
         MatSnackBarModule,
         MatCardModule,
@@ -56,14 +57,14 @@ import { tap } from 'rxjs/operators';
 })
 export class ComprasHistoryComponent implements OnInit, AfterViewInit {
 
+    filterForm: FormGroup;
+    maxDate: Date;
     totalElements = 0;
     pageSize = 10;
     pageIndex = 0;
     loading = false;
     error: string | null = null;
 
-    filtro: FiltroBusquedaCompraDto = this.getInitialFiltro();
-    selectedEstado: TipoEstadoCompra | '' = '';
     estadosOpts = Object.values(TipoEstadoCompra);
 
     displayedColumns: string[] = ['fechaCompra', 'cantidadPasajes', 'precioActual', 'estado', 'acciones'];
@@ -75,16 +76,40 @@ export class ComprasHistoryComponent implements OnInit, AfterViewInit {
     private clienteId!: number;
 
     constructor(
+        private fb: FormBuilder,
         private compraService: CompraService,
         private auth: AuthService,
         private dialog: MatDialog,
         private materialUtils: MaterialUtilsService,
         private router: Router,
-    ) { }
+    ) {
+        this.maxDate = new Date();
+        this.filterForm = this.fb.group({
+            fechaDesde: [null],
+            fechaHasta: [null],
+            montoMin: [null],
+            montoMax: [null],
+            estado: [null],
+        });
+    }
 
     ngOnInit(): void {
         this.clienteId = this.auth.userId!;
         this.loadCompras();
+        this.subscribeToDateChanges();
+    }
+
+    private subscribeToDateChanges(): void {
+        this.filterForm.get('fechaDesde')?.valueChanges.subscribe(value => {
+            const fechaHastaControl = this.filterForm.get('fechaHasta');
+            if (value && fechaHastaControl?.value && new Date(value) > new Date(fechaHastaControl.value)) {
+                fechaHastaControl.setValue(null);
+            }
+        });
+    }
+    
+    get fechaDesde(): Date | null {
+        return this.filterForm.get('fechaDesde')?.value;
     }
 
     ngAfterViewInit(): void {
@@ -96,29 +121,10 @@ export class ComprasHistoryComponent implements OnInit, AfterViewInit {
             .subscribe();
     }
 
-    getInitialFiltro(): FiltroBusquedaCompraDto {
-        return {
-            estados: [],
-            fechaDesde: undefined,
-            fechaHasta: undefined,
-            montoMin: undefined,
-            montoMax: undefined
-        };
-    }
-
-    onEstadoChange(): void {
-        this.filtro.estados = this.selectedEstado ? [this.selectedEstado] : [];
-    }
-
     onFilter(): void {
-        this.error = null;
-        if (this.filtro.fechaDesde && this.filtro.fechaHasta &&
-            new Date(this.filtro.fechaDesde) > new Date(this.filtro.fechaHasta)) {
-            this.error = 'Rango de fechas inválido';
-            return;
-        }
-        if ((this.filtro.montoMin || 0) > (this.filtro.montoMax || Infinity)) {
-            this.error = 'Rango de montos inválido';
+        const values = this.filterForm.value;
+        if ((values.montoMin || 0) > (values.montoMax || Infinity)) {
+            this.materialUtils.showError('El rango de montos es inválido.');
             return;
         }
         this.paginator.pageIndex = 0;
@@ -126,8 +132,7 @@ export class ComprasHistoryComponent implements OnInit, AfterViewInit {
     }
 
     limpiarFiltros(): void {
-        this.filtro = this.getInitialFiltro();
-        this.selectedEstado = '';
+        this.filterForm.reset();
         this.paginator.pageIndex = 0;
         this.sort.active = 'fechaCompra';
         this.sort.direction = 'desc';
@@ -163,14 +168,13 @@ export class ComprasHistoryComponent implements OnInit, AfterViewInit {
         this.loading = true;
         this.error = null;
 
-        const filtroEnv: FiltroBusquedaCompraDto = {
-            ...this.filtro,
-            fechaDesde: this.filtro.fechaDesde
-                ? new Date(this.filtro.fechaDesde).toISOString().split('T')[0]
-                : undefined,
-            fechaHasta: this.filtro.fechaHasta
-                ? new Date(this.filtro.fechaHasta).toISOString().split('T')[0]
-                : undefined
+        const formValues = this.filterForm.value;
+        const filtro: FiltroBusquedaCompraDto = {
+            estados: formValues.estado ? [formValues.estado] : [],
+            fechaDesde: formValues.fechaDesde ? new Date(formValues.fechaDesde).toISOString().split('T')[0] : undefined,
+            fechaHasta: formValues.fechaHasta ? new Date(formValues.fechaHasta).toISOString().split('T')[0] : undefined,
+            montoMin: formValues.montoMin,
+            montoMax: formValues.montoMax,
         };
 
         const sortActive = this.sort ? this.sort.active : 'fechaCompra';
@@ -178,7 +182,7 @@ export class ComprasHistoryComponent implements OnInit, AfterViewInit {
         const sortParam = `${sortActive},${sortDirection}`;
 
         this.compraService
-            .getHistorialCliente(this.clienteId, filtroEnv, this.paginator ? this.paginator.pageIndex : 0, this.paginator ? this.paginator.pageSize : 10, sortParam)
+            .getHistorialCliente(this.clienteId, filtro, this.paginator ? this.paginator.pageIndex : 0, this.paginator ? this.paginator.pageSize : 10, sortParam)
             .subscribe({
                 next: (resp) => {
                     this.compras = resp.content;

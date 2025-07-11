@@ -5,27 +5,27 @@
   </div>
 
   <!-- Filtros -->
-  <div class="content-card">
+  <div class="content-card" [formGroup]="filterForm">
     <div class="filters-container">
       <div class="filters-grid">
         <mat-form-field appearance="outline">
           <mat-label>Fecha Desde</mat-label>
-          <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="filtro.fechaDesde" name="fechaDesde" placeholder="dd/mm/yyyy">
+          <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" placeholder="dd/mm/yyyy">
           <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
           <mat-datepicker #pickerDesde></mat-datepicker>
         </mat-form-field>
         
         <mat-form-field appearance="outline">
           <mat-label>Fecha Hasta</mat-label>
-          <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="filtro.fechaHasta" name="fechaHasta" placeholder="dd/mm/yyyy">
+          <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" placeholder="dd/mm/yyyy" [min]="fechaDesde">
           <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
           <mat-datepicker #pickerHasta></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Origen</mat-label>
-          <mat-select [(ngModel)]="filtro.origenId" name="origenId">
-            <mat-option [value]="undefined">TODOS</mat-option>
+          <mat-select formControlName="origenId">
+            <mat-option [value]="null">TODOS</mat-option>
             <mat-option *ngFor="let o of todasLasLocalidades" [value]="o.id">
               {{ o.nombreConDepartamento }}
             </mat-option>
@@ -34,8 +34,8 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Destino</mat-label>
-          <mat-select [(ngModel)]="filtro.destinoId" name="destinoId">
-            <mat-option [value]="undefined">TODOS</mat-option>
+          <mat-select formControlName="destinoId">
+            <mat-option [value]="null">TODOS</mat-option>
             <mat-option *ngFor="let d of todasLasLocalidades" [value]="d.id">
               {{ d.nombreConDepartamento }}
             </mat-option>
@@ -44,7 +44,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Estado</mat-label>
-          <mat-select [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoChange()" name="estado">
+          <mat-select formControlName="estado">
             <mat-option value="">TODOS</mat-option>
             <mat-option *ngFor="let e of estadosOpts" [value]="e">
               {{ e }}

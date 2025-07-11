@@ -9,11 +9,30 @@ import { AuthInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './services/auth.service';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { SpanishPaginatorIntl } from './shared/spanish-paginator-intl';
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { MatDialogModule } from '@angular/material/dialog';
+
+const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: ['DD/MM/YYYY', 'DDMMYYYY'],
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    importProvidersFrom(BrowserAnimationsModule, FormsModule),
+    importProvidersFrom(
+      BrowserAnimationsModule, 
+      FormsModule,
+      MatDialogModule
+    ),
     provideHttpClient(withInterceptorsFromDi()),
     CookieService,
     {
@@ -25,6 +44,9 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MatPaginatorIntl,
       useValue: SpanishPaginatorIntl
-    }
+    },
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    provideMomentDateAdapter(),
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
   ]
 };

@@ -36,10 +36,16 @@ export class EditConfiguracionDialogComponent {
         private dialogRef: MatDialogRef<EditConfiguracionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public config: Configuracion & { id: number | null }
     ) {
+        const valorIntValidators = [Validators.min(0)];
+        const percentageConfigs = ['descuento_estudiante', 'descuento_jubilado', 'penalizacion_porcentaje'];
+        if (config.nombre && percentageConfigs.includes(config.nombre)) {
+            valorIntValidators.push(Validators.max(100));
+        }
+
         this.form = this.fb.group({
             id: [config.id],
             nombre: [{ value: config.nombre || '', disabled: config.id != null }, Validators.required],
-            valorInt: [config.valorInt ?? null],
+            valorInt: [config.valorInt ?? null, valorIntValidators],
             valor: [config.valor ?? null]
         }, { validators: [this.oneOfTwo('valorInt', 'valor')] });
     }

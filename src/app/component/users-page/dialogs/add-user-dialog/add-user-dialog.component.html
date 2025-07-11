@@ -39,8 +39,31 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Documento</mat-label>
-      <input matInput formControlName="documento" required />
-      <mat-error *ngIf="form.get('documento')?.hasError('required')">El documento es obligatorio.</mat-error>
+      <input matInput formControlName="documento" required [errorStateMatcher]="documentoMatcher" [attr.maxlength]="isTipoCedula || isTipoPasaporte ? 8 : null">
+      <mat-error *ngIf="form.get('documento')?.hasError('required')">
+        El documento es requerido.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('invalidCedulaLength')">
+        La cédula debe tener 8 dígitos.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('invalidCedula')">
+        La cédula no es válida. El dígito verificador debería ser {{ digitoVerificadorSugerido }}.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('pasaporteNeedsLetter')">
+        El pasaporte debe contener al menos una letra.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('pasaporteTooManyLetters')">
+        El pasaporte no puede contener más de una letra.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('pasaporteMustStartWithLetter')">
+        El pasaporte debe comenzar con una letra.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('pasaporteInvalidLength')">
+        El pasaporte debe tener 1 letra y 7 números.
+      </mat-error>
+      <mat-error *ngIf="form.get('documento')?.hasError('pasaporteInvalidFormat')">
+        El formato del pasaporte no es válido (ej: A1234567).
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">

@@ -32,16 +32,20 @@ export class DetallePasajeCompletoDialogComponent {
   isOpeningPdf = false;
   isReembolsando = false;
   isCliente = false;
+  mostrarLinkCompra = true;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { pasajeId: number },
+    @Inject(MAT_DIALOG_DATA) public data: { pasajeId: number, mostrarLinkCompra?: boolean },
     private dialogRef: MatDialogRef<DetallePasajeCompletoDialogComponent>,
     private pasajeService: PasajeService,
     private materialUtils: MaterialUtilsService,
     private dialog: MatDialog,
-    private authService: AuthService,
+    private authService: AuthService
   ) {
     this.isCliente = this.authService.rol === 'CLIENTE';
+    if (this.data.mostrarLinkCompra === false) {
+      this.mostrarLinkCompra = false;
+    }
     this.cargarDetallePasaje();
   }
 
@@ -60,6 +64,15 @@ export class DetallePasajeCompletoDialogComponent {
         this.dialogRef.close();
       }
     });
+  }
+
+  verCompra(): void {
+    if (this.pasaje?.compraId) {
+      this.dialogRef.close({
+        action: 'VER_COMPRA',
+        compraId: this.pasaje.compraId
+      });
+    }
   }
 
   /**

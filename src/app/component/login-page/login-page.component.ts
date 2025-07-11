@@ -57,8 +57,8 @@ export class LoginPageComponent {
     try {
       await this.authService.login(this.loginForm.value);
       this.router.navigate(['/home']);
-    } catch {
-      this.error = 'Credenciales inválidas';
+    } catch (error: any) {
+      this.error = error?.error?.message || 'Credenciales inválidas';
     } finally {
       this.isLoading = false;
     }

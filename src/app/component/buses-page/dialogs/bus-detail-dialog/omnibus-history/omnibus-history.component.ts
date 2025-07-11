@@ -2,6 +2,7 @@ import {
     Component,
     Input,
     OnInit,
+    OnDestroy,
     ViewChild
 } from '@angular/core';
 import { FormBuilder, FormGroup, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
@@ -20,6 +21,7 @@ import { MovimientoOmnibusDto } from '../../../../../models/movimiento-omnibus/m
 import { Page } from '../../../../../models';
 import { BusService } from '../../../../../services/bus.service';
 import { LocalidadService } from '../../../../../services/localidades.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     standalone: true,
@@ -41,7 +43,7 @@ import { LocalidadService } from '../../../../../services/localidades.service';
     templateUrl: './omnibus-history.component.html',
     styleUrls: ['./omnibus-history.component.scss']
 })
-export class OmnibusHistoryComponent implements OnInit {
+export class OmnibusHistoryComponent implements OnInit, OnDestroy {
     @Input() busId!: number;
 
     filterForm: FormGroup;
@@ -66,6 +68,9 @@ export class OmnibusHistoryComponent implements OnInit {
     localidadesMap: Record<number, string> = {};
     localidadesKeys: string[] = [];
 
+    private destroy$ = new Subject<void>();
+    minDateForLlegada: Date | null = null;
+
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
     constructor(
@@ -75,9 +80,9 @@ export class OmnibusHistoryComponent implements OnInit {
     ) {
         this.filterForm = this.fb.group(
             {
-                fechaHoraSalida: [''],
+                fechaHoraSalida: [null],
                 horaSalida: [''],
-                fechaHoraLlegada: [''],
+                fechaHoraLlegada: [null],
                 horaLlegada: [''],
                 origenId: [''],
                 destinoId: [''],
@@ -89,14 +94,33 @@ export class OmnibusHistoryComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.resetFilters();
         this.loadHistory();
+        this.loadLocalidades();
+        this.setupDateFilters();
         this.generarHorasDisponibles();
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    setupDateFilters(): void {
+        this.filterForm.get('fechaHoraSalida')?.valueChanges
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(value => {
+                this.minDateForLlegada = value ? new Date(value) : null;
+
+                const fechaLlegadaControl = this.filterForm.get('fechaHoraLlegada');
+                if (fechaLlegadaControl?.value && this.minDateForLlegada && fechaLlegadaControl.value < this.minDateForLlegada) {
+                    fechaLlegadaControl.setValue(null);
+                }
+            });
     }
 
     private buildDateTime(fecha: Date | null, hora: string, finDelDia: boolean = false): string | undefined {
         if (!fecha) return undefined;
-        
+
         let hh: number, mm: number, ss: number;
         if (hora) {
           [hh, mm] = hora.split(':').map(Number);
@@ -104,16 +128,16 @@ export class OmnibusHistoryComponent implements OnInit {
         } else {
           [hh, mm, ss] = finDelDia ? [23, 59, 59] : [0, 0, 0];
         }
-    
+
         const dt = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), hh, mm, ss);
-        
+
         const year = dt.getFullYear();
         const month = (dt.getMonth() + 1).toString().padStart(2, '0');
         const day = dt.getDate().toString().padStart(2, '0');
         const hours = dt.getHours().toString().padStart(2, '0');
         const minutes = dt.getMinutes().toString().padStart(2, '0');
         const seconds = dt.getSeconds().toString().padStart(2, '0');
-        
+
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
     }
 
@@ -142,10 +166,10 @@ export class OmnibusHistoryComponent implements OnInit {
             this.pageIndex = event.pageIndex;
             this.pageSize = event.pageSize;
         }
-        
+
         const raw = this.filterForm.value;
         const filtros: any = {};
-        
+
         filtros.fechaHoraSalida = this.buildDateTime(raw.fechaHoraSalida, raw.horaSalida);
         filtros.fechaHoraLlegada = this.buildDateTime(raw.fechaHoraLlegada, raw.horaLlegada);
 

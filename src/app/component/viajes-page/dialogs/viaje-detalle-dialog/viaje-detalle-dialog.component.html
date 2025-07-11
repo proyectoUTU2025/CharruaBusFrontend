@@ -323,19 +323,18 @@
       <!-- Controles superiores con filtros expandidos -->
       <div class="controls-section">
         <div class="filter-controls">
-          <div class="filter-row">
+          <div class="filter-group">
             <mat-form-field appearance="outline">
               <mat-label>Fecha desde</mat-label>
-              <input matInput [matDatepicker]="fechaDesde" [formControl]="fechaDesdeFilter">
-              <mat-datepicker-toggle matIconSuffix [for]="fechaDesde"></mat-datepicker-toggle>
-              <mat-datepicker #fechaDesde></mat-datepicker>
+              <input matInput [matDatepicker]="fechaDesdePicker" [formControl]="fechaDesdeFilter">
+              <mat-datepicker-toggle matSuffix [for]="fechaDesdePicker"></mat-datepicker-toggle>
+              <mat-datepicker #fechaDesdePicker></mat-datepicker>
             </mat-form-field>
-            
             <mat-form-field appearance="outline">
-              <mat-label>Fecha hasta</mat-label>
-              <input matInput [matDatepicker]="fechaHasta" [formControl]="fechaHastaFilter">
-              <mat-datepicker-toggle matIconSuffix [for]="fechaHasta"></mat-datepicker-toggle>
-              <mat-datepicker #fechaHasta></mat-datepicker>
+              <mat-label>Hasta</mat-label>
+              <input matInput [matDatepicker]="fechaHastaPicker" [formControl]="fechaHastaFilter" [min]="minDateForHasta">
+              <mat-datepicker-toggle matSuffix [for]="fechaHastaPicker"></mat-datepicker-toggle>
+              <mat-datepicker #fechaHastaPicker></mat-datepicker>
             </mat-form-field>
           </div>
 

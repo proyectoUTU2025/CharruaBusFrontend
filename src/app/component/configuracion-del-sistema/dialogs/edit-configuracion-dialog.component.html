@@ -10,12 +10,18 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Valor (número)</mat-label>
-      <input matInput type="number" formControlName="valorInt" />
+      <mat-label>Valor Entero</mat-label>
+      <input matInput type="number" formControlName="valorInt">
+      <mat-error *ngIf="form.get('valorInt')?.hasError('min')">
+        El valor no puede ser negativo.
+      </mat-error>
+      <mat-error *ngIf="form.get('valorInt')?.hasError('max')">
+        El valor no puede ser mayor a 100.
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Valor (texto)</mat-label>
+    <mat-form-field *ngIf="form.get('valor')" appearance="outline">
+      <mat-label>Valor</mat-label>
       <input matInput formControlName="valor" />
     </mat-form-field>
 

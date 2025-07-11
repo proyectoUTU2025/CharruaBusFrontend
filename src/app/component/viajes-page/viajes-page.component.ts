@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -22,8 +22,8 @@ import { LocalidadService } from '../../services/localidades.service';
 import { LocalidadNombreDepartamentoDto } from '../../models/localidades/localidad-nombre-departamento-dto.model';
 import { Page } from '../../models';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
-import { merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 
 // Validadores personalizados
 export const origenDestinoValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -77,7 +77,7 @@ export const fechasValidator: ValidatorFn = (control: AbstractControl): Validati
   templateUrl: './viajes-page.component.html',
   styleUrls: ['./viajes-page.component.scss']
 })
-export class ViajesPageComponent implements OnInit, AfterViewInit {
+export class ViajesPageComponent implements OnInit, AfterViewInit, OnDestroy {
   columns = [
     'id',
     'nombreLocalidadOrigen',
@@ -96,6 +96,8 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
   localidades: LocalidadNombreDepartamentoDto[] = [];
   isLoading = true;
   hasSearched = false;
+  minDateForHasta: Date | null = null;
+  private destroy$ = new Subject<void>();
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -125,6 +127,30 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.localidadService.getAllFlat().subscribe(ls => this.localidades = ls);
+    this.setupDateFilters();
+
+    const fechaDesdeControl = this.filterForm.get('fechaDesde');
+    if (fechaDesdeControl?.value) {
+      this.minDateForHasta = new Date(fechaDesdeControl.value);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  setupDateFilters(): void {
+    this.filterForm.get('fechaDesde')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        this.minDateForHasta = value ? new Date(value) : null;
+        
+        const fechaHastaControl = this.filterForm.get('fechaHasta');
+        if (fechaHastaControl?.value && this.minDateForHasta && fechaHastaControl.value < this.minDateForHasta) {
+          fechaHastaControl.setValue(null);
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -132,6 +158,7 @@ export class ViajesPageComponent implements OnInit, AfterViewInit {
 
     merge(this.sort.sortChange, this.paginator.page)
       .pipe(
+        takeUntil(this.destroy$),
         tap(() => this.buscar())
       )
       .subscribe();

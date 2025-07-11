@@ -1,5 +1,5 @@
 import { AuthService } from './../../services/auth.service';
-import { Component, OnInit, AfterViewInit, AfterViewChecked, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterViewChecked, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -73,7 +73,7 @@ export const origenDestinoValidator: ValidatorFn = (control: AbstractControl): V
   templateUrl: './compra-page.component.html',
   styleUrls: ['./compra-page.component.scss']
 })
-export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   @ViewChild('stepper') stepper!: MatStepper;
   @ViewChild('paginatorIda') paginatorIda!: MatPaginator;
   step = 0;
@@ -113,6 +113,8 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
   isLoadingAsientos = false;
   isProcessingPayment = false;
   errorMensaje = '';
+
+  private visibilityChangeListener!: () => void;
 
   // Nuevas propiedades para el viaje de vuelta
   isSearchingVuelta = false;
@@ -222,6 +224,23 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
           .then((data: UsuarioDto) => this.userInfo = data)
           .catch(() => this.userInfo = null);
       }
+    }
+    
+    this.visibilityChangeListener = () => this.handleVisibilityChange();
+    document.addEventListener('visibilitychange', this.visibilityChangeListener);
+  }
+
+  ngOnDestroy(): void {
+    if (this.visibilityChangeListener) {
+      document.removeEventListener('visibilitychange', this.visibilityChangeListener);
+    }
+  }
+
+  private handleVisibilityChange(): void {
+    if (document.visibilityState === 'visible' && this.isProcessingPayment) {
+      this.isProcessingPayment = false;
+      this.limpiarFiltros();
+      this.cdr.detectChanges();
     }
   }
 

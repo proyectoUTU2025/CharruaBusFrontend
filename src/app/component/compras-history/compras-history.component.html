@@ -6,49 +6,51 @@
 
     <!-- Filtros -->
     <div class="content-card">
-        <div class="filters-container">
-            <div class="filters-grid">
-                <!-- Filtro por Fechas -->
-                <mat-form-field appearance="outline">
-                    <mat-label>Fecha Desde</mat-label>
-                    <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="filtro.fechaDesde" name="fechaDesde" readonly>
-                    <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerDesde></mat-datepicker>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Fecha Hasta</mat-label>
-                    <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="filtro.fechaHasta" name="fechaHasta" readonly>
-                    <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerHasta></mat-datepicker>
-                </mat-form-field>
+        <form [formGroup]="filterForm">
+            <div class="filters-container">
+                <div class="filters-grid">
+                    <!-- Filtro por Fechas -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha Desde</mat-label>
+                        <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" [max]="maxDate" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerDesde></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fecha Hasta</mat-label>
+                        <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" [min]="fechaDesde" [max]="maxDate" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerHasta></mat-datepicker>
+                    </mat-form-field>
 
-                <!-- Filtro por Monto -->
-                <mat-form-field appearance="outline">
-                    <mat-label>Monto Mínimo</mat-label>
-                    <input matInput type="number" [(ngModel)]="filtro.montoMin" name="montoMin" placeholder="Ej: 100">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Monto Máximo</mat-label>
-                    <input matInput type="number" [(ngModel)]="filtro.montoMax" name="montoMax" placeholder="Ej: 5000">
-                </mat-form-field>
+                    <!-- Filtro por Monto -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Monto Mínimo</mat-label>
+                        <input matInput type="number" formControlName="montoMin" placeholder="Ej: 100">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Monto Máximo</mat-label>
+                        <input matInput type="number" formControlName="montoMax" placeholder="Ej: 5000">
+                    </mat-form-field>
 
-                <!-- Filtro por Estado -->
-                <mat-form-field appearance="outline">
-                    <mat-label>Estado</mat-label>
-                    <mat-select [(ngModel)]="selectedEstado" name="estado" (selectionChange)="onEstadoChange()">
-                        <mat-option value="">TODOS</mat-option>
-                        <mat-option *ngFor="let estado of estadosOpts" [value]="estado">
-                            {{ formatStateForFilter(estado) }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+                    <!-- Filtro por Estado -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Estado</mat-label>
+                        <mat-select formControlName="estado">
+                            <mat-option [value]="null">TODOS</mat-option>
+                            <mat-option *ngFor="let estado of estadosOpts" [value]="estado">
+                                {{ formatStateForFilter(estado) }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="filter-actions">
+                    <button mat-flat-button class="create-btn" (click)="onFilter()" [disabled]="loading">Buscar</button>
+                    <button mat-stroked-button class="massive-btn" (click)="limpiarFiltros()">Limpiar</button>
+                </div>
             </div>
-
-            <div class="filter-actions">
-                <button mat-flat-button class="create-btn" (click)="onFilter()" [disabled]="loading">Buscar</button>
-                <button mat-stroked-button class="massive-btn" (click)="limpiarFiltros()">Limpiar</button>
-            </div>
-        </div>
+        </form>
         <mat-error *ngIf="error">{{ error }}</mat-error>
     </div>
 

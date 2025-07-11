@@ -53,10 +53,20 @@
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Documento</mat-label>
-          <input matInput formControlName="documento" required>
-          <mat-error *ngIf="form.get('documento')?.hasError('required')">
-            El documento es obligatorio.
-          </mat-error>
+          <input matInput formControlName="documento" required [maxlength]="isTipoCedula || isTipoPasaporte ? 8 : null" [errorStateMatcher]="matcher" />
+          
+          <mat-error *ngIf="form.get('documento')?.hasError('required')">El documento es requerido.</mat-error>
+          
+          <mat-error *ngIf="form.get('documento')?.hasError('invalidFormat')">La cédula debe tener 8 dígitos.</mat-error>
+          <mat-error *ngIf="form.get('documento')?.hasError('invalidCedula')">Dígito verificador inválido. Debería ser {{ digitoVerificadorSugerido }}.</mat-error>
+          
+          <mat-error *ngIf="form.get('documento')?.hasError('pasaporteInvalidFormat')">Formato inválido. Debe ser: 1 letra + 7 dígitos (ej: A1234567).</mat-error>
+          <mat-error *ngIf="form.get('documento')?.hasError('pasaporteNeedsLetter')">El pasaporte debe empezar con una letra.</mat-error>
+          <mat-error *ngIf="form.get('documento')?.hasError('pasaporteTooManyLetters')">El pasaporte debe tener solo una letra al inicio.</mat-error>
+          <mat-error *ngIf="form.get('documento')?.hasError('pasaporteMustStartWithLetter')"> El pasaporte debe contener al menos una letra.</mat-error>
+          <mat-error *ngIf="form.get('documento')?.hasError('pasaporteInvalidLength')"> El pasaporte debe tener 1 letra y 7 números.</mat-error>
+          <mat-error *ngIf="form.get('documento')?.hasError('pasaporteMissingDigits')">Faltan {{ form.get('documento')?.errors?.['pasaporteMissingDigits'].remaining }} dígitos.</mat-error>
+
         </mat-form-field>
       </div>
 
@@ -77,6 +87,18 @@
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Rol</mat-label>
           <input matInput formControlName="rol">
+        </mat-form-field>
+      </div>
+
+      <!-- Campo Situación Laboral solo visible si es cliente -->
+      <div class="form-row" *ngIf="isCliente()">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Situación Laboral</mat-label>
+          <mat-select formControlName="situacionLaboral">
+            <mat-option *ngFor="let situacion of situacionLaboralOptions" [value]="situacion">
+              {{ situacion }}
+            </mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
     </form>

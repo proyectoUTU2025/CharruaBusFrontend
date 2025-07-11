@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PasajeService } from '../../services/pasaje.service';
@@ -11,6 +11,7 @@ import { TipoEstadoPasaje } from '../../models/pasajes/tipo-estado-pasaje.enum';
 import { PasajeDto } from '../../models/pasajes/pasaje-dto.model';
 import { DetallePasajeCompletoDialogComponent } from '../shared/detalle-pasaje-completo-dialog/detalle-pasaje-completo-dialog.component';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
+import { Router } from '@angular/router';
 
 // Imports de Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -33,6 +34,7 @@ import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-sp
     imports: [
         CommonModule,
         FormsModule,
+        ReactiveFormsModule,
         MatDialogModule,
         MatSnackBarModule,
         MatCardModule,
@@ -61,8 +63,7 @@ export class PasajeHistoryComponent implements OnInit {
     loading = false;
     error: string | null = null;
     
-    filtro: FiltroBusquedaPasajeDto = this.getInitialFiltro();
-    selectedEstado: TipoEstadoPasaje | '' = '';
+    filterForm: FormGroup;
     estadosOpts = Object.values(TipoEstadoPasaje);
     
     todasLasLocalidades: LocalidadNombreDepartamentoDto[] = [];
@@ -75,43 +76,47 @@ export class PasajeHistoryComponent implements OnInit {
     private clienteId!: number;
 
     constructor(
+        private fb: FormBuilder,
         private pasajeService: PasajeService,
         private auth: AuthService,
         private localidadService: LocalidadService,
         private dialog: MatDialog,
         private materialUtils: MaterialUtilsService,
-    ) { }
+        private router: Router,
+    ) {
+        this.filterForm = this.fb.group({
+            fechaDesde: [null],
+            fechaHasta: [null],
+            origenId: [null],
+            destinoId: [null],
+            estado: ['']
+        });
+    }
 
     ngOnInit(): void {
         this.clienteId = this.auth.userId!;
         this.localidadService.getAllFlat()
             .subscribe(list => this.todasLasLocalidades = list);
+
+        this.filterForm.get('fechaDesde')?.valueChanges.subscribe(value => {
+            const fechaHastaControl = this.filterForm.get('fechaHasta');
+            if (fechaHastaControl?.value && value && new Date(fechaHastaControl.value) < new Date(value)) {
+                fechaHastaControl.setValue(null);
+            }
+        });
+
         this.loadPasajes();
     }
 
-    getInitialFiltro(): FiltroBusquedaPasajeDto {
-        return {
-            estados: [],
-            fechaDesde: undefined,
-            fechaHasta: undefined,
-            origenId: undefined,
-            destinoId: undefined
-        };
-    }
-
-    onOrigenChange(origenId: any): void {
-        this.filtro.origenId = origenId || undefined;
-    }
-
-    onEstadoChange(): void {
-        this.filtro.estados = this.selectedEstado ? [this.selectedEstado] : [];
+    get fechaDesde() {
+        return this.filterForm.get('fechaDesde')?.value;
     }
 
     onFilter(): void {
-        this.error = null;
-        if (this.filtro.fechaDesde && this.filtro.fechaHasta &&
-            new Date(this.filtro.fechaDesde) > new Date(this.filtro.fechaHasta)) {
-            this.error = 'Rango de fechas inválido';
+        const formValue = this.filterForm.value;
+        if (formValue.fechaDesde && formValue.fechaHasta &&
+            new Date(formValue.fechaDesde) > new Date(formValue.fechaHasta)) {
+            this.materialUtils.showError('El rango de fechas es inválido.');
             return;
         }
         this.pageIndex = 0;
@@ -119,8 +124,13 @@ export class PasajeHistoryComponent implements OnInit {
     }
 
     limpiarFiltros(): void {
-        this.filtro = this.getInitialFiltro();
-        this.selectedEstado = '';
+        this.filterForm.reset({
+            fechaDesde: null,
+            fechaHasta: null,
+            origenId: null,
+            destinoId: null,
+            estado: ''
+        });
         this.onFilter();
     }
 
@@ -139,8 +149,12 @@ export class PasajeHistoryComponent implements OnInit {
             autoFocus: false,
         });
 
-        dialogRef.afterClosed().subscribe(() => {
-            this.loadPasajes();
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result && result.action === 'VER_COMPRA' && result.compraId) {
+                this.router.navigate(['/compra', result.compraId]);
+            } else {
+                this.loadPasajes();
+            }
         });
     }
 
@@ -163,14 +177,17 @@ export class PasajeHistoryComponent implements OnInit {
         this.loading = true;
         this.error = null;
 
+        const formValue = this.filterForm.value;
         const filtroEnv: FiltroBusquedaPasajeDto = {
-            ...this.filtro,
-            fechaDesde: this.filtro.fechaDesde
-                ? new Date(this.filtro.fechaDesde).toISOString().split('T')[0]
+            estados: formValue.estado ? [formValue.estado] : [],
+            fechaDesde: formValue.fechaDesde
+                ? new Date(formValue.fechaDesde).toISOString().split('T')[0]
                 : undefined,
-            fechaHasta: this.filtro.fechaHasta
-                ? new Date(this.filtro.fechaHasta).toISOString().split('T')[0]
-                : undefined
+            fechaHasta: formValue.fechaHasta
+                ? new Date(formValue.fechaHasta).toISOString().split('T')[0]
+                : undefined,
+            origenId: formValue.origenId || undefined,
+            destinoId: formValue.destinoId || undefined,
         };
 
         this.pasajeService

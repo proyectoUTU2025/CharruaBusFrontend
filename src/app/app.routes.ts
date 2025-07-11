@@ -26,7 +26,6 @@ import { ViajesDepartamentoComponent } from './component/estadisticas/transporte
 import { ViajesPorOmnibusComponent } from './component/estadisticas/transporte/viajes-por-omnibus/viajes-por-omnibus.component';
 import { MantenimientosPorOmnibusComponent } from './component/estadisticas/transporte/mantenimientos-por-omnibus/mantenimientos-por-omnibus.component';
 import { EstadisticasPasajesComponent } from './component/estadisticas/transporte/estadisticas-pasajes/estadisticas-pasajes.component';
-import { PasajesPorViajeComponent } from './component/pasajes-por-viaje/pasajes-por-viaje.component';
 import { CompraDetallePageComponent } from './component/compra-detalle/compra-detalle-page.component';
 import { LandingPageComponent } from './component/landing-page/landing-page.component';
 import { NotFoundComponent } from './component/not-found/not-found.component';

@@ -19,7 +19,7 @@
       
       <mat-form-field appearance="outline">
         <mat-label>Fecha fin</mat-label>
-        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
+        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin" [min]="minDateForFin">
         <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
         <mat-datepicker #pickerFin></mat-datepicker>
       </mat-form-field>
@@ -47,88 +47,108 @@
     </div>
   </div>
 
-  <div class="content-card" *ngIf="resumen">
-    <div class="card-header">
-      <h2 class="card-title">Resumen General</h2>
-      <div class="card-actions">
-        <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportResumenCsv()" class="secondary-btn">
-          <mat-icon>download</mat-icon>
-          {{ downloadingCsv ? 'Descargando...' : 'Resumen CSV' }}
-        </button>
-        <button mat-flat-button (click)="exportResumenPdf()" class="primary-btn">
-          <mat-icon>picture_as_pdf</mat-icon>
-          Resumen PDF
-        </button>
-        <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()" class="secondary-btn">
-          <mat-icon>download</mat-icon>
-          Detalle CSV
-        </button>
-        <button mat-flat-button (click)="exportDetallePdf()" class="primary-btn">
-          <mat-icon>picture_as_pdf</mat-icon>
-          Detalle PDF
-        </button>
+  <div *ngIf="loading" class="content-card">
+    <div style="position: relative; height: 200px;">
+      <div class="spinner-overlay">
+        <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
       </div>
     </div>
-    
-    <div class="resumen-container">
-      <div class="resumen-card">
-        <div class="resumen-row">
-          <div class="resumen-item"><strong>Destino:</strong> {{ resumen.destino }}</div>
-          <div class="resumen-item"><strong>Vendidos:</strong> {{ resumen.vendidos }}</div>
-          <div class="resumen-item"><strong>Devueltos:</strong> {{ resumen.devueltos }}</div>
-          <div class="resumen-item"><strong>Tasa venta:</strong> {{ resumen.tasaVenta | number:'1.2-2' }}%</div>
-          <div class="resumen-item"><strong>Tasa devolución:</strong> {{ resumen.tasaDevolucion | number:'1.2-2' }}%</div>
+  </div>
+  
+  <ng-container *ngIf="!loading">
+    <ng-container *ngIf="mostrarGrafico">
+      <div class="content-card" *ngIf="resumen">
+        <div class="card-header">
+          <h2 class="card-title">Resumen General</h2>
+          <div class="card-actions">
+            <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportResumenCsv()" class="secondary-btn">
+              <mat-icon>download</mat-icon>
+              {{ downloadingCsv ? 'Descargando...' : 'Resumen CSV' }}
+            </button>
+            <button mat-flat-button (click)="exportResumenPdf()" class="primary-btn">
+              <mat-icon>picture_as_pdf</mat-icon>
+              Resumen PDF
+            </button>
+            <button mat-stroked-button [disabled]="downloadingCsv" (click)="exportDetalleCsv()" class="secondary-btn">
+              <mat-icon>download</mat-icon>
+              Detalle CSV
+            </button>
+            <button mat-flat-button (click)="exportDetallePdf()" class="primary-btn">
+              <mat-icon>picture_as_pdf</mat-icon>
+              Detalle PDF
+            </button>
+          </div>
+        </div>
+        
+        <div class="resumen-container">
+          <div class="resumen-card">
+            <div class="resumen-row">
+              <div class="resumen-item"><strong>Destino:</strong> {{ resumen.destino }}</div>
+              <div class="resumen-item"><strong>Vendidos:</strong> {{ resumen.vendidos }}</div>
+              <div class="resumen-item"><strong>Devueltos:</strong> {{ resumen.devueltos }}</div>
+              <div class="resumen-item"><strong>Tasa venta:</strong> {{ resumen.tasaVenta | number:'1.2-2' }}%</div>
+              <div class="resumen-item"><strong>Tasa devolución:</strong> {{ resumen.tasaDevolucion | number:'1.2-2' }}%</div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div class="content-card">
+        <div class="card-header">
+          <h2 class="card-title">Gráfico de Pasajes por Destino</h2>
+        </div>
+    
+        <div class="grafico-container">
+          <canvas baseChart
+                  [datasets]="chartData"
+                  [labels]="chartLabels"
+                  [type]="chartType"
+                  [options]="chartOptions">
+          </canvas>
+        </div>
+      </div>
+    
+      <div class="content-card">
+        <div class="tabla-container">
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+            <ng-container matColumnDef="destino">
+              <th mat-header-cell *matHeaderCellDef (click)="toggleSort('destino')">
+                Destino
+                <span *ngIf="ordenarPor==='destino'">{{ ascendente ? '↑' : '↓' }}</span>
+              </th>
+              <td mat-cell *matCellDef="let e">{{ e.destino }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="vendidos">
+              <th mat-header-cell *matHeaderCellDef (click)="toggleSort('vendidos')">
+                Pasajes Vendidos
+                <span *ngIf="ordenarPor==='vendidos'">{{ ascendente ? '↑' : '↓' }}</span>
+              </th>
+              <td mat-cell *matCellDef="let e">{{ e.vendidos }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+    
+          <mat-paginator
+            [length]="total"
+            [pageSize]="pageSize"
+            [pageIndex]="pageIndex"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="load($event)"
+            showFirstLastButtons>
+          </mat-paginator>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="content-card" *ngIf="!mostrarGrafico">
+      <div class="no-results">
+        <mat-icon>search_off</mat-icon>
+        <h3>No se encontraron resultados</h3>
+        <p>Intenta ajustar los filtros de búsqueda.</p>
+      </div>
     </div>
-  </div>
-
-  <div class="content-card" *ngIf="mostrarGrafico">
-    <div class="card-header">
-      <h2 class="card-title">Gráfico de Pasajes por Destino</h2>
-    </div>
-
-    <div class="grafico-container">
-      <canvas baseChart
-              [data]="{ labels: chartLabels, datasets: chartData }"
-              [type]="chartType"
-              [options]="chartOptions">
-      </canvas>
-    </div>
-  </div>
-
-  <div class="content-card">
-    <div class="tabla-container">
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
-        <ng-container matColumnDef="destino">
-          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('destino')">
-            Destino
-            <span *ngIf="ordenarPor==='destino'">{{ ascendente ? '↑' : '↓' }}</span>
-          </th>
-          <td mat-cell *matCellDef="let e">{{ e.destino }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="vendidos">
-          <th mat-header-cell *matHeaderCellDef (click)="toggleSort('vendidos')">
-            Pasajes Vendidos
-            <span *ngIf="ordenarPor==='vendidos'">{{ ascendente ? '↑' : '↓' }}</span>
-          </th>
-          <td mat-cell *matCellDef="let e">{{ e.vendidos }}</td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-
-      <mat-paginator
-        *ngIf="dataSource.length > 0"
-        [length]="total"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="[5, 10, 20]"
-        (page)="load($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
-  </div>
+  </ng-container>
 </div>

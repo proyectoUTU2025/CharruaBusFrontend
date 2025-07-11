@@ -18,6 +18,8 @@ import { TipoDepartamento } from '../../../../models/estadisticas/transporte/tip
 import { EstadisticaTransporteService } from '../../../../services/estadistica-transporte.service';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../../environments/environment';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-estadisticas-pasajes',
@@ -35,7 +37,8 @@ import { environment } from '../../../../../environments/environment';
         NgChartsModule,
         MatDatepickerModule,
         MatNativeDateModule,
-        MatIconModule
+        MatIconModule,
+        MatProgressSpinnerModule
     ],
     templateUrl: './estadisticas-pasajes.component.html',
     styleUrls: ['./estadisticas-pasajes.component.scss']
@@ -43,6 +46,7 @@ import { environment } from '../../../../../environments/environment';
 export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
 
     private readonly BASE = `${environment.apiBaseUrl}`;
+    private destroy$ = new Subject<void>();
     
     fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
     fechaFinPorDefecto = new Date();
@@ -69,6 +73,8 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
     ascendente = true;
 
     downloadingCsv = false;
+    minDateForFin: Date | null = null;
+    loading = false;
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -93,7 +99,25 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
         this.origen.setValue(this.origenPorDefecto);
         this.destino.setValue(this.destinoPorDefecto);
         localStorage.removeItem('filtrosEstadisticasPasajes');
+        this.setupDateFilters();
         this.load();
+    }
+
+    setupDateFilters(): void {
+      this.fechaInicio.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(value => {
+          this.minDateForFin = value ? new Date(value) : null;
+          
+          const fechaFinControl = this.fechaFin;
+          if (fechaFinControl?.value && this.minDateForFin && fechaFinControl.value < this.minDateForFin) {
+            fechaFinControl.setValue(null);
+          }
+        });
+  
+      if (this.fechaInicio.value) {
+        this.minDateForFin = new Date(this.fechaInicio.value);
+      }
     }
 
     ngOnDestroy() {
@@ -103,9 +127,12 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
         this.fechaFin.setValue(this.fechaFinPorDefecto);
         this.origen.setValue(this.origenPorDefecto);
         this.destino.setValue(this.destinoPorDefecto);
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     load(event?: PageEvent) {
+        this.loading = true;
         if (event) {
             this.pageIndex = event.pageIndex;
             this.pageSize = event.pageSize;
@@ -114,15 +141,15 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
         const fin = this.formatDate(this.fechaFin.value);
 
         // RESUMEN
-        this.svc.getEstadisticaPasajes(
+        const resumen$ = this.svc.getEstadisticaPasajes(
             inicio || undefined,
             fin || undefined,
             this.origen.value || undefined,
             this.destino.value || undefined
-        ).subscribe(r => this.resumen = r);
+        );
 
         // AGRUPADO
-        this.svc.getPasajesAgrupados(
+        const agrupado$ = this.svc.getPasajesAgrupados(
             inicio || undefined,
             fin || undefined,
             this.origen.value || undefined,
@@ -131,16 +158,35 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
             this.pageSize,
             this.ordenarPor,
             this.ascendente
-        ).subscribe((p: Page<EstadisticaPasaje>) => {
-            this.dataSource = p.content;
-            this.total = p.page.totalElements;
+        );
 
-            this.chartLabels = p.content.map(e => e.destino);
-            this.chartData = [{
-                label: 'Pasajes vendidos',
-                data: p.content.map(e => e.vendidos),
-                backgroundColor: '#1976d2'
-            }];
+        forkJoin({ resumen: resumen$, agrupado: agrupado$ }).subscribe({
+            next: ({resumen, agrupado}) => {
+                this.resumen = resumen;
+                this.dataSource = agrupado.content;
+                this.total = agrupado.page.totalElements;
+
+                if (this.mostrarGrafico) {
+                    this.chartLabels = agrupado.content.map(e => e.destino);
+                    this.chartData = [{
+                        label: 'Pasajes vendidos',
+                        data: agrupado.content.map(e => e.vendidos),
+                        backgroundColor: '#1976d2'
+                    }];
+                } else {
+                    this.chartLabels = [];
+                    this.chartData = [];
+                }
+                this.loading = false;
+            },
+            error: () => {
+                this.resumen = null;
+                this.dataSource = [];
+                this.total = 0;
+                this.chartLabels = [];
+                this.chartData = [];
+                this.loading = false;
+            }
         });
     }
 
@@ -281,6 +327,13 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
     }
 
     get mostrarGrafico(): boolean {
-        return this.dataSource.length > 0;
+        if (this.dataSource.length > 1) {
+            return true;
+        }
+        if (this.dataSource.length === 1) {
+            const item = this.dataSource[0];
+            return item.destino !== 'TODOS' || item.vendidos > 0;
+        }
+        return false;
     }
 }

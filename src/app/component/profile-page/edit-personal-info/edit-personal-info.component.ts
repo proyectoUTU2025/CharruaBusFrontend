@@ -245,6 +245,29 @@ export class EditPersonalInfoComponent implements OnInit, OnDestroy {
           ...this.user,
           fechaNacimiento: new Date(this.user.fechaNacimiento + 'T00:00:00')
         }, { emitEvent: false });
+
+        const tipoDocumento = this.form.get('tipoDocumento')?.value;
+        const documentoControl = this.form.get('documento');
+
+        if (documentoControl && tipoDocumento) {
+            documentoControl.clearValidators();
+
+            if (tipoDocumento === 'CEDULA') {
+              documentoControl.setValidators([Validators.required, cedulaValidator]);
+            } else {
+              documentoControl.setValidators([Validators.required]);
+            }
+            documentoControl.updateValueAndValidity({ emitEvent: false });
+
+            if (tipoDocumento === 'CEDULA') {
+                const errors = documentoControl.errors;
+                if (errors && errors['invalidCedula']) {
+                  this.digitoVerificadorSugerido = errors['invalidCedula'].digitoCalculado;
+                } else {
+                  this.digitoVerificadorSugerido = null;
+                }
+            }
+        }
       }
     } catch (error) {
       this.materialUtils.showError('Error al cargar los datos del usuario.');

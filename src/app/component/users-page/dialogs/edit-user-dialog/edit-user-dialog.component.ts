@@ -231,6 +231,29 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
           situacionLaboral: (fullUser as any).situacionLaboral || ''
         }, { emitEvent: false });
         this.user = fullUser;
+
+        const tipoDocumento = this.form.get('tipoDocumento')?.value;
+        const documentoControl = this.form.get('documento');
+
+        if (documentoControl && tipoDocumento) {
+            documentoControl.clearValidators();
+
+            if (tipoDocumento === 'CEDULA') {
+              documentoControl.setValidators([Validators.required, cedulaValidator]);
+            } else {
+              documentoControl.setValidators([Validators.required]);
+            }
+            documentoControl.updateValueAndValidity({ emitEvent: false });
+            
+            if (tipoDocumento === 'CEDULA') {
+                const errors = documentoControl.errors;
+                if (errors && errors['invalidCedula']) {
+                  this.digitoVerificadorSugerido = errors['invalidCedula'].digitoCalculado;
+                } else {
+                  this.digitoVerificadorSugerido = null;
+                }
+            }
+        }
       })
       .catch(() => this.error = 'Error al cargar los datos del usuario')
       .finally(() => this.loading = false);

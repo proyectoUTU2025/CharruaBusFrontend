@@ -17,6 +17,8 @@ import { NgChartsModule } from 'ng2-charts';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../../../environments/environment';
+import { Subject, takeUntil } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-viajes-departamento',
@@ -33,13 +35,15 @@ import { environment } from '../../../../../environments/environment';
     MatDatepickerModule,
     MatNativeDateModule,
     NgChartsModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './viajes-departamento.component.html',
   styleUrls: ['./viajes-departamento.component.scss']
 })
 export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
   private readonly BASE = `${environment.apiBaseUrl}`;
+  private destroy$ = new Subject<void>();
 
   today = new Date();
   firstDayOfYear = new Date(this.today.getFullYear(), 0, 1);
@@ -63,6 +67,8 @@ export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
   ordenarPor = 'departamento';
   ascendente = true;
   downloadingCsv = false;
+  minDateForFin: Date | null = null;
+  loading = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -97,10 +103,29 @@ export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
     this.origen.setValue(this.origenPorDefecto);
     this.destino.setValue(this.destinoPorDefecto);
     localStorage.removeItem('filtrosViajesDepartamento');
+    this.setupDateFilters();
     this.load();
   }
 
+  setupDateFilters(): void {
+    this.fechaInicio.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        this.minDateForFin = value ? new Date(value) : null;
+        
+        const fechaFinControl = this.fechaFin;
+        if (fechaFinControl?.value && this.minDateForFin && fechaFinControl.value < this.minDateForFin) {
+          fechaFinControl.setValue(null);
+        }
+      });
+
+    if (this.fechaInicio.value) {
+      this.minDateForFin = new Date(this.fechaInicio.value);
+    }
+  }
+
   load(event?: PageEvent) {
+    this.loading = true;
     if (event) {
       this.pageIndex = event.pageIndex;
       this.pageSize = event.pageSize;
@@ -118,20 +143,28 @@ export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
       this.pageSize,
       this.ordenarPor,
       this.ascendente
-    ).subscribe((p: Page<EstadisticaViajePorDepartamento>) => {
-      this.dataSource = p.content;
-      this.total = p.page.totalElements;
+    ).subscribe({
+      next: (p: Page<EstadisticaViajePorDepartamento>) => {
+        this.dataSource = p.content;
+        this.total = p.page.totalElements;
 
-      if (this.mostrarGrafico) {
-        this.chartLabels = p.content.map(e => e.departamento);
-        this.chartData = [{
-          label: 'Cantidad de viajes',
-          data: p.content.map(e => e.cantidadViajes),
-          backgroundColor: '#1976d2'
-        }];
-      } else {
-        this.chartLabels = [];
-        this.chartData = [];
+        if (this.mostrarGrafico) {
+          this.chartLabels = p.content.map(e => e.departamento);
+          this.chartData = [{
+            label: 'Cantidad de viajes',
+            data: p.content.map(e => e.cantidadViajes),
+            backgroundColor: '#1976d2'
+          }];
+        } else {
+          this.chartLabels = [];
+          this.chartData = [];
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.dataSource = [];
+        this.total = 0;
+        this.loading = false;
       }
     });
   }
@@ -222,7 +255,14 @@ export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
   }
 
   get mostrarGrafico(): boolean {
-    return this.dataSource.length > 1 || (this.dataSource.length === 1 && this.dataSource[0].departamento !== 'TODOS');
+    if (this.dataSource.length > 1) {
+      return true;
+    }
+    if (this.dataSource.length === 1) {
+      const item = this.dataSource[0];
+      return item.departamento !== 'TODOS' || item.cantidadViajes > 0;
+    }
+    return false;
   }
 
   ngOnDestroy() {
@@ -232,5 +272,7 @@ export class ViajesDepartamentoComponent implements OnInit, OnDestroy {
     this.fechaFin.setValue(this.fechaFinPorDefecto);
     this.origen.setValue(this.origenPorDefecto);
     this.destino.setValue(this.destinoPorDefecto);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

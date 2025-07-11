@@ -200,6 +200,45 @@ $primary-color: #675992;
   }
 }
 
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+  
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #777;
+  
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    color: #bdbdbd;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .filtros-container {
     flex-direction: column;

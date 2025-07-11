@@ -15,6 +15,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../../../environments/environment';
+import { Subject, takeUntil } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-mantenimientos-por-omnibus',
@@ -30,7 +32,8 @@ import { environment } from '../../../../../environments/environment';
         NgChartsModule,
         MatDatepickerModule,
         MatNativeDateModule,
-        MatIconModule
+        MatIconModule,
+        MatProgressSpinnerModule
     ],
     templateUrl: './mantenimientos-por-omnibus.component.html',
     styleUrls: ['./mantenimientos-por-omnibus.component.scss']
@@ -38,6 +41,7 @@ import { environment } from '../../../../../environments/environment';
 export class MantenimientosPorOmnibusComponent implements OnInit, OnDestroy {
 
     private readonly BASE = `${environment.apiBaseUrl}`;
+    private destroy$ = new Subject<void>();
     
     fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
     fechaFinPorDefecto = new Date();
@@ -52,6 +56,8 @@ export class MantenimientosPorOmnibusComponent implements OnInit, OnDestroy {
     ordenarPor = 'matricula';
     ascendente = true;
     downloadingCsv = false;
+    minDateForFin: Date | null = null;
+    loading = false;
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -74,7 +80,25 @@ export class MantenimientosPorOmnibusComponent implements OnInit, OnDestroy {
         this.fechaInicio.setValue(this.fechaInicioPorDefecto);
         this.fechaFin.setValue(this.fechaFinPorDefecto);
         localStorage.removeItem('filtrosMantenimientosOmnibus');
+        this.setupDateFilters();
         this.load();
+    }
+
+    setupDateFilters(): void {
+      this.fechaInicio.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(value => {
+          this.minDateForFin = value ? new Date(value) : null;
+          
+          const fechaFinControl = this.fechaFin;
+          if (fechaFinControl?.value && this.minDateForFin && fechaFinControl.value < this.minDateForFin) {
+            fechaFinControl.setValue(null);
+          }
+        });
+  
+      if (this.fechaInicio.value) {
+        this.minDateForFin = new Date(this.fechaInicio.value);
+      }
     }
 
     ngOnDestroy() {
@@ -82,9 +106,12 @@ export class MantenimientosPorOmnibusComponent implements OnInit, OnDestroy {
         localStorage.removeItem('filtrosMantenimientosOmnibus');
         this.fechaInicio.setValue(this.fechaInicioPorDefecto);
         this.fechaFin.setValue(this.fechaFinPorDefecto);
+        this.destroy$.next();
+        this.destroy$.complete();
     }
     
     load(event?: PageEvent) {
+        this.loading = true;
         if (event) {
             this.pageIndex = event.pageIndex;
             this.pageSize = event.pageSize;
@@ -100,20 +127,28 @@ export class MantenimientosPorOmnibusComponent implements OnInit, OnDestroy {
             this.pageSize,
             this.ordenarPor,
             this.ascendente
-        ).subscribe((p: Page<EstadisticaOmnibus>) => {
-            this.dataSource = p.content;
-            this.total = p.page.totalElements;
-
-            if (this.mostrarGrafico) {
-                this.chartLabels = p.content.map(e => e.matricula);
-                this.chartData = [{
-                    label: 'Cantidad de viajes',
-                    data: p.content.map(e => e.cantidad),
-                    backgroundColor: '#1976d2'
-                }];
-            } else {
-                this.chartLabels = [];
-                this.chartData = [];
+        ).subscribe({
+            next: (p: Page<EstadisticaOmnibus>) => {
+                this.dataSource = p.content;
+                this.total = p.page.totalElements;
+    
+                if (this.mostrarGrafico) {
+                    this.chartLabels = p.content.map(e => e.matricula);
+                    this.chartData = [{
+                        label: 'Cantidad de mantenimientos',
+                        data: p.content.map(e => e.cantidad),
+                        backgroundColor: '#1976d2'
+                    }];
+                } else {
+                    this.chartLabels = [];
+                    this.chartData = [];
+                }
+                this.loading = false;
+            },
+            error: () => {
+                this.dataSource = [];
+                this.total = 0;
+                this.loading = false;
             }
         });
     }

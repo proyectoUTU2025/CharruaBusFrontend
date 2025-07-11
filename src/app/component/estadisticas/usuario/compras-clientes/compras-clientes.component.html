@@ -19,7 +19,7 @@
       
       <mat-form-field appearance="outline">
         <mat-label>Fecha fin</mat-label>
-        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin">
+        <input matInput [matDatepicker]="pickerFin" [formControl]="fechaFin" [min]="minDateForFin">
         <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
         <mat-datepicker #pickerFin></mat-datepicker>
       </mat-form-field>
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <div class="content-card">
+  <div class="content-card" *ngIf="data.length > 0">
     <div class="card-header">
       <h2 class="card-title">Gráfico de Compras por Cliente</h2>
       <div class="card-actions">
@@ -48,7 +48,8 @@
 
     <div class="grafico-container">
       <canvas baseChart
-              [data]="{ labels: chartLabels, datasets: chartData }"
+              [datasets]="chartData"
+              [labels]="chartLabels"
               [type]="chartType"
               [options]="chartOptions">
       </canvas>
@@ -56,42 +57,53 @@
   </div>
 
   <div class="content-card">
-    <div class="tabla-container">
-      <table mat-table [dataSource]="data" class="mat-elevation-z1" matSort matSortDisableClear>
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="email">
-            Email
-          </th>
-          <td mat-cell *matCellDef="let x">{{ x.email }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="cantidadPasajes">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="cantidadPasajes">
-            Pasajes
-          </th>
-          <td mat-cell *matCellDef="let x">{{ x.cantidadPasajes }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="totalGastado">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="totalGastado">
-            Total Gastado
-          </th>
-          <td mat-cell *matCellDef="let x">{{ x.totalGastado | currency:'UYU':'symbol':'1.2-2' }}</td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="['email','cantidadPasajes','totalGastado']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
-      </table>
-
-      <mat-paginator
-        *ngIf="data.length > 0"
-        [length]="total"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="[5, 10, 20]"
-        (page)="load($event)"
-        showFirstLastButtons>
-      </mat-paginator>
+    <div *ngIf="loading" class="spinner-overlay">
+        <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
     </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="tabla-container" *ngIf="data.length > 0">
+        <table mat-table [dataSource]="data" class="mat-elevation-z1" matSort matSortDisableClear>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="email">
+              Email
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="cantidadPasajes">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="cantidadPasajes">
+              Pasajes
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.cantidadPasajes }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalGastado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="totalGastado">
+              Total Gastado
+            </th>
+            <td mat-cell *matCellDef="let x">{{ x.totalGastado | currency:'UYU':'symbol':'1.2-2' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['email','cantidadPasajes','totalGastado']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['email','cantidadPasajes','totalGastado']"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="total"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[5, 10, 20]"
+          (page)="load($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+      <div *ngIf="data.length === 0" class="no-results">
+          <mat-icon>search_off</mat-icon>
+          <h3>No se encontraron resultados</h3>
+          <p>Intenta ajustar los filtros de búsqueda.</p>
+      </div>
+    </ng-container>
   </div>
 </div>

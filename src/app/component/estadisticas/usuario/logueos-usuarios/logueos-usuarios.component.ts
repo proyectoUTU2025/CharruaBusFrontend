@@ -17,6 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { environment } from '../../../../../environments/environment';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-logueos-usuarios',
@@ -41,6 +42,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly BASE = `${environment.apiBaseUrl}`;
+    private destroy$ = new Subject<void>();
     @ViewChild(MatSort) sort!: MatSort;
 
     data: EstadisticaLogueos[] = [];
@@ -57,6 +59,8 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
     fechaFin = new FormControl<Date | null>(new Date());
 
     downloadingCsv = false;
+    minDateForFin: Date | null = null;
+    loading = false;
 
     chartLabels: string[] = [];
     chartData: ChartDataset<'bar'>[] = [];
@@ -73,6 +77,7 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
     constructor(private svc: EstadisticaUsuarioService) { }
 
     ngOnInit() {
+        this.setupDateFilters();
         this.load();
     }
 
@@ -85,13 +90,33 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
         });
     }
 
+    setupDateFilters(): void {
+      this.fechaInicio.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(value => {
+          this.minDateForFin = value ? new Date(value) : null;
+          
+          const fechaFinControl = this.fechaFin;
+          if (fechaFinControl?.value && this.minDateForFin && fechaFinControl.value < this.minDateForFin) {
+            fechaFinControl.setValue(null);
+          }
+        });
+  
+      if (this.fechaInicio.value) {
+        this.minDateForFin = new Date(this.fechaInicio.value);
+      }
+    }
+
     ngOnDestroy() {
         // Resetear filtros al salir del componente
         this.fechaInicio.setValue(this.firstDayOfYear);
         this.fechaFin.setValue(new Date());
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     load(event?: PageEvent) {
+        this.loading = true;
         if (event) {
             this.pageIndex = event.pageIndex;
             this.pageSize = event.pageSize;
@@ -112,8 +137,16 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
                 this.chartData = [
                     { data: res.content.map(x => x.cantidadLogueos), backgroundColor: '#1976d2', label: 'Cantidad Logueos' }
                 ];
+                this.loading = false;
             },
-            error: err => console.error('Error cargando:', err)
+            error: err => {
+              console.error('Error cargando:', err);
+              this.data = [];
+              this.total = 0;
+              this.chartLabels = [];
+              this.chartData = [];
+              this.loading = false;
+            }
         });
     }
 

@@ -36,7 +36,7 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
   cargandoMas = false;
   clienteId: number | null = null;
   paginaActual = 0;
-  tamañoPagina = 5; // Incrementado para mostrar más notificaciones
+  tamañoPagina = 5;
   hayMasNotificaciones = true;
   totalNotificaciones = 0;
   private subscriptions: Subscription[] = [];
@@ -47,7 +47,6 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Solo inicializar si el usuario está logueado Y es un CLIENTE
     if (this.authService.isLoggedIn && this.authService.id && this.authService.rol === 'CLIENTE') {
       this.clienteId = this.authService.id;
       this.inicializarNotificaciones();
@@ -62,7 +61,6 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
   private inicializarNotificaciones(): void {
     if (!this.clienteId) return;
 
-    // Suscribirse al contador de notificaciones no leídas
     const contadorSub = this.notificacionService.contadorNoLeidas$.subscribe(
       count => {
         console.log('Contador no leídas actualizado:', count);
@@ -81,7 +79,6 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
   abrirNotificaciones(): void {
     if (!this.clienteId) return;
 
-    // Reiniciar paginado
     this.paginaActual = 0;
     this.notificaciones = [];
     this.hayMasNotificaciones = true;
@@ -111,13 +108,11 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
         this.hayMasNotificaciones = page.content.length === this.tamañoPagina && 
                                   this.notificaciones.length < this.totalNotificaciones;
         
-        // Si es la primera página y el contador no está actualizado, calcularlo localmente
         if (this.paginaActual === 0) {
           const noLeidasLocales = this.notificaciones.filter(n => !n.leido).length;
           console.log('Notificaciones no leídas encontradas localmente:', noLeidasLocales);
           console.log('Contador actual del servicio:', this.contadorNoLeidas);
           
-          // Si el contador del servicio es 0 pero hay notificaciones no leídas localmente, usar el local
           if (this.contadorNoLeidas === 0 && noLeidasLocales > 0) {
             console.log('Actualizando contador basándose en notificaciones locales');
             this.contadorNoLeidas = noLeidasLocales;
@@ -145,7 +140,6 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
   marcarTodasLeidas(): void {
     if (!this.clienteId) return;
 
-    // Verificar si hay notificaciones no leídas, ya sea por contador o por notificaciones locales
     const tieneNoLeidasLocales = this.notificaciones.some(n => !n.leido);
     if (this.contadorNoLeidas === 0 && !tieneNoLeidasLocales) {
       return;
@@ -153,13 +147,11 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
 
     this.notificacionService.marcarLeidas(this.clienteId).subscribe({
       next: () => {
-        // Actualizar las notificaciones localmente
         this.notificaciones = this.notificaciones.map(notif => ({
           ...notif,
           leido: true
         }));
         
-        // Actualizar contador local
         this.contadorNoLeidas = 0;
       },
       error: (error) => {

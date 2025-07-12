@@ -116,14 +116,12 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
 
   private visibilityChangeListener!: () => void;
 
-  // Nuevas propiedades para el viaje de vuelta
   isSearchingVuelta = false;
   noViajesVueltaEncontrados = false;
   totalElementsVuelta = 0;
   pageIndexVuelta = 0;
   pageSizeVuelta = 5;
 
-  // Propiedades para cálculo de precios
   subtotal = 0;
   montoDescuento = 0;
   precioFinal = 0;
@@ -285,7 +283,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
       return;
     }
 
-    // Reset selections
     this.viajeIdaSeleccionado = null;
     this.viajeVueltaSeleccionado = null;
     this.selectedSeats = [];
@@ -454,10 +451,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
 
   onAsientosVueltaChange(asientos: number[]): void {
     this.selectedSeatsVuelta = asientos;
-  }
-
-  abrirDialogPasajeros(esVuelta: boolean = false): void {
-    // This method is now obsolete
   }
 
   confirmarCompra(): void {
@@ -674,7 +667,6 @@ export class CompraPageComponent implements OnInit, AfterViewInit, AfterViewChec
     this.opcionesPasajeros = Array.from({ length: this.maxPasajes }, (_, i) => i + 1);
   }
 
-  // Métodos para formatear fechas en español
   formatearFechaSalida(esVuelta = false): string {
     const viaje = esVuelta ? this.viajeVueltaSeleccionado : this.viajeIdaSeleccionado;
     if (!viaje?.fechaHoraSalida) return '';

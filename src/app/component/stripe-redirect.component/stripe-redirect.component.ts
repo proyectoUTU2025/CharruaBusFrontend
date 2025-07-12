@@ -87,7 +87,6 @@ export class StripeRedirectComponent implements OnInit {
         };
         this.router.navigate(['/compra', this.compraId], { queryParams });
       } else {
-        // Si no hay ID de compra, redirigir a una página genérica
         this.router.navigate(['/pasajes-history']); 
       }
     }, 1000);

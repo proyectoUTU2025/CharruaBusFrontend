@@ -38,7 +38,7 @@ function cedulaValidator(control: AbstractControl): ValidationErrors | null {
   }
 
   if (!/^\d{8}$/.test(cedula)) {
-    return null; // No validar si no tiene 8 dígitos
+    return null;
   }
 
   const digitos = cedula.substring(0, 7).split('').map(Number);

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  //apiBaseUrl: 'https://charruabus.com' 
+  //apiBaseUrl: 'https://charruabusbackend-production.up.railway.app' 
 };

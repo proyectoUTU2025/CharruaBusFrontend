@@ -25,7 +25,6 @@ import { MaterialUtilsService } from '../../shared/material-utils.service';
 import { merge, Subject } from 'rxjs';
 import { tap, takeUntil } from 'rxjs/operators';
 
-// Validadores personalizados
 export const origenDestinoValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const origen = control.get('localidadOrigenId');
   const destino = control.get('localidadDestinoId');
@@ -172,12 +171,10 @@ export class ViajesPageComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!activeField || !direction) {
       return 'fechaHoraSalida,asc';
     }
-    // Mapear campos del frontend a campos del backend si difieren
     let backendField = activeField;
     if (activeField === 'precioTotal') {
       backendField = 'precio';
     }
-    // Convertir dirección a minúsculas
     const dir = direction.toLowerCase();
     return `${backendField},${dir}`;
   }
@@ -188,14 +185,12 @@ export class ViajesPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const f = this.filterForm.value;
     
-    // Helper para combinar fecha y hora
     const buildDateTime = (fecha: Date | null, hora: string): string | undefined => {
       if (!fecha) return undefined;
       const timeToUse = hora || '00:00';
       const [hh, mm] = timeToUse.split(':').map(Number);
       const dt = new Date(fecha);
       dt.setHours(hh, mm, 0, 0);
-      // YYYY-MM-DDTHH:mm:ss sin zona
       const year = dt.getFullYear();
       const month = (dt.getMonth() + 1).toString().padStart(2, '0');
       const day = dt.getDate().toString().padStart(2, '0');
@@ -251,13 +246,11 @@ export class ViajesPageComponent implements OnInit, AfterViewInit, OnDestroy {
     const tieneFechaDesde = f.fechaDesde !== null;
     const tieneFechaHasta = f.fechaHasta !== null;
 
-    // Ambas fechas deben estar presentes o ausentes
     if (tieneFechaDesde !== tieneFechaHasta) {
       this.materialUtils.showError('Si especificas fecha desde, también debes especificar fecha hasta y viceversa.');
       return;
     }
 
-    // Si hay ambas, validar orden incluyendo hora
     if (tieneFechaDesde && tieneFechaHasta) {
       const fechaDesde = new Date(f.fechaDesde);
       const fechaHasta = new Date(f.fechaHasta);

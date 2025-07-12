@@ -77,7 +77,6 @@
       </div>
     </div>
 
-    <!-- Loading spinner -->
     <app-loading-spinner 
       *ngIf="isLoading" 
       type="spinner" 
@@ -85,7 +84,6 @@
       [diameter]="40">
     </app-loading-spinner>
 
-    <!-- Sin resultados -->
     <div class="no-results-container" *ngIf="!isLoading && hasSearched && dataSource.data.length === 0">
       <div class="no-results-content">
         <mat-icon class="no-results-icon">people</mat-icon>
@@ -94,7 +92,6 @@
       </div>
     </div>
 
-    <!-- Table content -->
     <div class="table-container" [hidden]="isLoading || (hasSearched && dataSource.data.length === 0)">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z1" matSort>
         <ng-container matColumnDef="id">

@@ -34,9 +34,6 @@ export class MaterialUtilsService {
     private bottomSheet: MatBottomSheet
   ) { }
 
-  /**
-   * Muestra un mensaje de éxito
-   */
   showSuccess(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 3000,
@@ -46,9 +43,6 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Muestra un mensaje de error
-   */
   showError(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 5000,
@@ -58,9 +52,6 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Muestra un mensaje de advertencia
-   */
   showWarning(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 4000,
@@ -70,9 +61,6 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Muestra un mensaje informativo
-   */
   showInfo(message: string, config?: SnackBarConfig): void {
     this.snackBar.open(message, 'Cerrar', {
       duration: config?.duration || 3000,
@@ -82,9 +70,6 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Abre un diálogo
-   */
   openDialog<T>(component: ComponentType<T>, config?: DialogConfig): MatDialogRef<T> {
     return this.dialog.open(component, {
       width: config?.width || '500px',
@@ -98,9 +83,6 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Abre un bottom sheet
-   */
   openBottomSheet<T>(component: ComponentType<T>, config?: DialogConfig): MatBottomSheetRef<T> {
     return this.bottomSheet.open(component, {
       panelClass: config?.panelClass,
@@ -108,23 +90,14 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Cierra todos los diálogos abiertos
-   */
   closeAllDialogs(): void {
     this.dialog.closeAll();
   }
 
-  /**
-   * Cierra todos los bottom sheets abiertos
-   */
   closeAllBottomSheets(): void {
     this.bottomSheet.dismiss();
   }
 
-  /**
-   * Muestra un mensaje de confirmación
-   */
   showConfirmation(message: string, title: string = 'Confirmar', type: 'info' | 'warning' | 'error' | 'success' = 'info'): Promise<boolean> {
     const dialogData: ConfirmDialogData = {
       title,
@@ -141,9 +114,6 @@ export class MaterialUtilsService {
     return dialogRef.afterClosed().toPromise();
   }
 
-  /**
-   * Muestra un mensaje de carga
-   */
   showLoading(message: string = 'Cargando...'): void {
     this.snackBar.open(message, '', {
       duration: 0,
@@ -153,9 +123,6 @@ export class MaterialUtilsService {
     });
   }
 
-  /**
-   * Oculta el mensaje de carga
-   */
   hideLoading(): void {
     this.snackBar.dismiss();
   }

@@ -42,7 +42,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     private readonly BASE = `${environment.apiBaseUrl}`;
     private destroy$ = new Subject<void>();
 
-    fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
+    fechaInicioPorDefecto = new Date(2025, 0, 1);
     fechaFinPorDefecto = new Date();
 
     fechaInicio = new FormControl<Date | null>(this.fechaInicioPorDefecto);
@@ -75,7 +75,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     constructor(private svc: EstadisticaTransporteService) {}
 
     ngOnInit() {
-        // Siempre setear los valores por defecto
         this.fechaInicio.setValue(this.fechaInicioPorDefecto);
         this.fechaFin.setValue(this.fechaFinPorDefecto);
         localStorage.removeItem('filtrosViajesOmnibus');
@@ -101,7 +100,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     }
 
     ngOnDestroy() {
-        // Limpiar localStorage y resetear los filtros al salir del componente
         localStorage.removeItem('filtrosViajesOmnibus');
         this.fechaInicio.setValue(this.fechaInicioPorDefecto);
         this.fechaFin.setValue(this.fechaFinPorDefecto);

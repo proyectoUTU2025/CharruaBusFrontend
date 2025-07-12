@@ -2,13 +2,11 @@
   <div class="reload-overlay" *ngIf="isReloading">
     <mat-spinner diameter="40"></mat-spinner>
   </div>
-  <!-- Banner de estado de la compra -->
   <div *ngIf="banner.mostrar" class="status-banner" [ngClass]="banner.clase">
     <mat-icon>{{ banner.icono }}</mat-icon>
     <span>{{ banner.texto }}</span>
   </div>
 
-  <!-- Información de la reserva -->
   <mat-card class="info-reserva-card">
     <mat-card-header>
       <mat-card-title>Información de Reserva</mat-card-title>
@@ -56,14 +54,12 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Pasajes -->
   <mat-card class="detalles-compra-card">
     <mat-card-header>
       <mat-card-title>Pasajes</mat-card-title>
     </mat-card-header>
     <br>
     <mat-card-content>
-      <!-- Lista de Pasajes Horizontal -->
       <div class="pasajes-section">
         <div class="pasajes-horizontal-list">
           <div *ngFor="let pasaje of detalle.pasajes" class="pasaje-chip">
@@ -98,7 +94,6 @@
         </div>
       </div>
 
-      <!-- Cálculo de Precios General -->
       <div class="price-calculation-section">
         <div class="price-breakdown">
           <ng-container [ngSwitch]="detalle.estado">

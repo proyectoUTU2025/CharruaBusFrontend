@@ -48,22 +48,19 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
     private readonly BASE = `${environment.apiBaseUrl}`;
     private destroy$ = new Subject<void>();
     
-    fechaInicioPorDefecto = new Date(2025, 0, 1); // 1-1-2025
+    fechaInicioPorDefecto = new Date(2025, 0, 1);
     fechaFinPorDefecto = new Date();
     origenPorDefecto = null;
     destinoPorDefecto = null;
 
-    // filtros
     fechaInicio = new FormControl<Date | null>(this.fechaInicioPorDefecto);
     fechaFin = new FormControl<Date | null>(this.fechaFinPorDefecto);
     origen = new FormControl<TipoDepartamento | null>(this.origenPorDefecto);
     destino = new FormControl<TipoDepartamento | null>(this.destinoPorDefecto);
     departamentos = Object.values(TipoDepartamento);
 
-    // resumen
     resumen: EstadisticaPasaje | null = null;
 
-    // agrupado
     displayedColumns = ['destino', 'vendidos'];
     dataSource: EstadisticaPasaje[] = [];
     total = 0;
@@ -93,7 +90,6 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
     constructor(private svc: EstadisticaTransporteService) { }
 
     ngOnInit() {
-        // Siempre setear los valores por defecto
         this.fechaInicio.setValue(this.fechaInicioPorDefecto);
         this.fechaFin.setValue(this.fechaFinPorDefecto);
         this.origen.setValue(this.origenPorDefecto);
@@ -121,7 +117,6 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        // Limpiar localStorage y resetear los filtros al salir del componente
         localStorage.removeItem('filtrosEstadisticasPasajes');
         this.fechaInicio.setValue(this.fechaInicioPorDefecto);
         this.fechaFin.setValue(this.fechaFinPorDefecto);
@@ -140,7 +135,6 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
         const inicio = this.formatDate(this.fechaInicio.value);
         const fin = this.formatDate(this.fechaFin.value);
 
-        // RESUMEN
         const resumen$ = this.svc.getEstadisticaPasajes(
             inicio || undefined,
             fin || undefined,
@@ -148,7 +142,6 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
             this.destino.value || undefined
         );
 
-        // AGRUPADO
         const agrupado$ = this.svc.getPasajesAgrupados(
             inicio || undefined,
             fin || undefined,
@@ -253,7 +246,7 @@ export class EstadisticasPasajesComponent implements OnInit, OnDestroy {
         const params: any = {
             fechaInicio: inicio || undefined,
             fechaFin: fin || undefined,
-            ordenarPor: 'vendidos', // o cualquier otro valor por defecto
+            ordenarPor: 'vendidos',
             ascendente: true
         };
         if (this.origen.value) params.origen = this.origen.value;

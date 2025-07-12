@@ -3,7 +3,6 @@
 </div>
 
 <mat-dialog-content class="summary-content">
-  <!-- Mensaje especial para error de encabezado -->
   <div *ngIf="isHeaderError" class="header-error-container">
     <mat-icon class="header-error-icon">error_outline</mat-icon>
     <h3 class="header-error-title">Error en el archivo CSV</h3>
@@ -15,7 +14,6 @@
     </p>
   </div>
 
-  <!-- Resumen general (se oculta si es error de encabezado) -->
   <div *ngIf="!isHeaderError">
     <h3 class="summary-title">Proceso Finalizado</h3>
     <p class="summary-line">

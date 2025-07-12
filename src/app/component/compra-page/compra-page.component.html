@@ -1,5 +1,4 @@
 <div class="compra-container">
-  <!-- Overlay para el procesamiento de pago -->
   <div *ngIf="isProcessingPayment" class="loading-overlay">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Redirigiendo a la plataforma de pago, por favor espere...</p>
@@ -7,7 +6,6 @@
 
   <div class="stepper-container">
     <div class="step-indicators">
-      <!-- Para viaje de solo ida -->
       <ng-container *ngIf="tipoViaje === 'IDA'">
         <div class="step-indicator" [class.active]="step === 0" [class.completed]="step > 0">
           <div class="step-number">1</div>
@@ -31,7 +29,6 @@
         </div>
       </ng-container>
 
-      <!-- Para viaje de ida y vuelta -->
       <ng-container *ngIf="tipoViaje === 'IDA_Y_VUELTA'">
         <div class="step-indicator" [class.active]="step === 0" [class.completed]="step > 0">
           <div class="step-number">1</div>
@@ -66,19 +63,15 @@
   </div>
 
   <div class="step-content-wrapper">
-    <!-- Spinner de carga de configuración -->
     <div *ngIf="isLoadingConfig" class="loading-overlay">
       <mat-spinner diameter="50"></mat-spinner>
       <p>Cargando configuración...</p>
     </div>
 
-    <!-- Contenido de los pasos -->
     <ng-container *ngIf="!isLoadingConfig">
-      <!-- Paso 0: Búsqueda de viajes -->
       <div *ngIf="step === 0" class="search-step-wrapper">
         <div class="search-form-container">
           <form [formGroup]="searchForm" class="filters">
-            <!-- Fila 1 -->
             <mat-form-field appearance="outline" class="filter-item">
               <mat-label>Tipo de Viaje</mat-label>
               <mat-select formControlName="tipoViaje">
@@ -101,7 +94,6 @@
               </mat-select>
             </mat-form-field>
 
-            <!-- Fila 2 -->
             <mat-form-field appearance="outline" class="filter-item">
               <mat-label>Pasajeros</mat-label>
               <mat-select formControlName="pasajeros">
@@ -129,15 +121,12 @@
         </div>
       </div>
 
-      <!-- Paso 1: Selección de viaje ida -->
       <div *ngIf="step === 1" class="viajes-card">
-        <!-- Spinner de carga SIEMPRE dentro de la tarjeta -->
         <div *ngIf="isSearching" class="loading-overlay">
           <mat-spinner diameter="50"></mat-spinner>
           <p>Buscando viajes...</p>
         </div>
 
-        <!-- Mensaje de no encontrados -->
         <div *ngIf="noViajesEncontrados && !isSearching" class="no-viajes-encontrados">
           <mat-icon>directions_bus</mat-icon>
           <h3>No se encontraron viajes</h3>
@@ -145,7 +134,6 @@
           <button mat-stroked-button class="secondary-btn" (click)="anteriorPaso()">Volver a la búsqueda</button>
         </div>
 
-        <!-- Lista de viajes -->
         <div *ngIf="!isSearching && !noViajesEncontrados && viajes.length > 0" class="viajes-list-wrapper">
           <div *ngFor="let v of viajes" 
                class="viaje-item" 
@@ -182,7 +170,6 @@
         </div>
       </div>
 
-      <!-- Paso 2: Datos del pasajero -->
       <div *ngIf="(step === 3 && !esIdaYVuelta()) || (step === 5 && esIdaYVuelta())" class="viajes-card">
         
         <ng-container *ngIf="authService.rol === 'CLIENTE' && userInfo">
@@ -229,7 +216,6 @@
         </ng-container>
       </div>
 
-      <!-- Paso 3: Selección de asientos ida -->
       <div *ngIf="step === 2 && viajeIdaSeleccionado" class="viajes-card seat-selection-card">
         <div class="loading-overlay" *ngIf="isLoadingAsientos">
           <mat-spinner diameter="50"></mat-spinner>
@@ -269,15 +255,12 @@
         </app-seats>
       </div>
 
-      <!-- Paso 4: Selección de viaje vuelta -->
       <div *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 3" class="viajes-card">
-        <!-- Spinner de carga -->
         <div *ngIf="isSearchingVuelta" class="loading-overlay">
           <mat-spinner diameter="50"></mat-spinner>
           <p>Buscando viajes de vuelta...</p>
         </div>
 
-        <!-- Mensaje de no encontrados -->
         <div *ngIf="noViajesVueltaEncontrados && !isSearchingVuelta" class="no-viajes-encontrados">
           <mat-icon>directions_bus</mat-icon>
           <h3>No se encontraron viajes de vuelta</h3>
@@ -286,7 +269,6 @@
           <button mat-stroked-button class="secondary-btn" (click)="limpiarFiltros()">Volver a la búsqueda</button>
         </div>
 
-        <!-- Lista de viajes de vuelta -->
         <div *ngIf="!isSearchingVuelta && !noViajesVueltaEncontrados && viajesVuelta.length > 0" class="viajes-list-wrapper">
           <div *ngFor="let v of viajesVuelta" 
                class="viaje-item" 
@@ -324,7 +306,6 @@
         </div>
       </div>
 
-      <!-- Paso 5: Selección de asientos vuelta (si aplica) -->
       <div *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 4 && viajeVueltaSeleccionado" class="viajes-card seat-selection-card">
         <div class="loading-overlay" *ngIf="isLoadingAsientos">
           <mat-spinner diameter="50"></mat-spinner>
@@ -364,7 +345,6 @@
         </app-seats>
       </div>
 
-      <!-- Paso 4: Resumen (si es solo ida) -->
       <div *ngIf="step === 4 && !esIdaYVuelta() && !estadoCompra" class="viajes-card confirmation-container">
         <div *ngIf="isLoadingPrecios" class="loading-overlay">
           <mat-spinner diameter="50"></mat-spinner>
@@ -376,7 +356,6 @@
             <mat-icon>error_outline</mat-icon>
             <span>{{ errorMensaje }}</span>
           </div>
-          <!-- Resumen para viaje de IDA -->
           <div class="confirmation-section">
             <h3>Confirme los detalles del viaje de IDA</h3>
             <div class="details-grid">
@@ -439,7 +418,6 @@
         </ng-container>
       </div>
 
-      <!-- Paso 6: Resumen (si es ida y vuelta) -->
       <div *ngIf="tipoViaje === 'IDA_Y_VUELTA' && step === 6" class="viajes-card confirmation-container">
         <div *ngIf="isLoadingPrecios" class="loading-overlay">
           <mat-spinner diameter="50"></mat-spinner>
@@ -451,7 +429,6 @@
             <mat-icon>error_outline</mat-icon>
             <span>{{ errorMensaje }}</span>
           </div>
-          <!-- Resumen para viaje de IDA -->
           <div class="confirmation-section">
             <h3>Confirme los detalles del viaje de IDA</h3>
             <div class="details-grid">
@@ -486,7 +463,6 @@
             </div>
           </div>
 
-          <!-- Resumen para viaje de VUELTA -->
           <div *ngIf="viajeVueltaSeleccionado" class="confirmation-section">
             <h3>Confirme los detalles del viaje de VUELTA</h3>
             <div class="details-grid">
@@ -553,7 +529,6 @@
         </ng-container>
       </div>
 
-      <!-- Paso final: Estado de la compra -->
       <div *ngIf="(step === 4 && !esIdaYVuelta() && estadoCompra) || (step === 6 && esIdaYVuelta() && estadoCompra)" class="viajes-card purchase-result">
         <div *ngIf="estadoCompra === 'exito'" class="compra-estado exito">
           <mat-icon>check_circle</mat-icon>
@@ -574,13 +549,11 @@
 
   <div *ngIf="!estadoCompra" class="step-actions-container">
     <div class="step-actions">
-      <!-- Botones para el Paso 0 (Búsqueda) -->
       <ng-container *ngIf="step === 0">
         <button mat-stroked-button class="secondary-btn" (click)="limpiarFiltros()">Limpiar</button>
         <button mat-raised-button class="primary-btn" (click)="buscar()" [disabled]="searchForm.invalid">Buscar</button>
       </ng-container>
 
-      <!-- Botones para Pasos > 0 -->
       <ng-container *ngIf="step > 0">
         <button mat-stroked-button class="secondary-btn" (click)="anteriorPaso()" [disabled]="isProcessingPayment">
           <mat-icon>arrow_back</mat-icon>

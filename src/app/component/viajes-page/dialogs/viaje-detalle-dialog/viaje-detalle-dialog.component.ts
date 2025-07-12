@@ -69,7 +69,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
   destinoFilter = new FormControl('todas');
   numeroAsientoFilter = new FormControl(null, [Validators.min(1)]);
   
-  // Paginación
   currentPage = 0;
   pageSize = 10;
   totalElements = 0;
@@ -89,8 +88,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Los filtros solo se aplicarán cuando se presione el botón "Buscar"
-    // Agregar validador máximo dinámico basado en la cantidad de asientos del viaje
     this.numeroAsientoFilter.setValidators([
       Validators.min(1),
       Validators.max(this.cantidadMaximaAsientos)
@@ -118,7 +115,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
 
   onTabChange(index: number) {
     this.selectedTabIndex = index;
-    // Pestaña 2 = Historial de Pasajes (índice 2 porque es la tercera pestaña)
     if (index === 2 && this.pasajes.length === 0) {
       this.cargarPasajes();
     }
@@ -148,32 +144,20 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-
-
-
-
-
-
-  /**
-   * Aplica todos los filtros activos
-   */
   aplicarFiltros(resetPage: boolean = false) {
     if (this.isLoadingPasajes) return;
     
-    // Si se resetea la página o es una nueva búsqueda, ir a la primera página
     if (resetPage) {
       this.currentPage = 0;
     }
     
     const filtro: FiltroPasajeViajeDto = {};
     
-    // Filtro por estado
     const estado = this.estadoFilter.value;
     if (estado && estado !== 'todos') {
       filtro.estados = [estado as TipoEstadoPasaje];
     }
     
-    // Filtro por fechas
     if (this.fechaDesdeFilter.value) {
       filtro.fechaDesde = this.formatDateForBackend(this.fechaDesdeFilter.value);
     }
@@ -182,19 +166,16 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
       filtro.fechaHasta = this.formatDateForBackend(this.fechaHastaFilter.value);
     }
     
-    // Filtro por origen
     const origen = this.origenFilter.value;
     if (origen && origen !== 'todas') {
       filtro.origenId = parseInt(origen);
     }
     
-    // Filtro por destino
     const destino = this.destinoFilter.value;
     if (destino && destino !== 'todas') {
       filtro.destinoId = parseInt(destino);
     }
     
-    // Filtro por número de asiento
     const numeroAsiento = this.numeroAsientoFilter.value;
     if (numeroAsiento && numeroAsiento > 0 && this.numeroAsientoFilter.valid) {
       filtro.numeroAsiento = parseInt(numeroAsiento);
@@ -203,9 +184,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     this.cargarPasajesConFiltro(filtro);
   }
 
-  /**
-   * Limpia todos los filtros
-   */
   limpiarFiltros() {
     this.estadoFilter.setValue('todos');
     this.fechaDesdeFilter.setValue(null);
@@ -213,15 +191,10 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     this.origenFilter.setValue('todas');
     this.destinoFilter.setValue('todas');
     this.numeroAsientoFilter.setValue(null);
-    this.currentPage = 0; // Resetear a la primera página
+    this.currentPage = 0;
     this.cargarPasajes();
   }
 
-  /**
-   * Formats a date to YYYY-MM-DDTHH:mm:ss without timezone info.
-   * @param date The date to format.
-   * @param endOfDay If true, sets the time to 23:59:59. Otherwise, 00:00:00.
-   */
   private formatDateForBackend(date: Date, endOfDay: boolean = false): string {
     if (!date) return '';
 
@@ -235,9 +208,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     return `${yyyy}-${mm}-${dd}T00:00:00`;
   }
 
-  /**
-   * Maneja el evento de cambio de página
-   */
   onPageChange(event: PageEvent) {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
@@ -245,9 +215,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * Recarga los pasajes con filtros del servidor
-   */
   cargarPasajesConFiltro(filtro: FiltroPasajeViajeDto) {
     this.isLoadingPasajes = true;
     
@@ -270,8 +237,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-
-
   getEstadoText(estado: TipoEstadoPasaje): string {
     switch(estado) {
       case TipoEstadoPasaje.CONFIRMADO: return 'Confirmado';
@@ -292,9 +257,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Abre el diálogo de detalle completo del pasaje
-   */
   abrirDetallePasaje(pasaje: PasajeDto): void {
     const dialogRef = this.dialog.open(DetallePasajeCompletoDialogComponent, {
       width: '600px',
@@ -313,15 +275,8 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
-  /**
-   * Busca pasajes aplicando los filtros activos
-   */
   buscarPasajes() {
-    // Verificar que no hay errores de validación
     if (this.tieneErroresValidacion) {
-      // Mensajes específicos
       if (this.numeroAsientoFilter.invalid) {
         this.materialUtils.showError('Corrige los errores en el número de asiento antes de buscar');
       } else {
@@ -330,12 +285,9 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
       return;
     }
     
-    this.aplicarFiltros(true); // Resetear a la primera página en nueva búsqueda
+    this.aplicarFiltros(true); 
   }
 
-  /**
-   * Verifica si hay errores de validación en los filtros
-   */
   get tieneErroresValidacion(): boolean {
     return this.numeroAsientoFilter.invalid || this.fechasInvalidas;
   }
@@ -349,16 +301,10 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  /**
-   * TrackBy function para mejorar el rendimiento en la lista de paradas
-   */
   trackByParadaId(index: number, parada: { id: number, nombre: string }): number {
     return parada.id;
   }
 
-  /**
-   * Obtiene todas las paradas disponibles para el filtro de origen
-   */
   get paradasOrigen(): { id: number, nombre: string }[] {
     try {
       if (!this.data?.viaje?.paradas || this.data.viaje.paradas.length === 0) {
@@ -375,9 +321,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Obtiene todas las paradas disponibles para el filtro de destino
-   */
   get paradasDestino(): { id: number, nombre: string }[] {
     try {
       if (!this.data?.viaje?.paradas || this.data.viaje.paradas.length === 0) {
@@ -394,7 +337,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Métodos para asientos
   getAsientosDisponibles(): AsientoDto[] {
     const asientos = this.data.viaje.asientos || [];
     return asientos.filter(a => a.estado === 'DISPONIBLE');
@@ -410,7 +352,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     return asientos.filter(a => a.estado === 'RESERVADO');
   }
 
-  // Método obsoleto - mantener por compatibilidad pero usar getAsientosConfirmados
   getAsientosOcupados(): AsientoDto[] {
     return this.getAsientosConfirmados();
   }
@@ -424,7 +365,6 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Métodos existentes actualizados con datos reales
   tieneParadas(): boolean {
     return this.data.viaje.paradas && this.data.viaje.paradas.length >= 2;
   }
@@ -482,13 +422,11 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
   }
 
   get puedeReasignar(): boolean {
-    // Solo se puede reasignar si el viaje aún no ha comenzado.
     const fechaHoraSalida = new Date(this.data.viaje.fechaHoraSalida);
     const ahora = new Date();
     return fechaHoraSalida > ahora;
   }
 
-  // Método para organizar asientos en filas de autobús (2+2)
   getAsientosEnFilas(): { izquierda: AsientoDto[], derecha: AsientoDto[] }[] {
     const asientos = this.data.viaje.asientos || [];
     const filas: { izquierda: AsientoDto[], derecha: AsientoDto[] }[] = [];
@@ -499,14 +437,12 @@ export class ViajeDetalleDialogComponent implements OnInit, OnDestroy {
 
     const asientosOrdenados = [...asientos].sort((a, b) => a.numero - b.numero);
     
-    // Organizamos en filas de 4 asientos (2 izquierda + 2 derecha)
     for (let i = 0; i < asientosOrdenados.length; i += 4) {
       const fila = {
         izquierda: asientosOrdenados.slice(i, i + 2),
         derecha: asientosOrdenados.slice(i + 2, i + 4)
       };
       
-      // Solo agregamos la fila si tiene al menos un asiento
       if (fila.izquierda.length > 0 || fila.derecha.length > 0) {
         filas.push(fila);
       }

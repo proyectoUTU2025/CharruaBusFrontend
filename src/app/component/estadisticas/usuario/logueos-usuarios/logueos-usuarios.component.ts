@@ -108,7 +108,6 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
     }
 
     ngOnDestroy() {
-        // Resetear filtros al salir del componente
         this.fechaInicio.setValue(this.firstDayOfYear);
         this.fechaFin.setValue(new Date());
         this.destroy$.next();

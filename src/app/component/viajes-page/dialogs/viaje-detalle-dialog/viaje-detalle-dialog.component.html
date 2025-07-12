@@ -13,7 +13,6 @@
 
 <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" class="custom-tabs">
   
-  <!-- Pestaña 1: Detalles del Viaje -->
   <mat-tab>
     <ng-template mat-tab-label>
       <mat-icon>info</mat-icon> Detalles del Viaje
@@ -22,16 +21,13 @@
     <div class="tab-content">
       <div class="cards-container">
         
-        <!-- Card: Ruta y Horarios -->
         <mat-card class="info-card">
           <div class="card-header">
             <mat-icon class="card-icon location-icon">place</mat-icon>
             <h3>Ruta y Horarios</h3>
           </div>
           <div class="card-content">
-            <!-- Información básica completa arriba -->
             <div class="main-info-section">
-              <!-- Información de ruta -->
               <div class="route-basic-info">
                 <div class="route-info-grid">
                   <div class="route-info-item">
@@ -49,7 +45,6 @@
                 </div>
               </div>
 
-              <!-- Horarios y duración -->
               <div class="schedule-section">
                 <div class="schedule-grid">
                   <div class="schedule-item">
@@ -85,7 +80,6 @@
               </div>
             </div>
 
-            <!-- Resumen de la ruta abajo -->
             <div class="route-summary" *ngIf="data.viaje.paradas && data.viaje.paradas.length > 0">
               <h4 class="route-title">Resumen de la ruta</h4>
               <ol class="ruta-timeline">
@@ -120,7 +114,6 @@
           </div>
         </mat-card>
 
-        <!-- Card: Información Comercial -->
         <mat-card class="info-card">
           <div class="card-header">
             <mat-icon class="card-icon commercial-icon">attach_money</mat-icon>
@@ -131,7 +124,6 @@
           </div>
           <div class="card-content">
             <div class="commercial-content">
-              <!-- Precio y estadísticas principales -->
               <div class="commercial-main-section">
                 <div class="price-display">
                   <div class="price-amount">${{ data.viaje.precio }}</div>
@@ -149,7 +141,6 @@
                 </div>
               </div>
               
-              <!-- Información de asientos -->
               <div class="seats-info-section">
                 <div class="seats-stats-grid">
                   <div class="seat-stat">
@@ -170,7 +161,6 @@
                   </div>
                 </div>
                 
-                <!-- Barra de progreso -->
                 <div class="progress-bar-container">
                   <div class="progress-bar">
                     <div class="progress-fill" [style.width.%]="porcentajeOcupacion"></div>
@@ -183,7 +173,6 @@
 
       </div>
 
-      <!-- Botones de acción -->
       <div class="actions-section">
         <button *ngIf="puedeReasignar" mat-flat-button class="action-btn primary-btn" (click)="abrirReasignarOmnibus()">
           <mat-icon>swap_horiz</mat-icon>
@@ -193,7 +182,6 @@
     </div>
   </mat-tab>
 
-  <!-- Pestaña 2: Asientos -->
   <mat-tab>
     <ng-template mat-tab-label>
       <mat-icon>airline_seat_recline_normal</mat-icon> Asientos
@@ -201,7 +189,6 @@
     </ng-template>
     
     <div class="tab-content">
-      <!-- Leyenda mejorada -->
       <div class="seats-legend">
         <div class="legend-item">
           <div class="seat-icon-legend disponible">
@@ -223,7 +210,6 @@
         </div>
       </div>
 
-      <!-- Indicador de estado actual -->
       <div class="seats-status-indicator">
         <div class="status-item disponible">
           <div class="status-count">{{ getAsientosDisponibles().length }}</div>
@@ -248,10 +234,8 @@
         </div>
       </div>
 
-      <!-- Diagrama del autobús -->
       <mat-card class="bus-diagram-card">
         <div class="bus-container">
-          <!-- Frente del autobús -->
           <div class="bus-front">
             <div class="driver-section">
               <mat-icon class="steering-wheel">radio_button_unchecked</mat-icon>
@@ -263,13 +247,11 @@
             </div>
           </div>
 
-          <!-- Área de asientos -->
           <div class="seats-area">
             <div class="seats-rows">
               <div *ngFor="let fila of getAsientosEnFilas(); let filaIndex = index" class="seat-row">
                 <div class="row-number">{{ filaIndex + 1 }}</div>
                 
-                <!-- Asientos del lado izquierdo -->
                 <div class="seats-left">
                   <div 
                     *ngFor="let asiento of fila.izquierda; let asientoIndex = index" 
@@ -282,10 +264,8 @@
                   </div>
                 </div>
 
-                <!-- Pasillo -->
                 <div class="aisle"></div>
 
-                <!-- Asientos del lado derecho -->
                 <div class="seats-right">
                   <div 
                     *ngFor="let asiento of fila.derecha; let asientoIndex = index" 
@@ -301,7 +281,6 @@
             </div>
           </div>
 
-          <!-- Parte trasera del autobús -->
           <div class="bus-back">
             <div class="emergency-exit">
               <mat-icon>exit_to_app</mat-icon>
@@ -313,14 +292,12 @@
     </div>
   </mat-tab>
 
-  <!-- Pestaña 3: Historial de Pasajes -->
   <mat-tab>
     <ng-template mat-tab-label>
       <mat-icon>history</mat-icon> Historial de Pasajes
     </ng-template>
     
     <div class="tab-content">
-      <!-- Controles superiores con filtros expandidos -->
       <div class="controls-section">
         <div class="filter-controls">
           <div class="filter-group">
@@ -338,7 +315,6 @@
             </mat-form-field>
           </div>
 
-          <!-- Mensaje error fechas -->
           <div class="simple-error-message" *ngIf="fechasInvalidas">
             La fecha "Hasta" debe ser posterior o igual a la fecha "Desde".
           </div>
@@ -408,12 +384,10 @@
         </div>
       </div>
 
-      <!-- Loading spinner -->
       <div class="loading-section" *ngIf="isLoadingPasajes">
         <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
       </div>
 
-      <!-- Tabla de pasajes -->
       <div class="table-section" *ngIf="!isLoadingPasajes">
         <table mat-table [dataSource]="pasajesFiltrados" class="pasajes-table">
           
@@ -518,7 +492,6 @@
           <p>No hay pasajes para mostrar</p>
         </div>
 
-        <!-- Paginador -->
         <mat-paginator 
           *ngIf="!isLoadingPasajes && totalElements > 0"
           [length]="totalElements"

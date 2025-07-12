@@ -41,7 +41,6 @@ export class AddLocalidadDialogComponent {
     private materialUtils: MaterialUtilsService,
     @Inject(MAT_DIALOG_DATA) public data: { initialData?: LocalidadDto; error?: string } | null
   ) {
-    // Inicializar departamentos con formato amigable
     this.departamentos = Object.keys(TipoDepartamento).map(key => ({
       value: key,
       viewValue: this.formatDepartmentName(TipoDepartamento[key as keyof typeof TipoDepartamento])
@@ -52,12 +51,10 @@ export class AddLocalidadDialogComponent {
       departamento: ['', Validators.required]
     });
 
-    // Si hay datos iniciales, pre-rellenar el formulario
     if (data?.initialData) {
       this.form.patchValue(data.initialData);
     }
 
-    // Si hay un error, mostrarlo
     if (data?.error) {
       this.error = data.error;
     }
@@ -69,7 +66,7 @@ export class AddLocalidadDialogComponent {
 
   save(): void {
     if (this.form.valid) {
-      this.error = null; // Limpiar errores previos
+      this.error = null; 
       this.loading = true;
       
       const dto: LocalidadDto = this.form.value;
@@ -78,12 +75,11 @@ export class AddLocalidadDialogComponent {
         next: () => {
           this.loading = false;
           this.materialUtils.showSuccess('Localidad creada exitosamente.');
-          this.dialogRef.close(true); // Cerrar con éxito
+          this.dialogRef.close(true); 
         },
         error: (error) => {
           this.loading = false;
           
-          // Extraer mensaje de error del backend
           let errorMessage = 'Error al crear la localidad. Por favor, intenta nuevamente.';
           
           if (error?.error?.message) {
@@ -94,7 +90,7 @@ export class AddLocalidadDialogComponent {
             errorMessage = error.message;
           }
           
-          this.error = errorMessage; // Mostrar error sin cerrar el diálogo
+          this.error = errorMessage; 
         }
       });
     }

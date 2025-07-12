@@ -121,7 +121,6 @@ export class CompraDetallePageComponent implements OnInit {
           };
           this.materialUtils.showSuccess(`PDF de la compra ${this.compraId} abierto en nueva ventana`);
         } else {
-          // Si se bloqueó el popup, ofrecer descarga alternativa
           const link = document.createElement('a');
           link.href = url;
           link.download = `compra-${this.compraId}.pdf`;
@@ -129,7 +128,7 @@ export class CompraDetallePageComponent implements OnInit {
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
-          this.materialUtils.showInfo('PDF descargado (ventana emergente bloqueada)');
+          this.materialUtils.showInfo('PDF descargado');
         }
         this.isOpeningPdf = false;
       },
@@ -195,7 +194,6 @@ export class CompraDetallePageComponent implements OnInit {
     return text.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, s => s.toUpperCase());
   }
 
-  // NUEVO: determinar si el PDF puede descargarse según el estado
   puedeDescargarPdf(): boolean {
     if (!this.detalle) return false;
     const estado = this.detalle.estado as TipoEstadoCompra;
@@ -203,9 +201,6 @@ export class CompraDetallePageComponent implements OnInit {
            estado === TipoEstadoCompra.PARCIALMENTE_REEMBOLSADA;
   }
 
-  /**
-   * Reembolsa la compra completa
-   */
   reembolsar(): void {
     if (!this.detalle) return;
     
@@ -220,7 +215,6 @@ export class CompraDetallePageComponent implements OnInit {
       return;
     }
 
-    // Mostrar diálogo de confirmación
     const dialogData: ConfirmDialogData = {
       title: 'Confirmar Reembolso',
       message: `¿Está seguro que desea reembolsar la compra #${this.detalle.id}? Esta acción no se puede deshacer.`,
@@ -242,9 +236,6 @@ export class CompraDetallePageComponent implements OnInit {
     });
   }
 
-  /**
-   * Procesa el reembolso de la compra (llamado después de la confirmación)
-   */
   private procesarReembolso(): void {
     if (!this.detalle) return;
 
@@ -252,24 +243,21 @@ export class CompraDetallePageComponent implements OnInit {
 
     this.compraService.reembolsarCompra(this.detalle.id).subscribe({
       next: (mensaje) => {
-        // Recargar el detalle de la compra para obtener los datos actualizados
         this.cargarDetalleCompra();
         this.isReembolsando = false;
         setTimeout(() => {
           this.materialUtils.showSuccess(mensaje || `Reembolso de la compra ${this.detalle!.id} procesado correctamente`);
-        }, 100); // pequeño delay para asegurar que el overlay desaparezca
+        }, 100);
       },
       error: (error) => {
         console.error('Error al reembolsar compra:', error);
-        this.materialUtils.showError('Error al procesar el reembolso de la compra');
+        const errorMessage = error.error?.message || 'Error al procesar el reembolso de la compra';
+        this.materialUtils.showError(errorMessage);
         this.isReembolsando = false;
       }
     });
   }
 
-  /**
-   * Verifica si una compra se puede reembolsar
-   */
   puedeReembolsar(): boolean {
     if (!this.detalle || this.isCliente) return false;
     
@@ -280,9 +268,6 @@ export class CompraDetallePageComponent implements OnInit {
            !this.isOpeningPdf;
   }
 
-  /**
-   * Recarga el detalle de la compra
-   */
   private cargarDetalleCompra(): void {
     this.loadError = null;
     this.isReloading = true;
@@ -290,11 +275,9 @@ export class CompraDetallePageComponent implements OnInit {
       .subscribe({
         next: d => {
           this.detalle = d;
-          // cargar nombre de cliente
           this.userService.getById(d.clienteId)
             .then(u => this.detalle.clienteNombre = `${u.nombre} ${u.apellido}`)
             .catch(() => this.detalle.clienteNombre = 'No disponible');
-          // si vino de un vendedor, cargar nombre del vendedor
           if (d.vendedorId) {
             this.userService.getById(d.vendedorId)
               .then(v => this.detalle.vendedorNombre = `${v.nombre} ${v.apellido}`)

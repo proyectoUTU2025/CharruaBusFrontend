@@ -6,7 +6,6 @@ $color-primary: #1976d2;
 $color-danger: #dc3545;
 $color-success: #28a745;
 
-// Resumen de variables locales mínimas
 $shadow: 0 2px 8px rgba(0,0,0,0.1);
 
 :host {
@@ -20,7 +19,6 @@ $shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 12px;
 }
 
-// Leyenda
 .seats-legend {
   display: flex;
   justify-content: center;
@@ -108,7 +106,6 @@ $shadow: 0 2px 8px rgba(0,0,0,0.1);
   .bus-back { background:#495057;color:white;padding:12px 20px;border-radius:8px 8px 15px 15px; .emergency-exit{display:flex;align-items:center;gap:8px; mat-icon{color:#dc3545;} .exit-label{font-size:11px;font-weight:500;text-transform:uppercase;} } }
 }
 
-// Footer con acciones
 .actions-footer {
   padding-top: 1.5rem;
   display: flex;
@@ -125,7 +122,6 @@ $shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 }
 
-// Responsive
 @media (max-width: 600px) {
   .seats-grid {
     gap: 0.5rem;

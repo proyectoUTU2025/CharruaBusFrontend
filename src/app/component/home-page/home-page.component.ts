@@ -37,7 +37,6 @@ export class HomePageComponent implements OnInit {
     this.updateTime();
     this.setupQuickActions();
     
-    // Actualizar la hora cada minuto
     setInterval(() => this.updateTime(), 60000);
   }
 

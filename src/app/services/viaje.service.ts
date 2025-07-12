@@ -83,15 +83,6 @@ export class ViajeService {
     );
   }
 
-  // altaViaje(dto: AltaViajeDto): Promise<void> {
-  //   return firstValueFrom(this.http.post(`${this.baseUrl}`, dto))
-  //     .then(() => { })
-  //     .catch(err => {
-  //       const message = err?.error?.message || 'Error desconocido al registrar el viaje';
-  //       throw message;
-  //     });
-  // }
-
   altaViaje(dto: AltaViajeDto): Observable<any> {
     return this.http.post(this.baseUrl, dto);
   }

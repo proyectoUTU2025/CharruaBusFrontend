@@ -83,7 +83,6 @@ export class CreateConfiguracionDialogComponent {
                 error: (error) => {
                     this.loading = false;
                     
-                    // Extraer mensaje de error del backend
                     let errorMessage = 'Error al crear la configuración. Por favor, intenta nuevamente.';
                     
                     if (error?.error?.message) {

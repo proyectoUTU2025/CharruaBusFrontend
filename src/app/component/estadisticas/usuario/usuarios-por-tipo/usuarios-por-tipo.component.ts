@@ -93,7 +93,6 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
 
     procesarDatos() {
         if (this.agrupado) {
-            // Agrupar subtipos de cliente bajo 'CLIENTE', pero si ya existe CLIENTE usar solo ese
             const tieneCliente = this.dataOriginal.some(x => x.tipo === 'CLIENTE');
             const agrupados: { [key: string]: number } = {};
             for (const item of this.dataOriginal) {
@@ -109,7 +108,6 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
             }
             this.data = Object.entries(agrupados).map(([tipo, cantidad]) => ({ tipo, cantidad }));
         } else {
-            // Vista detallada: mostrar SOLO los subtipos de cliente con nombres amigables
             const subtipos = ['CLIENTE_ESTUDIANTE', 'CLIENTE_JUBILADO', 'CLIENTE_OTRO'];
             const nombreAmigable: { [key: string]: string } = {
                 'CLIENTE_ESTUDIANTE': 'ESTUDIANTE',

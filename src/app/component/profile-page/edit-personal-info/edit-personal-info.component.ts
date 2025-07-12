@@ -35,7 +35,7 @@ function cedulaValidator(control: AbstractControl): ValidationErrors | null {
   }
 
   if (!/^\d{8}$/.test(cedula)) {
-    return null; // No validar si no tiene 8 dígitos
+    return null; 
   }
 
   const digitos = cedula.substring(0, 7).split('').map(Number);
@@ -240,7 +240,6 @@ export class EditPersonalInfoComponent implements OnInit, OnDestroy {
         } else {
           this.form.get('situacionLaboral')?.disable();
         }
-        // Ajustar fechaNacimiento a objeto Date en zona horaria local para evitar desfase de un día
         this.form.patchValue({
           ...this.user,
           fechaNacimiento: new Date(this.user.fechaNacimiento + 'T00:00:00')
@@ -310,7 +309,6 @@ export class EditPersonalInfoComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     if (this.user) {
-      // Re-patch values and state on cancel
       if (this.isCliente()) {
         this.form.get('situacionLaboral')?.enable();
       } else {

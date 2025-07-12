@@ -56,12 +56,10 @@
   </div>
 </mat-dialog-content>
 
-<!-- Mensaje de error -->
 <div *ngIf="errorMensaje" class="error-container">
   <p class="error-message">{{ errorMensaje }}</p>
 </div>
 
-<!-- Loading overlay -->
 <div *ngIf="isLoadingConfirm" class="loading-overlay">
   <div class="loading-content">
     <mat-spinner diameter="50"></mat-spinner>  </div>

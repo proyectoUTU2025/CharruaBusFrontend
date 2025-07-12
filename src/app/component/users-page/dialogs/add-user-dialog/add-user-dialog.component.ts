@@ -28,7 +28,7 @@ function cedulaValidator(control: AbstractControl): ValidationErrors | null {
   }
 
   if (!/^\d{8}$/.test(cedula)) {
-    return null; // No validar si no tiene 8 dígitos
+    return null; 
   }
 
   const digitos = cedula.substring(0, 7).split('').map(Number);
@@ -87,7 +87,7 @@ export class AddUserDialogComponent implements OnInit, OnDestroy {
   form: FormGroup;
   tiposDocumento = Object.values(TipoDocumento).map(value => ({ value, viewValue: value.toUpperCase() }));
   roles = Object.values(TipoRol)
-    .filter(rol => rol !== TipoRol.CLIENTE) // Excluir CLIENTE
+    .filter(rol => rol !== TipoRol.CLIENTE) 
     .map(value => ({ value, viewValue: value }));
   loading = false;
   error: string | null = null;

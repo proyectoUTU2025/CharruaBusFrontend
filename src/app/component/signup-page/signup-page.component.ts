@@ -26,7 +26,7 @@ function cedulaValidator(control: AbstractControl): ValidationErrors | null {
   }
 
   if (!/^\d{8}$/.test(cedula)) {
-    return null; // No validar si no tiene 8 dígitos
+    return null;
   }
 
   const digitos = cedula.substring(0, 7).split('').map(Number);
@@ -253,7 +253,6 @@ export class SignupPageComponent implements OnInit {
       const formValue = { ...this.signupForm.getRawValue() };
 
       const date = new Date(formValue.fechaNacimiento);
-      // Formatear la fecha a 'YYYY-MM-DD' para evitar problemas de zona horaria
       formValue.fechaNacimiento = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
         .toISOString()
         .slice(0, 10);
@@ -261,7 +260,6 @@ export class SignupPageComponent implements OnInit {
       await this.authService.registrarCliente(formValue);
       this.router.navigate(['/verificar-codigo'], { state: { email: this.signupForm.value.email } });
     } catch (error: HttpErrorResponse | any) {
-      // Extraer mensaje específico del backend
       if (error?.error?.message) {
         this.error = error.error.message;
       } else if (typeof error?.error === 'string') {

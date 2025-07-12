@@ -43,7 +43,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Limpiar clases del body al destruir el componente
     document.body.classList.remove('mobile-menu-open');
   }
 
@@ -53,7 +52,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private checkScreenSize() {
-    // Usar matchMedia con em (59.375em = 950px con fuente base de 16px)
     const isDesktop = window.matchMedia('(min-width: 59.375em)').matches;
     if (isDesktop && this.mobileMenuOpen) {
       this.closeMobileMenu();
@@ -94,9 +92,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
-    this.estadisticasSubmenuOpen = false; // Cerrar submenú al abrir/cerrar menú principal
+    this.estadisticasSubmenuOpen = false; 
     
-    // Prevenir scroll del body cuando el menú está abierto
     if (this.mobileMenuOpen) {
       document.body.classList.add('mobile-menu-open');
     } else {

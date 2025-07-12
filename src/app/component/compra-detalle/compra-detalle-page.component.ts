@@ -261,7 +261,8 @@ export class CompraDetallePageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al reembolsar compra:', error);
-        this.materialUtils.showError('Error al procesar el reembolso de la compra');
+        const errorMessage = error.error?.message || 'Error al procesar el reembolso de la compra';
+        this.materialUtils.showError(errorMessage);
         this.isReembolsando = false;
       }
     });

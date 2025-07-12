@@ -180,7 +180,8 @@ export class DetallePasajeCompletoDialogComponent {
       },
       error: (error) => {
         console.error('Error al reembolsar pasaje:', error);
-        this.materialUtils.showError('Error al procesar el reembolso del pasaje');
+        const errorMessage = error.error?.message || 'Error al procesar el reembolso del pasaje';
+        this.materialUtils.showError(errorMessage);
         this.isReembolsando = false;
       }
     });

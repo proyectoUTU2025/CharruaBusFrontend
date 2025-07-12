@@ -31,12 +31,10 @@
     </div>
 
     <div *ngIf="!cargando && notificaciones.length > 0">
-      <!-- Header con contador total -->
       <div class="notifications-summary">
         <small>Mostrando {{ notificaciones.length }} de {{ totalNotificaciones }} notificaciones</small>
       </div>
       
-      <!-- Lista de notificaciones -->
       <div class="notifications-list">
         <div 
           *ngFor="let notificacion of notificaciones; trackBy: trackByNotificacion" 
@@ -54,7 +52,6 @@
         </div>
       </div>
 
-      <!-- Botón cargar más o indicador de fin -->
       <div class="load-more-section">
         <div *ngIf="cargandoMas" class="loading-more">
           <mat-spinner diameter="20"></mat-spinner>

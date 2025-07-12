@@ -91,7 +91,6 @@ export class ResetPasswordComponent implements OnInit {
       this.router.navigate(['/forgot-password']);
       return;
     }
-    // Limpiamos el estado para que no persista en el historial del navegador
     this.location.replaceState(this.router.url.split('?')[0]);
 
     this.form.get('newPassword')?.valueChanges.subscribe(value => {

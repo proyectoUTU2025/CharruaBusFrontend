@@ -1,13 +1,11 @@
 <div class="redirect-container">
   <mat-card class="redirect-card" [ngClass]="{'success-state': !cargando, 'error-state': !!error}">
-    <!-- Estado de carga -->
     <div *ngIf="cargando" class="state-container loading-container">
       <mat-spinner diameter="50"></mat-spinner>
       <h2 class="state-title">Procesando...</h2>
       <p class="state-description">Esto puede tardar unos segundos. No cierres esta ventana.</p>
     </div>
 
-    <!-- Estado de éxito -->
     <div *ngIf="!cargando && !error" class="state-container success-container">
       <div class="icon-wrapper success">
         <mat-icon>check_circle</mat-icon>
@@ -20,7 +18,6 @@
       </div>
     </div>
     
-    <!-- Estado de error/cancelación -->
     <div *ngIf="error" class="state-container error-container">
       <div class="icon-wrapper error">
         <mat-icon>cancel</mat-icon>

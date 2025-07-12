@@ -9,7 +9,6 @@ import { FiltroBusquedaCompraDto, CompraDto } from '../../models';
 import { TipoEstadoCompra } from '../../models/tipo-estado-compra';
 import { MaterialUtilsService } from '../../shared/material-utils.service';
 
-// Imports de Angular Material
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';

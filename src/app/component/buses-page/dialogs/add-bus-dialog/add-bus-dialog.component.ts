@@ -77,12 +77,11 @@ export class AddBusDialogComponent implements OnInit {
       
       this.busService.create(alta)
         .then(() => {
-          this.dialogRef.close(true); // Cierra con éxito
+          this.dialogRef.close(true);
         })
         .catch((error: HttpErrorResponse | any) => {
           console.error('Error al crear ómnibus:', error);
           
-          // Extraer mensaje específico del backend
           if (error?.error?.message) {
             this.error = error.error.message;
           } else if (typeof error?.error === 'string') {
@@ -103,7 +102,6 @@ export class AddBusDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  // Métodos legacy para compatibilidad
   save(): void {
     this.onSubmit();
   }

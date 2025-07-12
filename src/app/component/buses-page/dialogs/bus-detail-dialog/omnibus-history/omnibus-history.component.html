@@ -41,7 +41,6 @@
       </div>
     </div>
 
-    <!-- Mensaje de error entre fechas y horas -->
     <div class="error-row" *ngIf="filterForm.hasError('dateRangeInvalid')">
         <div class="simple-error-message">
             La fecha y hora de "Hasta" debe ser posterior, o igual, a la de "Salida".
@@ -90,8 +89,6 @@
           <span>Limpiar</span>
       </button>
     </div>
-
-    <!-- Bloque error se moverá arriba -->
 </form>
 
 <div class="table-wrapper">

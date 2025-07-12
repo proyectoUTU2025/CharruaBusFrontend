@@ -120,12 +120,12 @@
 
         <ng-container matColumnDef="fechaHoraSalida">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="fechaHoraSalida">Fecha salida</th>
-          <td mat-cell *matCellDef="let v">{{ v.fechaHoraSalida | date: 'short' }}</td>
+          <td mat-cell *matCellDef="let v">{{ v.fechaHoraSalida | date: 'dd/MM/yyyy HH:mm' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="fechaHoraLlegada">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="fechaHoraLlegada">Fecha llegada</th>
-          <td mat-cell *matCellDef="let v">{{ v.fechaHoraLlegada | date: 'short' }}</td>
+          <td mat-cell *matCellDef="let v">{{ v.fechaHoraLlegada | date: 'dd/MM/yyyy HH:mm' }}</td>
         </ng-container>   
 
         <ng-container matColumnDef="precioTotal">

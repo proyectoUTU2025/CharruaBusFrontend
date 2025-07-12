@@ -80,7 +80,6 @@
     <ng-container *ngIf="!loading">
         <div class="table-container" *ngIf="mostrarGrafico">
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z2">
-                <!-- Columna Departamento -->
                 <ng-container matColumnDef="departamento">
                     <th mat-header-cell *matHeaderCellDef (click)="toggleSort('departamento')" [class.sort-active]="ordenarPor==='departamento'">
                         Departamento
@@ -89,7 +88,6 @@
                     <td mat-cell *matCellDef="let e">{{ e.departamento }}</td>
                 </ng-container>
 
-                <!-- Columna Cantidad de Viajes -->
                 <ng-container matColumnDef="cantidadViajes">
                     <th mat-header-cell *matHeaderCellDef (click)="toggleSort('cantidadViajes')" [class.sort-active]="ordenarPor==='cantidadViajes'">
                         Cantidad de Viajes

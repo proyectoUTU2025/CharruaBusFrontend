@@ -486,8 +486,8 @@ ul {
 }
 
 .seat-selection-card {
-  padding: 0; // Eliminamos el padding para que el header ocupe todo
-  position: relative; // Necesario para posicionar el overlay
+  padding: 0; 
+  position: relative;
   
   & > .step-actions {
     padding: 1rem 1.5rem;
@@ -768,10 +768,8 @@ ul {
 
 .cliente-details {
   display: flex;
-  // ... existing code ...
 }
 
-// Estilos para el resumen - copiados del alta viaje
 .confirmation-section {
   background-color: transparent;
   border: none;
@@ -886,7 +884,6 @@ ul {
 
 .confirmation-message {
   display: flex;
-  // ... existing code ...
 }
 
 .step-actions-container {
@@ -941,7 +938,7 @@ ul {
 
 .messages-container {
   margin-top: 1rem;
-  min-height: 42px; // Para evitar saltos de layout
+  min-height: 42px; 
 }
 
 .info-message,

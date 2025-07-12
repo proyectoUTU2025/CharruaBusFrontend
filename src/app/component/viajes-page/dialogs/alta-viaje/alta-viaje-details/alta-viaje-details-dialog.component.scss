@@ -133,7 +133,6 @@ $default-color: #ccc;
   }
 }
 
-// Step 1: Detalles del viaje
 .form-section {
   .form-row {
     display: flex;
@@ -172,7 +171,6 @@ $default-color: #ccc;
   }
 }
 
-// Estilos para campos con errores
 .error-field .mat-mdc-form-field-outline-thick {
   color: #f44336 !important;
 }
@@ -186,7 +184,6 @@ $default-color: #ccc;
   margin-bottom: 16px;
 }
 
-// Mensajes de error personalizados
 .error-message {
   color: #f44336;
   font-size: 12px;
@@ -207,7 +204,6 @@ mat-form-field {
   }
 }
 
-// Step 2: Paradas (mantener el estilo existente mejorado)
 .paradas-step {
   .section-title {
     margin-bottom: 24px;
@@ -365,7 +361,6 @@ mat-form-field {
   }
 }
 
-// Step 3: Selección de ómnibus
 .bus-selection-section {
   .loading-container {
     display: flex;
@@ -502,7 +497,6 @@ mat-form-field {
   }
 }
 
-// Step 4: Confirmación
 .confirmation-section {
   .confirmation-grid {
     display: grid;
@@ -548,7 +542,6 @@ mat-form-field {
   }
 }
 
-// Acciones del diálogo
 .dialog-actions {
   display: flex;
   justify-content: space-between;
@@ -638,7 +631,6 @@ mat-form-field {
   }
 }
 
-// Responsive
 @media (max-width: 768px) {
   .dialog-header,
   .dialog-content,
@@ -710,8 +702,6 @@ mat-form-field {
   font-size: 0.9rem;
 }
 
-// === Estilos para Drag & Drop ===
-// 1. Estilo del "fantasma" que se arrastra
 .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 8px;
@@ -719,7 +709,6 @@ mat-form-field {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-// 2. Estilo del espacio donde se puede soltar el elemento
 .cdk-drag-placeholder {
   background: #eef2ff;
   border: 1px dashed #799dff;
@@ -730,13 +719,11 @@ mat-form-field {
   opacity: 1 !important;
 }
 
-// 3. Estilo del elemento original en la lista mientras se arrastra
 li.cdk-drag-dragging {
   opacity: 0.4;
   background: #f8f9fa;
 }
 
-// 4. Animaciones suaves
 .cdk-drop-list-dragging .cdk-drag {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
@@ -745,7 +732,6 @@ li.cdk-drag-dragging {
   transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-// Loading overlay styles
 .loading-overlay {
   position: absolute;
   top: 0;

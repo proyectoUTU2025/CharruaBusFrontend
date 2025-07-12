@@ -13,7 +13,6 @@ export class EstadisticaUsuarioService {
 
     constructor(private http: HttpClient) { }
 
-    /** Usuarios por tipo (paginado + ordenable) */
     getUsuariosPorTipo(
         page = 0,
         size = 10,
@@ -45,7 +44,6 @@ export class EstadisticaUsuarioService {
         );
     }
 
-    /** Compras por cliente (paginado + ordenable) */
     getComprasClientes(
         fechaInicio?: string,
         fechaFin?: string,

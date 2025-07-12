@@ -49,7 +49,6 @@
         </mat-form-field>
       </div>
       
-      <!-- Fecha y Hora de Salida -->
       <div class="filter-field datetime-field">
         <div class="datetime-group">
           <mat-form-field appearance="outline" class="date-field">
@@ -71,7 +70,6 @@
         </div>
       </div>
       
-      <!-- Fecha y Hora de Llegada -->
       <div class="filter-field datetime-field">
         <div class="datetime-group">
           <mat-form-field appearance="outline" class="date-field">
@@ -116,7 +114,6 @@
       </div>
     </div>
 
-    <!-- Loading spinner -->
     <app-loading-spinner 
       [hidden]="!isLoading" 
       type="spinner" 
@@ -124,7 +121,6 @@
       [diameter]="40">
     </app-loading-spinner>
 
-    <!-- Sin resultados -->
     <div *ngIf="!isLoading && hasSearched && buses.length === 0" class="no-results-container">
       <div class="no-results-content">
         <mat-icon class="no-results-icon">directions_bus_filled</mat-icon>
@@ -133,7 +129,6 @@
       </div>
     </div>
 
-    <!-- Table content -->
     <div [hidden]="isLoading || (hasSearched && buses.length === 0)" class="table-container">
       <table mat-table [dataSource]="buses" class="mat-elevation-z1" matSort matSortDisableClear>
         <ng-container matColumnDef="id">

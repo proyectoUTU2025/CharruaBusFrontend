@@ -128,17 +128,14 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Resetear a la primera página si el usuario cambia el orden
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-    // Unificar eventos de sort y paginación para recargar los datos
     merge(this.sort.sortChange, this.paginator.page)
       .pipe(
         tap(() => this.loadBuses())
       )
       .subscribe();
 
-    // Carga inicial
     this.loadBuses();
   }
   
@@ -172,13 +169,11 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       fechaHoraLlegada: buildDateTime(f.fechaLlegada, f.horaLlegada)
     };
 
-    // Obtener el ordenamiento del MatSort, con valores por defecto para la carga inicial
     const sortActive = this.sort?.active || 'matricula';
     const sortDirection = this.sort?.direction || 'asc';
     const backendField = sortActive === 'capacidad' ? 'cantidadAsientos' : sortActive;
     const sortParam = `${backendField},${sortDirection}`;
     
-    // Obtener paginación del MatPaginator
     const pageIndex = this.paginator?.pageIndex || 0;
     const pageSize = this.paginator?.pageSize || 5;
     
@@ -204,7 +199,6 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
   onSearch() {
     const f = this.filterForm.value;
     
-    // 1. Validaciones de asientos
     if (f.minAsientos !== null && f.maxAsientos !== null) {
       if (f.minAsientos > f.maxAsientos) {
         this.materialUtils.showError('El mínimo de asientos no puede ser mayor que el máximo.');
@@ -222,26 +216,21 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       return;
     }
     
-    // 2. Validaciones de fechas
     const tieneFechaSalida = f.fechaSalida !== null;
     const tieneFechaLlegada = f.fechaLlegada !== null;
     
-    // Ambas fechas deben estar presentes o ambas ausentes
     if (tieneFechaSalida !== tieneFechaLlegada) {
       this.materialUtils.showError('Si especificas fecha de salida, también debes especificar fecha de llegada y viceversa.');
       return;
     }
     
-    // Si hay ambas fechas, validar orden temporal
     if (tieneFechaSalida && tieneFechaLlegada) {
       const fechaSalida = new Date(f.fechaSalida);
       const fechaLlegada = new Date(f.fechaLlegada);
       
-      // Inicializar horas para evitar problemas de zona horaria con fechas sin hora
       fechaSalida.setHours(0, 0, 0, 0);
       fechaLlegada.setHours(0, 0, 0, 0);
 
-      // Aplicar horas específicas si están presentes
       if (f.horaSalida) {
         const [hSalida, mSalida] = f.horaSalida.split(':').map(Number);
         fechaSalida.setHours(hSalida, mSalida);
@@ -257,7 +246,6 @@ export class BusesPageComponent implements OnInit, AfterViewInit {
       }
     }
     
-    // 3. Validaciones de dependencias: Fechas ↔ Ubicación
     const tieneFechas = tieneFechaSalida && tieneFechaLlegada;
     const tieneLocalidad = f.localidadId && f.localidadId !== null;
     

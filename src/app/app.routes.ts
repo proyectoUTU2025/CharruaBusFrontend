@@ -88,9 +88,9 @@ export const routes: Routes = [
     ]
   },
 
-  // Página 404 específica para acceso sin permisos
+  // Página 404 para acceso sin permisos
   { path: 'not-found', component: NotFoundComponent },
 
-  // Wildcard route para URLs realmente inexistentes
+  // URLs realmente inexistentes
   { path: '**', component: NotFoundComponent }
 ];

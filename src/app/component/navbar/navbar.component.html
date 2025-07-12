@@ -1,5 +1,4 @@
 <mat-toolbar color="primary" class="navbar-toolbar">
-  <!-- Logo y nombre -->
   <div class="navbar-left">
     <img src="assets/charruabusIcon.png" alt="Logo" class="logo clickable" (click)="onLogoClick()" />
     <span class="brand clickable" (click)="onLogoClick()">CharruaBus</span>
@@ -10,7 +9,7 @@
 
   <span class="spacer"></span>
 
-  <!-- Menú desktop (pantallas grandes) -->
+  <!-- Menú desktop -->
   <div class="desktop-menu">
     <ng-container *ngIf="isLoggedIn">
       <!-- ADMIN -->

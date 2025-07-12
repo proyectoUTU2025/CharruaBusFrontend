@@ -75,9 +75,6 @@ export class DetallePasajeCompletoDialogComponent {
     }
   }
 
-  /**
-   * Abre el PDF del pasaje en una nueva ventana
-   */
   abrirPdf(): void {
     if (!this.pasaje) return;
     
@@ -90,12 +87,10 @@ export class DetallePasajeCompletoDialogComponent {
     
     this.pasajeService.descargarPdf(this.pasaje.id).subscribe({
       next: (blob) => {
-        // Crear URL del blob y abrir en nueva ventana
         const url = window.URL.createObjectURL(blob);
         const newWindow = window.open(url, '_blank');
         
         if (newWindow) {
-          // Limpiar URL después de un tiempo para liberar memoria
           newWindow.onload = () => {
             setTimeout(() => {
               window.URL.revokeObjectURL(url);
@@ -103,7 +98,6 @@ export class DetallePasajeCompletoDialogComponent {
           };
           this.materialUtils.showSuccess(`PDF del pasaje ${this.pasaje!.id} abierto en nueva ventana`);
         } else {
-          // Si se bloqueó el popup, ofrecer descarga alternativa
           const link = document.createElement('a');
           link.href = url;
           link.download = `pasaje-${this.pasaje!.id}.pdf`;
@@ -111,7 +105,7 @@ export class DetallePasajeCompletoDialogComponent {
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
-          this.materialUtils.showInfo('PDF descargado (ventana emergente bloqueada)');
+          this.materialUtils.showInfo('PDF descargado');
         }
         
         this.isOpeningPdf = false;
@@ -124,9 +118,6 @@ export class DetallePasajeCompletoDialogComponent {
     });
   }
 
-  /**
-   * Reembolsa el pasaje
-   */
   reembolsar(): void {
     if (!this.pasaje) return;
     
@@ -140,7 +131,6 @@ export class DetallePasajeCompletoDialogComponent {
       return;
     }
 
-    // Mostrar diálogo de confirmación
     const dialogData: ConfirmDialogData = {
       title: 'Confirmar Reembolso',
       message: `¿Está seguro que desea reembolsar el pasaje #${this.pasaje.id}? Esta acción no se puede deshacer.`,
@@ -162,9 +152,6 @@ export class DetallePasajeCompletoDialogComponent {
     });
   }
 
-  /**
-   * Procesa el reembolso del pasaje (llamado después de la confirmación)
-   */
   private procesarReembolso(): void {
     if (!this.pasaje) return;
 
@@ -174,7 +161,6 @@ export class DetallePasajeCompletoDialogComponent {
       next: (mensaje) => {
         this.materialUtils.showSuccess(mensaje || `Reembolso del pasaje ${this.pasaje!.id} procesado correctamente`);
         
-        // Recargar el detalle del pasaje para obtener los datos actualizados
         this.cargarDetallePasaje();
         this.isReembolsando = false;
       },
@@ -187,9 +173,6 @@ export class DetallePasajeCompletoDialogComponent {
     });
   }
 
-  /**
-   * Verifica si un pasaje se puede reembolsar (solo pasajes confirmados)
-   */
   puedeReembolsar(): boolean {
     if (!this.pasaje || this.isCliente) return false;
     
@@ -199,9 +182,6 @@ export class DetallePasajeCompletoDialogComponent {
            !this.isOpeningPdf;
   }
 
-  /**
-   * Verifica si se puede ver el PDF del pasaje (solo pasajes confirmados)
-   */
   puedeVerPdf(): boolean {
     if (!this.pasaje) return false;
     

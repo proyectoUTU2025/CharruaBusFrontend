@@ -64,7 +64,6 @@ export class OmnibusHistoryComponent implements OnInit, OnDestroy {
 
     horasDisponibles: string[] = [];
 
-    /** Mapa id -> nombre con departamento para listado de localidades */
     localidadesMap: Record<number, string> = {};
     localidadesKeys: string[] = [];
 
@@ -219,9 +218,6 @@ export class OmnibusHistoryComponent implements OnInit, OnDestroy {
         });
     }
 
-    /**
-     * Valida que la fecha y hora "Hasta" no sea anterior a la de "Salida".
-     */
     private dateRangeValidator = (form: AbstractControl): ValidationErrors | null => {
         const fechaSalida: Date | null = form.get('fechaHoraSalida')?.value ?? null;
         const horaSalida: string = form.get('horaSalida')?.value ?? '';
@@ -229,7 +225,6 @@ export class OmnibusHistoryComponent implements OnInit, OnDestroy {
         const horaLlegada: string = form.get('horaLlegada')?.value ?? '';
 
         if (!fechaSalida || !fechaLlegada) {
-            // No hay rango completo para evaluar
             return null;
         }
 

@@ -4,12 +4,10 @@
         <p class="page-subtitle">Revisa el detalle y estado de todas tus compras.</p>
     </div>
 
-    <!-- Filtros -->
     <div class="content-card">
         <form [formGroup]="filterForm">
             <div class="filters-container">
                 <div class="filters-grid">
-                    <!-- Filtro por Fechas -->
                     <mat-form-field appearance="outline">
                         <mat-label>Fecha Desde</mat-label>
                         <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" [max]="maxDate" readonly>
@@ -23,7 +21,6 @@
                         <mat-datepicker #pickerHasta></mat-datepicker>
                     </mat-form-field>
 
-                    <!-- Filtro por Monto -->
                     <mat-form-field appearance="outline">
                         <mat-label>Monto Mínimo</mat-label>
                         <input matInput type="number" formControlName="montoMin" placeholder="Ej: 100">
@@ -33,7 +30,6 @@
                         <input matInput type="number" formControlName="montoMax" placeholder="Ej: 5000">
                     </mat-form-field>
 
-                    <!-- Filtro por Estado -->
                     <mat-form-field appearance="outline">
                         <mat-label>Estado</mat-label>
                         <mat-select formControlName="estado">
@@ -54,7 +50,6 @@
         <mat-error *ngIf="error">{{ error }}</mat-error>
     </div>
 
-    <!-- Lista de Compras -->
     <div class="content-card">
         <div class="table-header-row">
             <h2 class="card-title">Mis Compras</h2>
@@ -69,7 +64,6 @@
             <div class="table-container">
                 <table mat-table [dataSource]="compras" class="w-100" matSort matSortActive="fechaCompra" matSortDirection="desc" matSortDisableClear>
 
-                    <!-- Columnas de la tabla -->
                     <ng-container matColumnDef="fechaCompra">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
                         <td mat-cell *matCellDef="let compra"> {{compra.fechaCompra | date:'dd/MM/yyyy HH:mm'}} </td>

@@ -1,21 +1,18 @@
 .notification-button {
   position: relative;
-  // Los estilos principales se manejan desde el navbar para consistencia
 }
 
-// Estilos responsivos para el ancho del mat-menu
 ::ng-deep .notifications-menu {
   .mat-mdc-menu-content {
     padding: 0 !important;
-    width: clamp(320px, 35vw, 480px) !important; // Responsive entre 320px y 480px
+    width: clamp(320px, 35vw, 480px) !important;
     min-width: 320px !important;
     max-width: 480px !important;
-    max-height: 70vh !important; // 70% de la altura de pantalla
+    max-height: 70vh !important;
     overflow-y: auto !important;
   }
 }
 
-// Estilos adicionales para asegurar el ancho
 ::ng-deep .mat-mdc-menu-panel.notifications-menu {
   width: clamp(320px, 35vw, 480px) !important;
   min-width: 320px !important;
@@ -54,7 +51,7 @@
 }
 
 .notifications-content {
-  max-height: 60vh; // Usar viewport height para adaptarse a la pantalla
+  max-height: 60vh;
   overflow-y: auto;
 }
 
@@ -179,7 +176,6 @@
   }
 }
 
-// Estilos para el badge (aplicados globalmente para este componente)
 ::ng-deep .notification-button .mat-badge-content {
   background-color: #f44336 !important;
   color: white !important;
@@ -189,11 +185,10 @@
   height: 18px !important;
   line-height: 18px !important;
   box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
-  top: 2px !important; // Ajuste para el botón cuadrado centrado
+  top: 2px !important; 
   right: 2px !important;
 }
 
-// Estilos para el snackbar de notificaciones
 ::ng-deep .notification-snackbar {
   .mat-mdc-snack-bar-container {
     --mdc-snackbar-container-color: #2196f3;
@@ -227,14 +222,14 @@
     width: 100%;
     font-size: 13px;
     padding: 8px 16px;
-    color: #1976d2 !important; // Color primario del sistema
-    background-color: #f5f7fa !important; // Fondo consistente con el sistema
-    border: 1px solid #1976d2 !important; // Borde del color primario
+    color: #1976d2 !important;
+    background-color: #f5f7fa !important;
+    border: 1px solid #1976d2 !important;
     transition: all 0.2s ease;
     
     &:hover {
-      background-color: #e3f2fd !important; // Hover usando el color primario
-      color: #1251a3 !important; // Color hover del sistema
+      background-color: #e3f2fd !important;
+      color: #1251a3 !important;
     }
     
     .mat-icon {
@@ -256,23 +251,18 @@
   }
 }
 
-// Estilos para el botón de notificaciones en modo desktop (navbar horizontal)
 @media (min-width: 59.375em) {
   .notification-button {
     .nav-text {
-      display: none; // Ocultar texto en desktop
+      display: none; 
     }
   }
 }
 
-// Estilos para el botón de notificaciones en modo móvil (menú sidebar)
 @media (max-width: 59.374em) {
   .notification-button {
-    // Los estilos principales ya están definidos en navbar.component.scss
-    // Aquí solo ajustamos detalles específicos si es necesario
-    
     .nav-text {
-      display: inline; // Mostrar texto en móvil
+      display: inline;
       font-weight: 500;
       font-size: 1rem;
       letter-spacing: 0.0125rem;
@@ -280,14 +270,13 @@
   }
 }
 
-// Responsive design para pantallas pequeñas
 @media (max-width: 480px) {
   ::ng-deep .notifications-menu {
     .mat-mdc-menu-content {
-      width: 95vw !important; // En móviles, usar casi toda la pantalla
+      width: 95vw !important;
       min-width: 280px !important;
       max-width: 95vw !important;
-      max-height: 80vh !important; // Más altura en móviles
+      max-height: 80vh !important;
     }
   }
   
@@ -307,7 +296,7 @@
   }
   
   .notifications-content {
-    max-height: 60vh !important; // Ajustar altura del contenido en móviles
+    max-height: 60vh !important; 
   }
   
   .notification-button {

@@ -80,7 +80,7 @@ export class VerificarCodigoComponent implements OnInit, AfterViewInit, OnDestro
     const value = input.value;
 
     if (value.length === 1 && /^\d$/.test(value)) {
-      if (index < 5) { // Use 0-based index for array access
+      if (index < 5) {
         this.digitInputs.toArray()[index + 1].nativeElement.focus();
       }
     }

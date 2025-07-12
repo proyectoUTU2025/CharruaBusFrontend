@@ -4,7 +4,6 @@ import localeEs from '@angular/common/locales/es';
 import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
 
-// Registrar el locale español
 registerLocaleData(localeEs);
 
 bootstrapApplication(AppComponent, appConfig)

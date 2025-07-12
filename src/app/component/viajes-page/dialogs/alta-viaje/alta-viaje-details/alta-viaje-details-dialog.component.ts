@@ -87,7 +87,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.localidades = await firstValueFrom(this.localidadesService.getAllFlat());
-    // Establecer fecha mínima como hoy
     this.fechaMinima.setHours(0, 0, 0, 0);
     this.updateFechaMinimallegada();
     this.generarHorasDisponibles();
@@ -101,15 +100,12 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
     for (let hora = 0; hora < 24; hora++) {
       for (let minuto = 0; minuto < 60; minuto += 5) {
-        // Solo filtrar horarios si la fecha seleccionada es hoy
         if (esHoy && hora === ahora.getHours()) {
           const minutoActual = ahora.getMinutes();
-          // Solo incluimos horarios que sean al menos 5 minutos en el futuro
           if (minuto <= minutoActual + 5) {
             continue;
           }
         } else if (esHoy && hora < ahora.getHours()) {
-          // Si es hoy y la hora ya pasó, no la incluimos
           continue;
         }
         
@@ -127,15 +123,12 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
     for (let hora = 0; hora < 24; hora++) {
       for (let minuto = 0; minuto < 60; minuto += 5) {
-        // Solo filtrar horarios si la fecha seleccionada es hoy
         if (esHoy && hora === ahora.getHours()) {
           const minutoActual = ahora.getMinutes();
-          // Solo incluimos horarios que sean al menos 5 minutos en el futuro
           if (minuto <= minutoActual + 5) {
             continue;
           }
         } else if (esHoy && hora < ahora.getHours()) {
-          // Si es hoy y la hora ya pasó, no la incluimos
           continue;
         }
         
@@ -156,15 +149,13 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   onFechaSalidaChange() {
     this.updateFechaMinimallegada();
-    this.generarHorasDisponibles(); // Recalcular horas disponibles
+    this.generarHorasDisponibles(); 
 
-    // Si la fecha de llegada es anterior a la nueva fecha mínima, resetearla
     if (this.fechaLlegada && this.fechaSalida && this.compararSoloFechas(this.fechaLlegada, this.fechaSalida) < 0) {
       this.fechaLlegada = null;
       this.horaLlegada = '';
     }
 
-    // Resetear la hora de salida si ya no es válida
     if (this.horaSalida && !this.horasDisponibles.includes(this.horaSalida)) {
       this.horaSalida = '';
     }
@@ -173,13 +164,11 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   onFechaLlegadaChange() {
     this.generarHorasLlegadaDisponibles();
     
-    // Resetear la hora de llegada si ya no es válida
     if (this.horaLlegada && !this.horasLlegadaDisponibles.includes(this.horaLlegada)) {
       this.horaLlegada = '';
     }
   }
 
-  // Método para forzar la validación visual cuando hay errores críticos
   hasOrigenDestinoError(): boolean {
     return !!(this.origenId && this.destinoId && this.origenId === this.destinoId);
   }
@@ -197,7 +186,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
       return false;
     }
 
-    // Solo validamos horario si es el mismo día
     if (this.compararSoloFechas(this.fechaSalida, this.fechaLlegada) === 0) {
       const salidaCompleta = this.getCombinedDateTime(this.fechaSalida, this.horaSalida);
       const llegadaCompleta = this.getCombinedDateTime(this.fechaLlegada, this.horaLlegada);
@@ -248,7 +236,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   siguiente(): void {
     this.errorMensaje = '';
-    // Si pasamos de los detalles a las paradas, validamos la lista.
     if (this.step === 0) {
       this.validarParadasExistentes();
     }
@@ -262,8 +249,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     this.step--;
     this.errorMensaje = '';
 
-    // Si retrocedemos a un paso anterior a la selección de ómnibus (paso 2),
-    // limpiamos la selección del bus para obligar a elegir nuevamente.
     if (this.step < 2) {
       this.busSeleccionado = null;
       this.busSeleccionadoArray = [];
@@ -355,7 +340,7 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
     if (!this.origenId || !this.destinoId || !this.fechaSalida || !this.fechaLlegada || this.precio <= 0) return;
 
     this.isLoadingBuses = true;
-    this.buses = []; // Limpiamos la lista anterior para evitar mostrar datos viejos
+    this.buses = []; 
 
     const filtro: FiltroDisponibilidadOmnibusDto = {
       origenId: this.origenId,
@@ -377,7 +362,6 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
   }
 
   seleccionarBus(bus: OmnibusDisponibleDto): void {
-    // Si se hace clic sobre el mismo bus seleccionado, lo deseleccionamos
     if (this.busSeleccionado?.matricula === bus.matricula) {
       this.busSeleccionado = null;
       this.busSeleccionadoArray = [];
@@ -393,28 +377,23 @@ export class AltaViajeDetailsDialogComponent implements OnInit {
 
   deberiaDeshabilitarSiguiente(): boolean {
     if (this.step === 0) {
-      // Validaciones básicas
       if (!this.origenId || !this.destinoId || !this.fechaSalida || !this.horaSalida || 
           !this.fechaLlegada || !this.horaLlegada || this.precio <= 0) {
         return true;
       }
       
-      // Validación de origen diferente de destino
       if (this.origenId === this.destinoId) {
         return true;
       }
       
-      // Validación de fecha de salida no anterior a hoy
       if (!this.esFechaValidaSalida()) {
         return true;
       }
       
-      // Validación de fecha de llegada posterior o igual a fecha de salida
       if (!this.esFechaValidaLlegada()) {
         return true;
       }
       
-      // Validación de horario
       if (this.hasHorarioError()) {
         return true;
       }

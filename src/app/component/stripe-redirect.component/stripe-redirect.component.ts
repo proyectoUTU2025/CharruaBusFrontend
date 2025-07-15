@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CompraService } from '../../services/compra.service';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -30,7 +31,8 @@ export class StripeRedirectComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private compraService: CompraService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -87,7 +89,11 @@ export class StripeRedirectComponent implements OnInit {
         };
         this.router.navigate(['/compra', this.compraId], { queryParams });
       } else {
-        this.router.navigate(['/pasajes-history']); 
+        if (this.authService.rol === 'CLIENTE') {
+          this.router.navigate(['/compras']);
+        } else {
+          this.router.navigate(['/comprar']);
+        }
       }
     }, 1000);
   }

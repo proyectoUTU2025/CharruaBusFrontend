@@ -40,6 +40,7 @@
           *ngFor="let notificacion of notificaciones; trackBy: trackByNotificacion" 
           class="notification-item"
           [class.unread]="!notificacion.leido"
+          (click)="redirigirACompra(notificacion)"
         >
           <div class="notification-content">
             <div class="notification-header">

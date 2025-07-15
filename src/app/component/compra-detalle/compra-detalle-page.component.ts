@@ -81,6 +81,7 @@ export class CompraDetallePageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Escuchar cambios en query params (por ejemplo, banners)
     this.route.queryParamMap.subscribe(params => {
       const source = params.get('source');
       const status = params.get('status');
@@ -103,8 +104,19 @@ export class CompraDetallePageComponent implements OnInit {
     });
 
     this.isCliente = this.authService.rol === 'CLIENTE';
-    this.compraId = Number(this.route.snapshot.paramMap.get('id'));
-    this.cargarDetalleCompra();
+
+    // Escuchar también cambios en el parámetro :id para volver a cargar la compra
+    this.route.paramMap.subscribe(pm => {
+      const newId = Number(pm.get('id'));
+      if (!isNaN(newId) && newId !== this.compraId) {
+        this.compraId = newId;
+        this.cargarDetalleCompra();
+      } else if (this.compraId === undefined) {
+        // Primera carga
+        this.compraId = newId;
+        this.cargarDetalleCompra();
+      }
+    });
   }
 
   descargarPdf() {

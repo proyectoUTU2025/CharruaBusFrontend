@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -12,6 +13,7 @@ import { NotificacionService } from '../../../services/notificacion.service';
 import { AuthService } from '../../../services/auth.service';
 import { NotificacionUsuarioDto } from '../../../models/notificaciones';
 import { Page } from '../../../models/api';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notificaciones',
@@ -41,9 +43,12 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
   totalNotificaciones = 0;
   private subscriptions: Subscription[] = [];
 
+  @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
+
   constructor(
     private notificacionService: NotificacionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -157,6 +162,19 @@ export class NotificacionesComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error al marcar notificaciones como leídas:', error);
       }
+    });
+  }
+
+  redirigirACompra(notificacion: NotificacionUsuarioDto): void {
+    if (!notificacion || notificacion.id == null) return;
+
+    // Cerrar menú de notificaciones antes de navegar
+    if (this.menuTrigger) {
+      this.menuTrigger.closeMenu();
+    }
+
+    this.router.navigate(['/compra', notificacion.compraId], {
+      queryParamsHandling: 'preserve'
     });
   }
 

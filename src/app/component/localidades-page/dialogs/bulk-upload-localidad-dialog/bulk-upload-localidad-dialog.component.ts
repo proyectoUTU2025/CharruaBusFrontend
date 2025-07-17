@@ -69,13 +69,7 @@ export class BulkUploadLocalidadDialogComponent {
     this.localidadService.bulkUpload(this.file).subscribe({
       next: (resp: BulkResponseDto) => {
         this.loading = false;
-        const errors = resp.results.filter((r: BulkLineResult) => !r.creado);
-        if (errors.length > 0) {
-          this.dialogRef.close({ errors });
-        } else {
-          this.snackBar.open('Archivo procesado con éxito', 'OK', { duration: 3000 });
-          this.dialogRef.close({ success: true });
-        }
+        this.dialogRef.close({ results: resp.results });
       },
       error: (err) => {
         this.loading = false;

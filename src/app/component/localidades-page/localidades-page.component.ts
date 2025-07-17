@@ -151,11 +151,12 @@ export class LocalidadesPageComponent implements OnInit, AfterViewInit {
       disableClose: true
     })
       .afterClosed()
-      .subscribe(result => {
-        if (result?.errors) {
-          this.dialog.open(BulkErrorsDialogComponent, { data: { results: result.errors } });
-        } else if (result?.success) {
-          this.buscar();
+      .subscribe((result: { results: BulkLineResult[] } | undefined) => {
+        if (result && result.results) {
+          this.dialog.open(BulkErrorsDialogComponent, { data: { results: result.results } });
+          if (result.results.some(r => r.creado)) {
+            this.buscar();
+          }
         }
       });
   }

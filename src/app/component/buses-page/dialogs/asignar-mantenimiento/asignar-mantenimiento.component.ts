@@ -135,13 +135,28 @@ export class AsignarMantenimientoComponent implements OnInit, OnDestroy {
         this.subs.unsubscribe();
     }
 
-    updateHorasInicio(selectedDate: Date | null) {
+    // Helper para convertir distintos tipos de fecha (Date, string, Moment) a Date
+    private toDate(value: any): Date | null {
+        if (!value) return null;
+        if (value instanceof Date) return value;
+        // Soporta objetos Moment (tienen toDate())
+        if (typeof value.toDate === 'function') return value.toDate();
+        if (typeof value === 'string') {
+            const d = new Date(value);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+    }
+
+    updateHorasInicio(selectedDate: Date | string | any | null) {
         const now = new Date();
+        const dateObj = this.toDate(selectedDate);
+
         if (
-            selectedDate &&
-            selectedDate.getDate() === now.getDate() &&
-            selectedDate.getMonth() === now.getMonth() &&
-            selectedDate.getFullYear() === now.getFullYear()
+            dateObj &&
+            dateObj.getDate() === now.getDate() &&
+            dateObj.getMonth() === now.getMonth() &&
+            dateObj.getFullYear() === now.getFullYear()
         ) {
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
@@ -157,10 +172,13 @@ export class AsignarMantenimientoComponent implements OnInit, OnDestroy {
     updateHorasFin() {
         const { fechaInicio, horaInicio, fechaFin } = this.form.value;
 
+        const fechaInicioDate = this.toDate(fechaInicio);
+        const fechaFinDate = this.toDate(fechaFin);
+
         if (
-            fechaInicio &&
-            fechaFin &&
-            new Date(fechaInicio).getTime() === new Date(fechaFin).getTime() &&
+            fechaInicioDate &&
+            fechaFinDate &&
+            fechaInicioDate.getTime() === fechaFinDate.getTime() &&
             horaInicio
         ) {
             this.horasFin = this.horas.filter((h) => h > horaInicio);

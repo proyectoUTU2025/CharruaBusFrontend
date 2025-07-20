@@ -153,13 +153,27 @@ export class AltaViajeExpresoComponent implements OnInit, OnDestroy {
         this.subs.unsubscribe();
     }
 
-    updateHorasSalida(selectedDate: Date | null) {
+    // Helper para convertir Date, string o Moment a Date nativa
+    private toDate(value: any): Date | null {
+        if (!value) return null;
+        if (value instanceof Date) return value;
+        if (typeof value.toDate === 'function') return value.toDate();
+        if (typeof value === 'string') {
+            const d = new Date(value);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+    }
+
+    updateHorasSalida(selectedDate: Date | string | any | null) {
         const now = new Date();
+        const dateObj = this.toDate(selectedDate);
+
         if (
-            selectedDate &&
-            selectedDate.getDate() === now.getDate() &&
-            selectedDate.getMonth() === now.getMonth() &&
-            selectedDate.getFullYear() === now.getFullYear()
+            dateObj &&
+            dateObj.getDate() === now.getDate() &&
+            dateObj.getMonth() === now.getMonth() &&
+            dateObj.getFullYear() === now.getFullYear()
         ) {
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
@@ -175,10 +189,13 @@ export class AltaViajeExpresoComponent implements OnInit, OnDestroy {
     updateHorasLlegada() {
         const { fechaSalida, horaSalida, fechaLlegada } = this.form.value;
 
+        const fechaSalidaDate = this.toDate(fechaSalida);
+        const fechaLlegadaDate = this.toDate(fechaLlegada);
+
         if (
-            fechaSalida &&
-            fechaLlegada &&
-            new Date(fechaSalida).getTime() === new Date(fechaLlegada).getTime() &&
+            fechaSalidaDate &&
+            fechaLlegadaDate &&
+            fechaSalidaDate.getTime() === fechaLlegadaDate.getTime() &&
             horaSalida
         ) {
             this.horasLlegada = this.horas.filter((h) => h > horaSalida);

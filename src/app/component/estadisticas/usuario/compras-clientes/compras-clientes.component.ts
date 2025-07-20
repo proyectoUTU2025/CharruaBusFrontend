@@ -17,7 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { environment } from '../../../../../environments/environment';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-compras-clientes',
@@ -45,13 +45,21 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit, OnDestro
     private readonly BASE = `${environment.apiBaseUrl}`;
     private destroy$ = new Subject<void>();
     private sort!: MatSort;
-    private sortSub?: any;
+    private sortSub?: Subscription;
 
     @ViewChild(MatSort)
     set matSort(ms: MatSort) {
         if (ms) {
             // Si el MatSort cambia (puede ocurrir cuando *ngIf recrea la tabla), nos volvemos a suscribir
             this.sort = ms;
+            // Restaurar estado actual de ordenamiento visual después del ciclo de detección de cambios
+            setTimeout(() => {
+                if (this.sort) {
+                    this.sort.active = this.ordenarPor;
+                    this.sort.direction = this.ascendente ? 'asc' : 'desc';
+                }
+            });
+
             if (this.sortSub) {
                 this.sortSub.unsubscribe();
             }

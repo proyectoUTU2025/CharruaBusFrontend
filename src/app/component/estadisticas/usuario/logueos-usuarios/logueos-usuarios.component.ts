@@ -17,7 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { environment } from '../../../../../environments/environment';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-logueos-usuarios',
@@ -43,7 +43,29 @@ import { Subject, takeUntil } from 'rxjs';
 export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly BASE = `${environment.apiBaseUrl}`;
     private destroy$ = new Subject<void>();
-    @ViewChild(MatSort) sort!: MatSort;
+
+    private sort!: MatSort;
+    private sortSub?: Subscription;
+
+    @ViewChild(MatSort)
+    set matSort(ms: MatSort) {
+        if (ms) {
+            this.sort = ms;
+            // Restaurar estado actual de ordenamiento
+            this.sort.active = this.ordenarPor;
+            this.sort.direction = this.ascendente ? 'asc' : 'desc';
+
+            if (this.sortSub) {
+                this.sortSub.unsubscribe();
+            }
+            this.sortSub = this.sort.sortChange.subscribe((sort: Sort) => {
+                this.ordenarPor = sort.active || 'email';
+                this.ascendente = sort.direction === 'asc';
+                this.pageIndex = 0;
+                this.load();
+            });
+        }
+    }
 
     data: EstadisticaLogueos[] = [];
     total = 0;
@@ -81,14 +103,7 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
         this.load();
     }
 
-    ngAfterViewInit() {
-        this.sort.sortChange.subscribe((sort: Sort) => {
-            this.ordenarPor = sort.active || 'email';
-            this.ascendente = sort.direction === 'asc';
-            this.pageIndex = 0;
-            this.load();
-        });
-    }
+    ngAfterViewInit() { }
 
     setupDateFilters(): void {
       this.fechaInicio.valueChanges
@@ -110,6 +125,9 @@ export class LogueosUsuariosComponent implements OnInit, AfterViewInit, OnDestro
     ngOnDestroy() {
         this.fechaInicio.setValue(this.firstDayOfYear);
         this.fechaFin.setValue(new Date());
+        if (this.sortSub) {
+            this.sortSub.unsubscribe();
+        }
         this.destroy$.next();
         this.destroy$.complete();
     }

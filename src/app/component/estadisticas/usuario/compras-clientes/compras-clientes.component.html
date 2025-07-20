@@ -63,7 +63,7 @@
 
     <ng-container *ngIf="!loading">
       <div class="tabla-container" *ngIf="data.length > 0">
-        <table mat-table [dataSource]="data" class="mat-elevation-z1" matSort matSortDisableClear>
+        <table mat-table [dataSource]="data" class="mat-elevation-z1" matSort>
           <ng-container matColumnDef="email">
             <th mat-header-cell *matHeaderCellDef mat-sort-header="email">
               Email
@@ -94,7 +94,7 @@
           [pageSize]="pageSize"
           [pageIndex]="pageIndex"
           [pageSizeOptions]="[5, 10, 20]"
-          (page)="load($event)"
+          (page)="pageChanged($event)"
           showFirstLastButtons>
         </mat-paginator>
       </div>

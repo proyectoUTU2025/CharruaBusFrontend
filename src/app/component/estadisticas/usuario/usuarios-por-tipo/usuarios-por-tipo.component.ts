@@ -11,6 +11,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { Subscription } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -31,7 +32,28 @@ import { environment } from '../../../../../environments/environment';
 })
 export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
     private readonly BASE = `${environment.apiBaseUrl}`;
-    @ViewChild(MatSort) sort!: MatSort;
+    private sort!: MatSort;
+    private sortSub?: Subscription;
+
+    @ViewChild(MatSort)
+    set matSort(ms: MatSort) {
+        if (ms) {
+            this.sort = ms;
+            // Restaurar estado actual de ordenamiento
+            this.sort.active = this.ordenarPor;
+            this.sort.direction = this.ascendente ? 'asc' : 'desc';
+
+            if (this.sortSub) {
+                this.sortSub.unsubscribe();
+            }
+            this.sortSub = this.sort.sortChange.subscribe((sort: Sort) => {
+                this.ordenarPor = sort.active || 'tipo';
+                this.ascendente = sort.direction === 'asc';
+                this.pageIndex = 0;
+                this.load();
+            });
+        }
+    }
 
     data: EstadisticaUsuario[] = [];
     total = 0;
@@ -42,6 +64,8 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
 
     downloadingCsv = false;
     downloadingPdf = false;
+
+    loading = false;
 
     chartLabels: string[] = [];
     chartData: ChartDataset<'bar'>[] = [];
@@ -65,14 +89,7 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
         this.load();
     }
 
-    ngAfterViewInit() {
-        this.sort.sortChange.subscribe((sort: Sort) => {
-            this.ordenarPor = sort.active || 'tipo';
-            this.ascendente = sort.direction === 'asc';
-            this.pageIndex = 0;
-            this.load();
-        });
-    }
+    ngAfterViewInit() { }
 
     toggleAgrupado() {
         this.agrupado = !this.agrupado;
@@ -80,14 +97,23 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
     }
 
     load() {
+        this.loading = true;
         this.svc.getUsuariosPorTipo(this.pageIndex, this.pageSize, this.ordenarPor, this.ascendente)
             .subscribe({
                 next: (res: Page<EstadisticaUsuario>) => {
                     this.dataOriginal = res.content;
                     this.total = res.page.totalElements;
                     this.procesarDatos();
+                    this.loading = false;
                 },
-                error: err => console.error('Error cargando estadísticas:', err)
+                error: err => {
+                    console.error('Error cargando estadísticas:', err);
+                    this.dataOriginal = [];
+                    this.total = 0;
+                    this.chartLabels = [];
+                    this.chartData = [];
+                    this.loading = false;
+                }
             });
     }
 
@@ -130,6 +156,12 @@ export class UsuariosPorTipoComponent implements OnInit, AfterViewInit {
         this.pageIndex = e.pageIndex;
         this.pageSize = e.pageSize;
         this.load();
+    }
+
+    ngOnDestroy(): void {
+        if (this.sortSub) {
+            this.sortSub.unsubscribe();
+        }
     }
 
     exportCsv() {

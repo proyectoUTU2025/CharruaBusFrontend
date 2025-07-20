@@ -32,8 +32,14 @@
     </div>
   </div>
 
+  <!-- Spinner global -->
+  <div *ngIf="loading" class="spinner-overlay">
+    <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+  </div>
+
   <div class="content-card">
-    <div class="tabla-container">
+    <ng-container *ngIf="!loading">
+      <div class="tabla-container">
         <table mat-table [dataSource]="data" matSort matSortDisableClear>
             <ng-container matColumnDef="tipo">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="tipo">
@@ -62,6 +68,7 @@
             (page)="pageChanged($event)"
             showFirstLastButtons>
         </mat-paginator>
-    </div>
+      </div>
+    </ng-container>
   </div>
 </div>

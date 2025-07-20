@@ -44,7 +44,25 @@ import { Subject, takeUntil } from 'rxjs';
 export class ComprasClientesComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly BASE = `${environment.apiBaseUrl}`;
     private destroy$ = new Subject<void>();
-    @ViewChild(MatSort) sort!: MatSort;
+    private sort!: MatSort;
+    private sortSub?: any;
+
+    @ViewChild(MatSort)
+    set matSort(ms: MatSort) {
+        if (ms) {
+            // Si el MatSort cambia (puede ocurrir cuando *ngIf recrea la tabla), nos volvemos a suscribir
+            this.sort = ms;
+            if (this.sortSub) {
+                this.sortSub.unsubscribe();
+            }
+            this.sortSub = this.sort.sortChange.subscribe((sort: Sort) => {
+                this.ordenarPor = sort.active || 'totalGastado';
+                this.ascendente = sort.direction === 'asc';
+                this.pageIndex = 0;
+                this.load();
+            });
+        }
+    }
 
     data: EstadisticaClienteCompras[] = [];
     total = 0;
@@ -82,14 +100,7 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit, OnDestro
         this.load();
     }
 
-    ngAfterViewInit() {
-        this.sort.sortChange.subscribe((sort: Sort) => {
-            this.ordenarPor = sort.active || 'totalGastado';
-            this.ascendente = sort.direction === 'asc';
-            this.pageIndex = 0;
-            this.load();
-        });
-    }
+    ngAfterViewInit() { }
 
     setupDateFilters(): void {
       this.fechaInicio.valueChanges
@@ -111,17 +122,16 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit, OnDestro
     ngOnDestroy() {
         this.fechaInicio.setValue(this.firstDayOfYear);
         this.fechaFin.setValue(new Date());
+        if (this.sortSub) {
+            this.sortSub.unsubscribe();
+        }
         this.destroy$.next();
         this.destroy$.complete();
     }
 
-    load(event?: PageEvent) {
+    load() {
         this.loading = true;
-        if (event) {
-            this.pageIndex = event.pageIndex;
-            this.pageSize = event.pageSize;
-        }
-
+        
         this.svc.getComprasClientes(
             this.formatDate(this.fechaInicio.value) || undefined,
             this.formatDate(this.fechaFin.value) || undefined,
@@ -148,6 +158,12 @@ export class ComprasClientesComponent implements OnInit, AfterViewInit, OnDestro
                 this.loading = false;
             }
         });
+    }
+
+    pageChanged(event: PageEvent) {
+      this.pageIndex = event.pageIndex;
+      this.pageSize = event.pageSize;
+      this.load();
     }
 
     filtrar() {
